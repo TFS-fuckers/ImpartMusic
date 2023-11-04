@@ -1,0 +1,4 @@
+com\tfs\server\logger\Logger.class
+com\tfs\server\Main.class
+com\tfs\server\Server.class
+com\tfs\server\ClientHandler.class
