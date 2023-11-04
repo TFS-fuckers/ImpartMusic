@@ -2,6 +2,7 @@ package com.tfs.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -10,7 +11,6 @@ import com.tfs.server.logger.Logger;
 
 public class Server {
     private boolean running = true;
-
     public Server(int port){
         long prepareStart = System.currentTimeMillis();
         Thread.currentThread().setName("ServerThread");
@@ -22,9 +22,16 @@ public class Server {
             Logger.logInfo("Done! [%.2f seconds]", (System.currentTimeMillis() - prepareStart) * 1.0f / 1000);
             
             while(this.running){
-                Socket connection = server.accept();
-                Logger.logInfo("User %s is connected", connection.getInetAddress().toString());
-                pool.execute(new ClientHandler(connection));
+                try{
+                    Socket connection = server.accept();
+                    Logger.logInfo("User %s is connected", connection.getInetAddress().toString());
+                    pool.execute(new ClientHandler(connection));
+                } catch(SocketException socketException){
+                    Logger.logError(socketException.toString());
+                } catch(Exception e){
+                    Logger.logError(e.toString());
+                    this.kill();
+                }
             }
 
             server.close();

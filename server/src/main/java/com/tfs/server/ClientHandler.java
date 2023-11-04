@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -24,6 +25,7 @@ public class ClientHandler implements Runnable{
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+            writer.println("fuck you, buddy");
             while(clientSocket.isConnected()){
                 String receive = reader.readLine();
                 if(receive != null){
@@ -34,8 +36,10 @@ public class ClientHandler implements Runnable{
                 }
             }
             clientSocket.close();
-        } catch (Exception e) {
-            Logger.logError("Error occurred: %s", e.toString());
+        } catch (SocketException e) {
+            Logger.logInfo("User disconnected, cause: %s", e.getMessage());
+        } catch (Exception e){
+            Logger.logError(e.toString());
             e.printStackTrace();
         }
         Logger.logInfo("User %s disconnected from the server", clientSocket.getInetAddress().toString());
