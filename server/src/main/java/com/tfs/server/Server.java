@@ -69,4 +69,11 @@ public class Server {
     public static Server instance(){
         return INSTANCE;
     }
+
+    public void sentToAll(String message){
+        for(ClientHandler handler : connectedClients){
+            handler.sendMessage(message);
+        }
+        return;
+    }
 }

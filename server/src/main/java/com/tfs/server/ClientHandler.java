@@ -66,7 +66,7 @@ public class ClientHandler implements Runnable{
     private void sendMessageThread(){
         Thread.currentThread().setName(this.mainThreadName + " SEND");
         try {
-            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
+            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
             while(!this.clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
                 if(this.toSend.size() > 0){
                     writer.println(this.toSend.remove());
