@@ -1,9 +1,7 @@
-import java.util.Scanner;
-
-import com.tfs.client.ClientConnection;
+import com.tfs.client.Connection;
 
 public class ClientTest {
     public static void main(String[] args){
-        ClientConnection connection = new ClientConnection("43.138.28.230", 25585);
+        new Connection("localhost", 25585);
     }
 }
