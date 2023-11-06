@@ -8,9 +8,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.lang.Thread;
 
-import com.tfs.server.logger.Logger;
+import com.tfs.logger.Logger;
+
+import java.lang.Thread;
 
 public class ClientHandler implements Runnable{
     private final Socket clientSocket;
@@ -76,8 +77,11 @@ public class ClientHandler implements Runnable{
                 }
             }
             writer.close();
+        } catch (SocketException se){
+            Logger.logInfo(se.getMessage());
         } catch (Exception e) {
-            Logger.logError(e.toString());
+            Logger.logError(e.getMessage());
+        } finally {
             this.killConnection();
         }
     }
@@ -95,8 +99,11 @@ public class ClientHandler implements Runnable{
                 this.receive.add(receive);
             }
             reader.close();
+        } catch(SocketException se){
+            Logger.logInfo(se.getMessage());
         } catch (Exception e){
-            Logger.logError(e.toString());
+            Logger.logError(e.getMessage());
+        } finally {
             this.killConnection();
         }
     }

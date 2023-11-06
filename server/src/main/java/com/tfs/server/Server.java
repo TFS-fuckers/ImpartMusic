@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.tfs.server.logger.Logger;
+import com.tfs.logger.Logger;
 
 public class Server {
     private static Server INSTANCE = null;
