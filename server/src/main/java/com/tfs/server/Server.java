@@ -13,6 +13,7 @@ import com.tfs.server.logger.Logger;
 
 public class Server {
     private static Server INSTANCE = null;
+    public static int TICK_DELAY_MILLISECONDS = 50;
 
     private boolean running = true;
     private List<ClientHandler> connectedClients = new ArrayList<>();

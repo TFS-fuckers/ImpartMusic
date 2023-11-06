@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.lang.Thread;
 
 import com.tfs.server.logger.Logger;
 
@@ -42,6 +43,7 @@ public class ClientHandler implements Runnable{
             //ClientHandler本身run就是线程池分配的一个子线程，所以不需要单独新建一个mainThread
             while(!clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
                 try {
+                    Thread.sleep(Server.TICK_DELAY_MILLISECONDS);
                     // 主要处理逻辑
                 } catch (Exception e) {
                     Logger.logError(e.toString());
@@ -68,6 +70,7 @@ public class ClientHandler implements Runnable{
         try {
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
             while(!this.clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
+                Thread.sleep(Server.TICK_DELAY_MILLISECONDS);
                 if(this.toSend.size() > 0){
                     writer.println(this.toSend.remove());
                 }
@@ -84,6 +87,7 @@ public class ClientHandler implements Runnable{
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             while(!this.clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
+                Thread.sleep(Server.TICK_DELAY_MILLISECONDS);
                 String receive = reader.readLine();
                 if(receive == null){
                     break;
