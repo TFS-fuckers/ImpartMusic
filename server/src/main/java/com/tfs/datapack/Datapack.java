@@ -52,3 +52,16 @@ public class Datapack {
      */
     public static final Datapack HEARTBEAT = new Datapack("HEARTBEAT", null);
 }
+
+/*
+ * 数据包的标识信息应该表明数据包的类型，比如HEARTBEAT就是服务器与客户端之间进行验证的“心跳”
+ * 如果要直接传输字符串，可以构造
+ * ```java
+ * Datapack pack = new Datapack("String", "<要传输的字符串>");
+ * ``` 
+ * 并且在接收端获取，根据identifier进行解析。
+ * 如果要进行对象的传输，可以把identifier设置为对象的类名，在接收端对pack的content进行从json
+ * 的反序列化，对象格式由identifier决定。
+ * 
+ * 重点是约定发送端和接收端的统一协议，这样才能进行数据的有效传输。
+ */
