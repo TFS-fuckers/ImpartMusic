@@ -1,4 +1,4 @@
-package com.tfs.server.logger;
+package com.tfs.logger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -87,6 +87,8 @@ public class Connection {
         Thread sendMessageThread = new Thread(() -> sendMessageThread());
         receiveMessageThread.setDaemon(true);
         sendMessageThread.setDaemon(true);
+        receiveMessageThread.start();
+        sendMessageThread.start();
         while(!this.socket.isClosed() && !(Thread.currentThread().isInterrupted())){
             try {
                 //主要处理逻辑
@@ -115,6 +117,7 @@ public class Connection {
                 if(receive == null){
                     break;
                 }
+                Logger.logInfo("Received message: %s", receive);
                 this.received.add(receive);
                 //将收取到的内容（json格式）加入到收取队列。
             }
