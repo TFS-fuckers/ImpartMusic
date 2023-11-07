@@ -8,7 +8,10 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.tfs.datapack.Datapack;
 import com.tfs.logger.Logger;
+
+import javafx.scene.chart.PieChart.Data;
 
 import java.lang.Thread;
 
@@ -44,10 +47,34 @@ public class ClientHandler implements Runnable{
 
     public void onTick(){
         try {
+            this.heartbeat();
             this.sendMessage();
             this.receiveMessage();
         } catch (IOException ioException) {
             Logger.logError(ioException.getMessage());
+            this.killConnection();
+        }
+    }
+
+    private int heartbeatCounter = 0;
+    private int heartbeatNoResponse = -1;
+    public static final int HEARTBEAT_INTERVAL = 20;
+    public static final int HEARTBEAT_MAX_TRIES = 5;
+
+    private void heartbeat(){
+        if(this.receive.size() > 0){
+            this.heartbeatCounter = 0;
+            this.heartbeatNoResponse = -1;
+            return;
+        }
+
+        heartbeatCounter++;
+        if(heartbeatCounter >= HEARTBEAT_INTERVAL){
+            heartbeatCounter = 0;
+            this.sendMessage(Datapack.HEARTBEAT);
+        }
+        heartbeatNoResponse++;
+        if(heartbeatNoResponse == HEARTBEAT_MAX_TRIES){
             this.killConnection();
         }
     }
@@ -85,6 +112,10 @@ public class ClientHandler implements Runnable{
             return;
         }
         this.toSend.add(message);
+    }
+
+    public void sendMessage(Datapack datapack){
+        this.sendMessage(datapack.toJson());
     }
 
     public String popReceive(){
