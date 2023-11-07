@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.tfs.server.logger.Logger;
+import com.tfs.logger.Logger;
+
+import java.lang.Thread;
 
 public class ClientHandler implements Runnable{
     private final Socket clientSocket;
@@ -19,81 +20,47 @@ public class ClientHandler implements Runnable{
     private final Queue<String> toSend = new LinkedList<>();
     private final Queue<String> receive = new LinkedList<>();
 
+    private PrintWriter writer;
+    private BufferedReader reader;
+
     public ClientHandler(Socket clientSocket){
         this.clientSocket = clientSocket;
     }
 
-    public final Queue<String> messageQueue = new LinkedList<>();
 
     @Override
     public void run(){
-        Server.instance().getConnectedClients().add(this);
         this.mainThreadName = String.format("ClientHandler IP %s", clientSocket.getInetAddress().toString());
         Thread.currentThread().setName(this.mainThreadName);
-    
-        Thread sendMessageThread = new Thread(() -> sendMessageThread());
-        Thread receiveMessageThread = new Thread(() -> receiveMessageThread());
-        sendMessageThread.setDaemon(true);
-        receiveMessageThread.setDaemon(true);
-        sendMessageThread.start();
-        receiveMessageThread.start();
-    
+        Server.instance().connectedClients.add(this);
         try {
-            //ClientHandler本身run就是线程池分配的一个子线程，所以不需要单独新建一个mainThread
-            while(!clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
-                try {
-                    // 主要处理逻辑
-                } catch (Exception e) {
-                    Logger.logError(e.toString());
-                }
-            }
-            Thread.currentThread().interrupt();
-            sendMessageThread.interrupt();
-            receiveMessageThread.interrupt();
-            clientSocket.close();
-        } catch (SocketException e) {
-            Logger.logInfo("User disconnected, cause: %s", e.getMessage());
-        } catch (Exception e){
-            Logger.logError(e.toString());
-            e.printStackTrace();
-        }
-        
-        this.connected = false;
-        Logger.logInfo("User %s disconnected from the server", clientSocket.getInetAddress().toString());
-        Server.instance().getConnectedClients().remove(this);
-    }
-
-    private void sendMessageThread(){
-        Thread.currentThread().setName(this.mainThreadName + " SEND");
-        try {
-            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
-            while(!this.clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
-                if(this.toSend.size() > 0){
-                    writer.println(this.toSend.remove());
-                }
-            }
-            writer.close();
+            this.writer = new PrintWriter(clientSocket.getOutputStream(), true);
+            this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         } catch (Exception e) {
-            Logger.logError(e.toString());
+            Logger.logError(e.getMessage());
             this.killConnection();
         }
     }
 
-    private void receiveMessageThread(){
-        Thread.currentThread().setName(this.mainThreadName + " RECEIVE");
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            while(!this.clientSocket.isClosed() && !Thread.currentThread().isInterrupted()){
-                String receive = reader.readLine();
-                if(receive == null){
-                    break;
-                }
-                this.receive.add(receive);
-            }
-            reader.close();
-        } catch (Exception e){
-            Logger.logError(e.toString());
+    public void onTick(){
+        try {
+            this.sendMessage();
+            this.receiveMessage();
+        } catch (IOException ioException) {
+            Logger.logError(ioException.getMessage());
             this.killConnection();
+        }
+    }
+
+    private void sendMessage(){
+        if(this.toSend.size() != 0){
+            this.writer.println(toSend.remove());
+        }
+    }
+
+    private void receiveMessage() throws IOException{
+        if(this.reader.ready()){
+            this.receive.add(this.reader.readLine());
         }
     }
 
@@ -105,6 +72,7 @@ public class ClientHandler implements Runnable{
         try {
             this.clientSocket.close();
             this.connected = false;
+            Server.instance().connectedClients.remove(this);
         } catch (IOException err) {
             Logger.logError("Error while closing socket");
             Logger.logError(err.getMessage());

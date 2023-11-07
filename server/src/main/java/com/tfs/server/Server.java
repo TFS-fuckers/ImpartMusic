@@ -5,17 +5,20 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.tfs.server.logger.Logger;
+import com.tfs.logger.Logger;
 
 public class Server {
     private static Server INSTANCE = null;
+    public static int TICK_DELAY_MILLISECONDS = 50;
 
     private boolean running = true;
-    private List<ClientHandler> connectedClients = new ArrayList<>();
+    public final List<ClientHandler> connectedClients = new ArrayList<>();
 
     public Server(int port){
         if(INSTANCE != null){
@@ -27,6 +30,17 @@ public class Server {
         Thread.currentThread().setName("ServerThread");
         ThreadPoolExecutor pool = new ThreadPoolExecutor(20, 50, 3L, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
         Logger.logInfo("Server Starting...");
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                for(ClientHandler handler : connectedClients){
+                    handler.onTick();
+                }
+            }
+        }, 0, 50);
+        
+        Logger.logInfo("Server tick started");
         try {
             ServerSocket server = new ServerSocket(port);
             Logger.logInfo("Server is starting on port " + port);
@@ -62,11 +76,14 @@ public class Server {
         this.running = false;
     }
 
-    public List<ClientHandler> getConnectedClients() {
-        return connectedClients;
-    }
-
     public static Server instance(){
         return INSTANCE;
+    }
+
+    public void sentToAll(String message){
+        for(ClientHandler handler : connectedClients){
+            handler.sendMessage(message);
+        }
+        return;
     }
 }
