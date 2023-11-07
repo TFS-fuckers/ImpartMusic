@@ -13,13 +13,21 @@ import java.util.concurrent.TimeUnit;
 
 import com.tfs.logger.Logger;
 
+/**Impart Music 服务器 */
 public class Server {
+    /**服务器的唯一实例 */
     private static Server INSTANCE = null;
+    /**服务器每两个tick（逻辑运行）的间隔时间 */
     public static int TICK_DELAY_MILLISECONDS = 50;
-
+    /**服务器是否在运行 */
     private boolean running = true;
+    /**服务器已经连接的所有客户端 */
     public final List<ClientHandler> connectedClients = new ArrayList<>();
 
+    /**
+     * 服务器实例构造，也是启动服务器的入口
+     * @param port 服务器监听的端口
+     */
     public Server(int port){
         if(INSTANCE != null){
             Logger.logError("You can't run two or more servers in one process");
@@ -68,18 +76,33 @@ public class Server {
         INSTANCE = null;
     }
 
+    /**
+     * 获取服务器是否正在运行
+     * @return 获取服务器是否正在运行，如果是，返回${true}$
+     */
     public boolean isRunning() {
         return this.running;
     }
 
+    /**
+     * 中断服务器的运行
+     */
     public void kill(){
         this.running = false;
     }
 
+    /**
+     * 获取服务器的实例
+     * @return 服务器实例
+     */
     public static Server instance(){
         return INSTANCE;
     }
 
+    /**
+     * 向与服务器连接的所有客户端发送信息，内容应遵守Datapack的Json规范
+     * @param message 待发送的信息
+     */
     public void sentToAll(String message){
         for(ClientHandler handler : connectedClients){
             handler.sendMessage(message);
