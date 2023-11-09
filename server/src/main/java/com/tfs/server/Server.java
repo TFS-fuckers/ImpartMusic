@@ -4,7 +4,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -25,7 +27,8 @@ public class Server {
     private boolean running = true;
     /**服务器已经连接的所有客户端 */
     public final List<ClientHandler> connectedClients = new ArrayList<>();
-    
+    /**服务器从所有客户端收到的所有数据包 */
+    public final Queue<Datapack> receivedDatapacks = new LinkedList<>();
     /**
      * 服务器实例构造，也是启动服务器的入口。注意，这是一个阻塞方法，所以应该考虑是否放入一个独立的线程。
      * @param port 服务器监听的端口

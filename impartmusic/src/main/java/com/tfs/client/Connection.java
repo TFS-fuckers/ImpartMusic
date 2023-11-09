@@ -17,13 +17,14 @@ import com.tfs.logger.Logger;
 /**与服务器之间的连接实例 */
 public class Connection {
     /**发送内容队列 */
-    private final Queue<String> toSend = new LinkedList<>();
+    private final Queue<Datapack> toSend = new LinkedList<>();
     /**接受内容队列 */
-    private final Queue<String> received = new LinkedList<>();
+    private final Queue<Datapack> received = new LinkedList<>();
     /**与服务器的socket通信实例 */
     private Socket socket;
     /**指定的服务器ip */
     private InetSocketAddress address = null;
+    /**处理与服务器连接的监听主线程 */
     private Thread mainThread = null;
     /**请勿更改 服务器是否响应的触发器 */
     private boolean receiveTrigger = false;
@@ -34,7 +35,7 @@ public class Connection {
     /**与服务器通信的验证间隔时间 */
     public static final int HEART_BEAT_INTERVAL_MILLISECONDS = 1000;
     /**服务器无响应的最大容忍次数 */
-    public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
+    public static final int NO_RESPONSE_TIMEOUT_TRIES = 100000;
 
     /**
      * 创建一个与服务器的连接实例
@@ -82,7 +83,7 @@ public class Connection {
         if(message == null){
             Logger.logError("Can't send null message");
         }
-        this.toSend.add(message);
+        this.toSend.add(Datapack.toDatapack(message));
         //发送内容就是将待发送内容排队
     }
 
@@ -90,7 +91,7 @@ public class Connection {
      * 从接受内容流中获取队列首部内容
      * @return 获取的内容，应为Datapack的Json信息
      */
-    public String popReceive(){
+    public Datapack popReceive(){
         if(this.received.size() == 0){
             return null;
         }
@@ -158,10 +159,10 @@ public class Connection {
      */
     private void receiveMessage() throws IOException{
         if(this.reader.ready()){
-            String receive = this.reader.readLine();
+            Datapack receive = Datapack.toDatapack(this.reader.readLine());
             Logger.logInfo("message from server: %s", receive);
             this.receiveTrigger = true;
-            if(Datapack.toDatapack(receive).identifier.equals(Datapack.HEARTBEAT.identifier)){
+            if(receive.identifier.equals(Datapack.HEARTBEAT.identifier)){
                 this.sendMessage(Datapack.HEARTBEAT);
                 Logger.logInfo("responding server's heartbeat");
                 return;
@@ -175,7 +176,7 @@ public class Connection {
      */
     private void sendMessage(){
         if(this.toSend.size() > 0){
-            this.writer.println(this.toSend.remove());
+            this.writer.println(this.toSend.remove().toJson());
             Logger.logInfo("sent message to server");
         }
     }
@@ -185,7 +186,7 @@ public class Connection {
      * @param datapack 待发送的数据包
      */
     public void sendMessage(Datapack datapack){
-        this.sendMessage(datapack.toJson());
+        this.toSend.add(datapack);
     }
 
     /**
