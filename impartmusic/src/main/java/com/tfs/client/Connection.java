@@ -157,7 +157,7 @@ public class Connection {
      * 内部方法，代表一个refresh内客户端接受信息的逻辑
      * @throws IOException 可能出现的reader错误
      */
-    private void receiveMessage() throws IOException{
+    private void receiveMessageTick() throws IOException{
         if(this.reader.ready()){
             Datapack receive = Datapack.toDatapack(this.reader.readLine());
             Logger.logInfo("message from server: %s", receive);
@@ -174,7 +174,7 @@ public class Connection {
     /**
      * 内部方法，代表一次refresh内客户端的发送信息的逻辑
      */
-    private void sendMessage(){
+    private void sendMessageTick(){
         if(this.toSend.size() > 0){
             this.writer.println(this.toSend.remove().toJson());
             Logger.logInfo("sent message to server");
@@ -202,8 +202,8 @@ public class Connection {
      */
     private void onRefresh(){
         try {
-            this.receiveMessage();
-            this.sendMessage();
+            this.receiveMessageTick();
+            this.sendMessageTick();
         } catch (Exception e) {
             Logger.logError("Connection error :%s", e.getMessage());
             this.killConnection();
