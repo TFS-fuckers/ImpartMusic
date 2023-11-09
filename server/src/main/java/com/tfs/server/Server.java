@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.tfs.datapack.Datapack;
 import com.tfs.logger.Logger;
 
 /**Impart Music 服务器 */
@@ -18,14 +19,15 @@ public class Server {
     /**服务器的唯一实例 */
     private static Server INSTANCE = null;
     /**服务器每两个tick（逻辑运行）的间隔时间 */
-    public static int TICK_DELAY_MILLISECONDS = 50;
+    public static int tickIntervalMilliseconds = 50;
+    private ServerSocket server;
     /**服务器是否在运行 */
     private boolean running = true;
     /**服务器已经连接的所有客户端 */
     public final List<ClientHandler> connectedClients = new ArrayList<>();
-
+    
     /**
-     * 服务器实例构造，也是启动服务器的入口
+     * 服务器实例构造，也是启动服务器的入口。注意，这是一个阻塞方法，所以应该考虑是否放入一个独立的线程。
      * @param port 服务器监听的端口
      */
     public Server(int port){
@@ -50,7 +52,7 @@ public class Server {
         
         Logger.logInfo("Server tick started");
         try {
-            ServerSocket server = new ServerSocket(port);
+            this.server = new ServerSocket(port);
             Logger.logInfo("Server is starting on port " + port);
             Logger.logInfo("Done! [%.2f seconds]", (System.currentTimeMillis() - prepareStart) * 1.0f / 1000);
             
@@ -60,7 +62,7 @@ public class Server {
                     Logger.logInfo("User %s is connected", connection.getInetAddress().toString());
                     pool.execute(new ClientHandler(connection));
                 } catch(SocketException socketException){
-                    Logger.logError(socketException.toString());
+                    Logger.logInfo(socketException.toString());
                 } catch(Exception e){
                     Logger.logError(e.toString());
                     this.kill();
@@ -88,7 +90,12 @@ public class Server {
      * 中断服务器的运行
      */
     public void kill(){
-        this.running = false;
+        try {
+            this.server.close();
+            this.running = false;
+        } catch (Exception e) {
+            Logger.logError("Exception while shutting down:%s", e.getMessage());
+        }
     }
 
     /**
@@ -109,4 +116,16 @@ public class Server {
         }
         return;
     }
+
+    /**
+     * 向与服务器连接的所有客户端发送数据包
+     * @param datapack 待发送的数据包
+     */
+    public void sendToAll(Datapack datapack){
+        for(ClientHandler handler : connectedClients){
+            handler.sendMessage(datapack);
+        }
+        return;
+    }
+
 }
