@@ -15,7 +15,7 @@ String num; //√
 String number; //√
 
 User admin;//√
-User administrator;//√
+User administrator;
 ```
 
 - 禁止**单一字母**，**字母加数字变量**（除短声明周期变量，遍历序号（某些情况下也不能使用字母））
