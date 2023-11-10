@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable{
     /**
      * 客户端没有回应的最大次数容忍限度
      */
-    public static final int NO_RESPONSE_TIMEOUT_TRIES = 100000;
+    public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
 
     /**
      * 初始化方法
@@ -131,12 +131,12 @@ public class ClientHandler implements Runnable{
         //如果不用ready()，readLine()将会阻塞线程，用ready()来确保缓冲区有数据可读
         if(this.reader.ready()){
             Datapack received = Datapack.toDatapack(this.reader.readLine());
-            Logger.logInfo("received message from client: %s", received);
             this.receiveTrigger = true;
             //如果是HeartBeat验证消息，不用加入数据包集合，因为这只是个辅助消息，对其他功能没有用处
             if(received.identifier.equals(Datapack.HEARTBEAT.identifier)){
                 return;
             }
+            Logger.logInfo("received message from client: %s", received);
             this.receive.add(received);
         }
     }

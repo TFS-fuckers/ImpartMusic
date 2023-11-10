@@ -35,7 +35,7 @@ public class Connection {
     /**与服务器通信的验证间隔时间 */
     public static final int HEART_BEAT_INTERVAL_MILLISECONDS = 1000;
     /**服务器无响应的最大容忍次数 */
-    public static final int NO_RESPONSE_TIMEOUT_TRIES = 100000;
+    public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
 
     /**
      * 创建一个与服务器的连接实例
@@ -160,13 +160,13 @@ public class Connection {
     private void receiveMessageTick() throws IOException{
         if(this.reader.ready()){
             Datapack receive = Datapack.toDatapack(this.reader.readLine());
-            Logger.logInfo("message from server: %s", receive);
             this.receiveTrigger = true;
             if(receive.identifier.equals(Datapack.HEARTBEAT.identifier)){
                 this.sendMessage(Datapack.HEARTBEAT);
-                Logger.logInfo("responding server's heartbeat");
+                // Logger.logInfo("responding server's heartbeat");
                 return;
             }
+            Logger.logInfo("message from server: %s", receive);
             this.received.add(receive);
         }
     }
@@ -177,7 +177,6 @@ public class Connection {
     private void sendMessageTick(){
         if(this.toSend.size() > 0){
             this.writer.println(this.toSend.remove().toJson());
-            Logger.logInfo("sent message to server");
         }
     }
 

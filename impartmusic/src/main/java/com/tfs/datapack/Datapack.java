@@ -58,6 +58,16 @@ public class Datapack {
     }
 
     /**
+     * 把该数据包持有的内容反序列化为某对象
+     * @param <T> 对象类型
+     * @param targetClass 对象的类
+     * @return 反序列化后的对象实例
+     */
+    public <T> T DeserializeContent(Class<T> targetClass){
+        return GSON.fromJson(this.content, targetClass);
+    }
+
+    /**
      * 用于验证服务器和客户端之间通信的特殊数据包HEARTBEAT
      */
     public static final Datapack HEARTBEAT = new Datapack("HEARTBEAT", null);
