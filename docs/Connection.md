@@ -329,10 +329,11 @@ public class ClientTest {
 - 摘要：根据标识信息和对象生成一个数据包
 - 使用：`new Datapack("...", object)`
 
-##### `deserializeContent(Class<T> targetClass)`
+##### `T deserializeContent(Class<T> targetClass)`
 - 摘要：根据传入的目标类，把本数据包持有的`content`序列化为某类的示例
 - 警告：一定注意`content`和目标类的匹配。
-- 使用：`datapack.DeserializeContent(TargetClass.class)`
+- 返回：传入的目标类的实例
+- 使用：`datapack.eserializeContent(TargetClass.class)`
 
 
 #### Logger类
