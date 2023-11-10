@@ -63,7 +63,7 @@ public class Datapack {
      * @param targetClass 对象的类
      * @return 反序列化后的对象实例
      */
-    public <T> T DeserializeContent(Class<T> targetClass){
+    public <T> T deserializeContent(Class<T> targetClass){
         return GSON.fromJson(this.content, targetClass);
     }
 
