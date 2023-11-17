@@ -12,6 +12,9 @@ public class ServerTest {
             if(in.equals("ok")){
                 break;
             }
+            if(in.equals("stop")) {
+                Server.instance().kill();
+            }
             Server.instance().sendToAll(new Datapack("SimpleString", in));
         }
         sc.close();

@@ -1,8 +1,8 @@
 package com.tfs.server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,14 +64,13 @@ public class Server {
                     Socket connection = server.accept();
                     Logger.logInfo("User %s is connected", connection.getInetAddress().toString());
                     pool.execute(new ClientHandler(connection));
-                } catch(SocketException socketException){
-                    Logger.logInfo(socketException.toString());
+                } catch(IOException e){
+                    Logger.logInfo("Server is being closed");
                 } catch(Exception e){
                     Logger.logError(e.toString());
                     this.kill();
                 }
             }
-            server.close();
         } catch (Exception e) {
             Logger.logError("Error occured message: %s", e.toString());
             e.printStackTrace();
