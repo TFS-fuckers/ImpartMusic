@@ -10,7 +10,7 @@ import java.util.Queue;
 
 import com.tfs.datapack.AccessInstruction;
 import com.tfs.datapack.Datapack;
-import com.tfs.datapack.KillConnectionCommand;
+import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
@@ -85,14 +85,20 @@ public class ClientHandler implements Runnable{
                     User confiltUser = Server.instance().nameToUser.get(user.getName());
                     if(confiltUser != null){
                         confiltUser.getHandler().askForKillConnection(
-                            new KillConnectionCommand("A user with the same name logged in")
+                            new ControlConnect("A user with the same name logged in")
                         );
                     }
                     // 如果已经有相同名称的用户，将其踢出（异地登录）
-                    Server.instance().receivedDatapacks.add(vertificationPack);
+                    synchronized(Server.instance().receivedDatapacks){
+                        Server.instance().receivedDatapacks.add(vertificationPack);
+                    }
                     this.writer.println(new Datapack("AccessInstruction", new AccessInstruction("Granted", "")).toJson());
-                    Server.instance().nameToUser.put(this.user.getName(), this.user);
-                    Server.instance().connectedUsers.add(this.user);
+                    synchronized(Server.instance().nameToUser){
+                        Server.instance().nameToUser.put(this.user.getName(), this.user);
+                    }
+                    synchronized(Server.instance().connectedUsers){
+                        Server.instance().connectedUsers.add(this.user);
+                    }
                     vertified = true;
                     break;
                 }
@@ -162,7 +168,9 @@ public class ClientHandler implements Runnable{
     private void sendMessageTick(){
         //如果队列中有待发送的消息，就发送一个
         if(this.toSend.size() != 0){
-            this.writer.println(toSend.remove().toJson());
+            synchronized(this.toSend){
+                this.writer.println(toSend.remove().toJson());
+            }
         }
     }
 
@@ -181,7 +189,9 @@ public class ClientHandler implements Runnable{
                 return;
             }
             Logger.logInfo("received message from client: %s", received);
-            this.receive.add(received);
+            synchronized(this.receive){
+                this.receive.add(received);
+            }
         }
     }
 
@@ -200,8 +210,12 @@ public class ClientHandler implements Runnable{
         try {
             //断开连接
             this.clientSocket.close();
-            Server.instance().connectedUsers.remove(this.user);
-            Server.instance().nameToUser.remove(this.user.getName());
+            synchronized(Server.instance().connectedUsers) {
+                Server.instance().connectedUsers.remove(this.user);
+            }
+            synchronized(Server.instance().nameToUser) {
+                Server.instance().nameToUser.remove(this.user.getName());
+            }
             this.user.setConnected(false);
             Logger.logInfo("%s disconnected from the server", this.user.getName());
         } catch (IOException err) {
@@ -214,8 +228,8 @@ public class ClientHandler implements Runnable{
      * 命令用户断开连接(相对于强行中断的killConnection，向客户端说明了原因)
      * @param killConnectionDatapack 断开连接的最后原因
      */
-    public void askForKillConnection(KillConnectionCommand killConnectionCommand){
-        this.sendImmediateMessage(new Datapack("kick", killConnectionCommand));
+    public void askForKillConnection(ControlConnect killConnectionCommand){
+        this.sendImmediateMessage(new Datapack("ControlConnect", killConnectionCommand));
         Logger.logInfo("kicked user %s from server, cause: %s", user.getName(), killConnectionCommand.getCause());
         this.killConnection();
     }
@@ -232,7 +246,9 @@ public class ClientHandler implements Runnable{
             Logger.logError("Can't send null message");
             return;
         }
-        this.toSend.add(Datapack.toDatapack(message));
+        synchronized(this.toSend){
+            this.toSend.add(Datapack.toDatapack(message));
+        }
     }
 
     /**
@@ -241,7 +257,9 @@ public class ClientHandler implements Runnable{
      * @param datapack 待发送的数据包
      */
     public void sendMessage(Datapack datapack){
-        this.toSend.add(datapack);
+        synchronized(this.toSend){
+            this.toSend.add(datapack);
+        }
     }
 
     /**
@@ -249,7 +267,9 @@ public class ClientHandler implements Runnable{
      */
     private void popReceiveTick(){
         if(this.receive.size() > 0){
-            Server.instance().receivedDatapacks.add(receive.remove());
+            synchronized(Server.instance().receivedDatapacks){
+                Server.instance().receivedDatapacks.add(receive.remove());
+            }
         }
     }
 
@@ -258,7 +278,9 @@ public class ClientHandler implements Runnable{
      * @param datapack 发送的数据包
      */
     public void sendImmediateMessage(Datapack datapack) {
-        this.writer.println(datapack.toJson());
-        this.writer.flush();
+        synchronized(this.writer){
+            this.writer.println(datapack.toJson());
+            this.writer.flush();
+        }
     }
 }

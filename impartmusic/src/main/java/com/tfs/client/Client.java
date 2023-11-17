@@ -26,11 +26,7 @@ public class Client {
                 PackageResolver.resolveDatapack(datapack);
             }
             //break条件待定
-            if(true){
-                break;
-            }
         }
-        INSTANCE = null;
     }
 
     public static Client INSTANCE(){
@@ -58,7 +54,7 @@ public class Client {
     }
 
     protected void controlConnect(ControlConnect controlconnect){
-        Logger.logInfo("You are kicked out the sever!");
+        Logger.logInfo("You are kicked out the sever! Cause: %s", controlconnect.getCause());
         connection.killConnection();
     }
 

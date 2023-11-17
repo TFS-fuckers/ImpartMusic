@@ -1,7 +1,12 @@
 package com.tfs.datapack;
-/**
- * 服务器强制客户登出
- */
+
 public class ControlConnect {
-    
+    private String cause;
+    public String getCause() {
+        return cause;
+    }
+
+    public ControlConnect (String cause) {
+        this.cause = cause;
+    }
 }

@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.tfs.datapack.Datapack;
-import com.tfs.datapack.KillConnectionCommand;
+import com.tfs.datapack.ControlConnect;
 import com.tfs.exceptions.AccessToOfflineUserException;
 import com.tfs.logger.Logger;
 
@@ -211,7 +211,7 @@ public class Server {
             return;
         }
         try {
-            user.getHandler().askForKillConnection(new KillConnectionCommand("kicked"));
+            user.getHandler().askForKillConnection(new ControlConnect("kicked"));
         } catch (AccessToOfflineUserException e) {
             e.printStackTrace();
         }
@@ -229,7 +229,7 @@ public class Server {
             return;
         }
         try {
-            user.getHandler().askForKillConnection(new KillConnectionCommand(cause));
+            user.getHandler().askForKillConnection(new ControlConnect(cause));
         } catch (AccessToOfflineUserException e) {
             e.printStackTrace();
         }

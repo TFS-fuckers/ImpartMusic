@@ -143,7 +143,7 @@ public class Connection {
         for(int i = 0; i < VERTIFICATION_MAX_TRIES; i++) {
             try {
                 if(this.reader.ready()) {
-                        String rawJson = this.reader.readLine();
+                    String rawJson = this.reader.readLine();
                     Datapack feedback = new Datapack(rawJson);
                     AccessInstruction accessInstruction = feedback.deserializeContent(AccessInstruction.class);
                     if(accessInstruction.getResult().equals("Granted")) {
@@ -242,6 +242,7 @@ public class Connection {
         try {
             this.receiveMessageTick();
             this.sendMessageTick();
+            
         } catch (Exception e) {
             Logger.logError("Connection error :%s", e.getMessage());
             this.killConnection();
