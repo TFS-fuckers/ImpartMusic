@@ -20,9 +20,9 @@ public class ClientHandler implements Runnable{
     private final Socket clientSocket;
     private String mainThreadName;
     /**发送字符串队列 */
-    private final Queue<String> toSend = new LinkedList<>();
+    private final Queue<Datapack> toSend = new LinkedList<>();
     /**接受字符串队列 */
-    private final Queue<String> receive = new LinkedList<>();
+    private final Queue<Datapack> receive = new LinkedList<>();
 
     /** 请勿更改 收取信息的触发器，用于检测是否有信息流入*/
     private boolean receiveTrigger = false;
@@ -52,6 +52,7 @@ public class ClientHandler implements Runnable{
      * 初始化方法
      * 
      * 将本实例放入Server实例的连接实例表中，加入服务器tick统一监听
+     * 注意，此方法虽然是public，但是不要在外部进行直接调用
      */
     @Override
     public void run(){
@@ -100,8 +101,9 @@ public class ClientHandler implements Runnable{
     public void onTick(){
         try {
             //服务器tick一次的逻辑
-            this.sendMessage();
-            this.receiveMessage();
+            this.sendMessageTick();
+            this.receiveMessageTick();
+            this.popReceiveTick();
         } catch (IOException ioException) {
             //如果出现IOException，应为连接已经被断开，所以直接断开本地的连接
             Logger.logError(ioException.getMessage());
@@ -113,10 +115,10 @@ public class ClientHandler implements Runnable{
      * 内部方法
      * 代表服务器在一个tick内的发送信息逻辑
      */
-    private void sendMessage(){
+    private void sendMessageTick(){
         //如果队列中有待发送的消息，就发送一个
         if(this.toSend.size() != 0){
-            this.writer.println(toSend.remove());
+            this.writer.println(toSend.remove().toJson());
         }
     }
 
@@ -125,16 +127,16 @@ public class ClientHandler implements Runnable{
      * 代表服务器在一个tick内的接受信息逻辑
      * @throws IOException 可能出现的连接错误
      */
-    private void receiveMessage() throws IOException{
+    private void receiveMessageTick() throws IOException{
         //如果不用ready()，readLine()将会阻塞线程，用ready()来确保缓冲区有数据可读
         if(this.reader.ready()){
-            String received = this.reader.readLine();
-            Logger.logInfo("received message from client: %s", received);
+            Datapack received = Datapack.toDatapack(this.reader.readLine());
             this.receiveTrigger = true;
             //如果是HeartBeat验证消息，不用加入数据包集合，因为这只是个辅助消息，对其他功能没有用处
-            if(Datapack.toDatapack(received).identifier.equals(Datapack.HEARTBEAT.identifier)){
+            if(received.identifier.equals(Datapack.HEARTBEAT.identifier)){
                 return;
             }
+            Logger.logInfo("received message from client: %s", received);
             this.receive.add(received);
         }
     }
@@ -174,7 +176,7 @@ public class ClientHandler implements Runnable{
             Logger.logError("Can't send null message");
             return;
         }
-        this.toSend.add(message);
+        this.toSend.add(Datapack.toDatapack(message));
     }
 
     /**
@@ -183,17 +185,15 @@ public class ClientHandler implements Runnable{
      * @param datapack 待发送的数据包
      */
     public void sendMessage(Datapack datapack){
-        this.sendMessage(datapack.toJson());
+        this.toSend.add(datapack);
     }
 
     /**
-     * 从输入流中获取一个从客户端收取的信息，处理应该按照数据包规范
-     * @return json信息（开发中允许直接发送普通字符串）
+     * 将从客户端收取的所有信息在一次tick中交予Server实例
      */
-    public String popReceive(){
-        if(this.receive.size() == 0){
-            return null;
+    private void popReceiveTick(){
+        if(this.receive.size() > 0){
+            Server.instance().receivedDatapacks.add(receive.remove());
         }
-        return this.receive.remove();
     }
 }
