@@ -48,6 +48,26 @@ public class Datapack {
     }
 
     /**
+     * 根据标识信息和对象实例构造数据包实例
+     * @param identifier 标识信息
+     * @param object 对象实例
+     */
+    public Datapack(String identifier, Object object){
+        this.content = GSON.toJson(object);
+        this.identifier = identifier;
+    }
+
+    /**
+     * 把该数据包持有的内容反序列化为某对象
+     * @param <T> 对象类型
+     * @param targetClass 对象的类
+     * @return 反序列化后的对象实例
+     */
+    public <T> T deserializeContent(Class<T> targetClass){
+        return GSON.fromJson(this.content, targetClass);
+    }
+
+    /**
      * 用于验证服务器和客户端之间通信的特殊数据包HEARTBEAT
      */
     public static final Datapack HEARTBEAT = new Datapack("HEARTBEAT", null);
