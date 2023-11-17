@@ -1,5 +1,8 @@
 package com.tfs.client;
+import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
+import com.tfs.datapack.PlayMusic;
+import com.tfs.datapack.SynchronizeMusic;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
@@ -35,23 +38,39 @@ public class Client {
     }
 
 
-    protected void playMusic(){
+    protected void playMusic(PlayMusic playMusic){
+        switch(playMusic.opType){
+            case "continue":
 
+                break;
+            
+            case "pause":
+
+                break;
+
+            case "change":
+
+                break;
+
+            default:
+                Logger.logError("wrong opType of PlayMusic: " + playMusic.opType);
+        }
     }
 
-    protected void controlConnect(){
-
+    protected void controlConnect(ControlConnect controlconnect){
+        Logger.logInfo("You are kicked out the sever!");
+        connection.killConnection();
     }
 
-    protected void synchronizeMusic(){
-        
+    protected void synchronizeMusic(SynchronizeMusic synchronizeMusic){
+        // if(getMusicId() != synchronizeMusic.musicId){
+        //     changeMusic(musicId);
+        // }
+
     }
 
     protected void checkLoginInfo(UserInfo loginInfo){
-        Logger.logInfo("");
+        Logger.logInfo(loginInfo.toString());
     }
 
-    protected void AdjustPlayingSchedule(){
-
-    }
 }
