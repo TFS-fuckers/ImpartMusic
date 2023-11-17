@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.tfs.datapack.Datapack;
 import com.tfs.logger.Logger;
 
 /**Impart Music 服务器 */
@@ -109,4 +110,16 @@ public class Server {
         }
         return;
     }
+
+    /**
+     * 向与服务器连接的所有客户端发送数据包
+     * @param datapack 待发送的数据包
+     */
+    public void sendToAll(Datapack datapack){
+        for(ClientHandler handler : connectedClients){
+            handler.sendMessage(datapack);
+        }
+        return;
+    }
+    // TODO:对单独用户的发送
 }
