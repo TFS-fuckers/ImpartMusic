@@ -1,7 +1,7 @@
-import com.tfs.client.Connection;
+import com.tfs.client.Client;
 
 public class ClientTest {
     public static void main(String[] args){
-        new Connection("localhost", 25585);
+        new Client();
     }
 }
