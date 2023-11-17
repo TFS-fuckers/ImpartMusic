@@ -21,7 +21,7 @@ public class PackageResolver {
                     break;
     
                 case "CheckLoginInfo":
-                    // client.checkLoginInfo(datapack.deserializeContent(UserInfo.class));
+                    client.checkLoginInfo(datapack.deserializeContent(UserInfo.class));
                     break;
     
                 case "Adjust":

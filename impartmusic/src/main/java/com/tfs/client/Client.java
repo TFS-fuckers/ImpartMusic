@@ -18,10 +18,10 @@ public class Client {
             } catch (Exception e) {
                 Logger.logError("Thread sleep error: " + e.getMessage());
             }
-            // Datapack datapack = connection.popReceive();
-            // if(datapack != null){
-            //     PackageResolver.resolveDatapack(datapack);
-            // }
+            Datapack datapack = connection.popReceive();
+            if(datapack != null){
+                PackageResolver.resolveDatapack(datapack);
+            }
             //break条件待定
             if(true){
                 break;
