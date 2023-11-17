@@ -11,8 +11,11 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.tfs.datapack.AccessInstruction;
 import com.tfs.datapack.Datapack;
+import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
+
 
 /**与服务器之间的连接实例 */
 public class Connection {
@@ -31,21 +34,25 @@ public class Connection {
 
     private PrintWriter writer;
     private BufferedReader reader;
+    private UserInfo userInfo;
 
     /**与服务器通信的验证间隔时间 */
     public static final int HEART_BEAT_INTERVAL_MILLISECONDS = 1000;
     /**服务器无响应的最大容忍次数 */
     public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
+    /**与服务器进行身份验证的最大等待次数 */
+    public static final int VERTIFICATION_MAX_TRIES = 5;
 
     /**
      * 创建一个与服务器的连接实例
      * @param host 服务器的IP
      * @param port 服务器的端口号
      */
-    public Connection(String host, int port){
+    public Connection(String host, int port, UserInfo vertificationUserInfo){
         Logger.logInfo("Trying to connect to " + host + ":" + port);
         try {
             this.address = new InetSocketAddress(host, port);
+            this.userInfo = vertificationUserInfo;
             mainThread = new Thread(() -> this.mainThread());
             mainThread.start();
         } catch (Exception e) {
@@ -130,6 +137,38 @@ public class Connection {
             Logger.logError(e.getMessage());
             this.killConnection();
         }
+        this.writer.println(new Datapack("UserInfo", this.userInfo).toJson());
+        boolean vertified = false;
+        String failCause = "No vertification feedback";
+        for(int i = 0; i < VERTIFICATION_MAX_TRIES; i++) {
+            try {
+                if(this.reader.ready()) {
+                        String rawJson = this.reader.readLine();
+                    Datapack feedback = new Datapack(rawJson);
+                    AccessInstruction accessInstruction = feedback.deserializeContent(AccessInstruction.class);
+                    if(accessInstruction.getResult().equals("Granted")) {
+                        vertified = true;
+                        break;
+                    }
+                    if(accessInstruction.getResult().equals("Denied")) {
+                        failCause = accessInstruction.getCause();
+                        break;
+                    }
+                }
+                Thread.sleep(200);
+            } catch (Exception e) {
+                Logger.logError("Error while vertification");
+                this.killConnection();
+                return;
+            }
+        }
+
+        if(!vertified) {
+            Logger.logError("Vertification failed, cause: %s", failCause);
+            this.killConnection();
+            return;
+        }
+
         timer.scheduleAtFixedRate(new RefreshTask(), 0, 50);
         int noResponseCount = 0;
         while(this.isConnected()){

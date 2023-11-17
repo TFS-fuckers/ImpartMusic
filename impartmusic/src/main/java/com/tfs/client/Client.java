@@ -10,7 +10,7 @@ public class Client {
     public Client(){
         INSTANCE = this;
 
-        this.connection = new Connection("localhost", 25585);
+        this.connection = new Connection("localhost", 25585, new UserInfo("yufan_nb", "login"));
 
         while(true){
             try {

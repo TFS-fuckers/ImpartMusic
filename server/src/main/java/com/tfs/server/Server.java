@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,6 +16,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.tfs.datapack.Datapack;
+import com.tfs.datapack.KillConnectionCommand;
+import com.tfs.exceptions.AccessToOfflineUserException;
 import com.tfs.logger.Logger;
 
 /**Impart Music 服务器 */
@@ -26,7 +30,9 @@ public class Server {
     /**服务器是否在运行 */
     private boolean running = true;
     /**服务器已经连接的所有客户端 */
-    public final List<ClientHandler> connectedClients = new ArrayList<>();
+    public final List<User> connectedUsers = new ArrayList<>();
+    public final Map<String, User> nameToUser = new HashMap<String, User>();
+
     /**服务器从所有客户端收到的所有数据包 */
     public final Queue<Datapack> receivedDatapacks = new LinkedList<>();
     /**
@@ -47,8 +53,12 @@ public class Server {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){
-                for(ClientHandler handler : connectedClients){
-                    handler.onTick();
+                for(User handler : connectedUsers){
+                    try {
+                        handler.getHandler().onTick();
+                    } catch (AccessToOfflineUserException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }, 0, 50);
@@ -82,7 +92,7 @@ public class Server {
 
     /**
      * 获取服务器是否正在运行
-     * @return 获取服务器是否正在运行，如果是，返回${true}$
+     * @return 获取服务器是否正在运行，如果是，返回true
      */
     public boolean isRunning() {
         return this.running;
@@ -113,8 +123,12 @@ public class Server {
      * @param message 待发送的信息
      */
     public void sentToAll(String message){
-        for(ClientHandler handler : connectedClients){
-            handler.sendMessage(message);
+        for(User user : connectedUsers){
+            try {
+                user.getHandler().sendMessage(message);
+            } catch (AccessToOfflineUserException e) {
+                e.printStackTrace();
+            }
         }
         return;
     }
@@ -124,10 +138,109 @@ public class Server {
      * @param datapack 待发送的数据包
      */
     public void sendToAll(Datapack datapack){
-        for(ClientHandler handler : connectedClients){
-            handler.sendMessage(datapack);
+        for(User user : connectedUsers){
+            try {
+                user.getHandler().sendMessage(datapack);
+            } catch (AccessToOfflineUserException e) {
+                e.printStackTrace();
+            }
         }
         return;
     }
-    // TODO:对单独用户的发送
+    
+    /**
+     * 向与服务器连接的所有客户端立即发送数据包
+     * @param datapack 立即发送的数据包
+     */
+    public void sendToAllImmediately(Datapack datapack){
+        for(User user : connectedUsers){
+            try {
+                user.getHandler().sendImmediateMessage(datapack);
+            } catch (AccessToOfflineUserException e) {
+                e.printStackTrace();
+            }
+        }
+        return;
+    }
+
+    /**
+     * 向某用户发送数据包（放入队列）
+     * @param userName 用户的昵称
+     * @param datapack 发送的数据包
+     */
+    public void sendToUser(String userName, Datapack datapack) {
+        User user = this.nameToUser.get(userName);
+        if(user == null) {
+            Logger.logError("User %s not found", userName);
+            return;
+        }
+
+        try {
+            user.getHandler().sendMessage(datapack);
+        } catch (AccessToOfflineUserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 向某用户立即发送数据包（立刻发送）
+     * @param userName 用户的名称
+     * @param datapack 立即发送的数据包
+     */
+    public void sendToUserImmediately(String userName, Datapack datapack) {
+        User user = this.nameToUser.get(userName);
+        if(user == null) {
+            Logger.logError("User %s not found", userName);
+            return;
+        }
+        try {
+            user.getHandler().sendImmediateMessage(datapack);
+        } catch (AccessToOfflineUserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 踢出某用户
+     * @param userName 踢出的用户名称
+     */
+    public void kickUser(String userName) {
+        User user = getUser(userName);
+        if(user == null) {
+            Logger.logError("User %s not found", userName);
+            return;
+        }
+        try {
+            user.getHandler().askForKillConnection(new KillConnectionCommand("kicked"));
+        } catch (AccessToOfflineUserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 踢出某用户
+     * @param userName 踢出的用户名称
+     * @param cause 踢出的原因
+     */
+    public void kickUser(String userName, String cause) {
+        User user = getUser(userName);
+        if(user == null) {
+            Logger.logError("User %s not found", userName);
+            return;
+        }
+        try {
+            user.getHandler().askForKillConnection(new KillConnectionCommand(cause));
+        } catch (AccessToOfflineUserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 寻找某个用户实例
+     * @param userName 用户的名称
+     * @return 用户实例，如果没有找到，返回null
+     */
+    public User getUser(String userName) {
+        return this.nameToUser.get(userName);
+    }
 }
