@@ -1,5 +1,7 @@
 package com.tfs.datapack;
-
+/**
+ * 传递用户登录登出信息，传至所有用户
+ */
 public class UserInfo {
     private String name;
     /**
