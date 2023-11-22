@@ -6,10 +6,15 @@ import com.tfs.datapack.SynchronizeMusic;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Client {
     private static Client INSTANCE = null;
     private Connection connection = null;
-
+    private HashMap<String, File> musicFileHashMap = new HashMap<>();
     public Client(){
         INSTANCE = this;
 
@@ -69,4 +74,37 @@ public class Client {
         Logger.logInfo(loginInfo.toString());
     }
 
+    protected void saveMusicList() {
+        String path = ".data/MusicList";
+        File file = new File(path);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
+            oos.writeObject(this.musicFileHashMap);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void readMusicList() {
+        String path = ".data/MusicList";
+        try {
+            FileInputStream in = new FileInputStream(path);
+            ObjectInputStream input=new ObjectInputStream(in);
+            this.musicFileHashMap = (HashMap<String, File>) (input.readObject());
+            input.close();
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

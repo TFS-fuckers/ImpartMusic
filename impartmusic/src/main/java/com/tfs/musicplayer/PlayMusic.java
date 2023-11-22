@@ -12,20 +12,21 @@ public class PlayMusic {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
-        player.setOnPlaying(() -> isPlaying = true);
-        player.setOnPaused(() -> isPlaying = false);
-        player.setOnStopped(() -> isPlaying = false);
-        player.setOnEndOfMedia(() -> isPlaying = false);
+        this.setPlayer(media);
     }
 
+    private void setPlayer(Media media) {
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setOnPlaying(() -> isPlaying = true);
+        mediaPlayer.setOnPaused(() -> isPlaying = false);
+        mediaPlayer.setOnStopped(() -> isPlaying = false);
+        mediaPlayer.setOnEndOfMedia(() -> isPlaying = false);
+    }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
-        player.setOnPlaying(() -> isPlaying = true);
-        player.setOnPaused(() -> isPlaying = false);
-        player.setOnStopped(() -> isPlaying = false);
-        player.setOnEndOfMedia(() -> isPlaying = false);
+        this.setPlayer(media);
     }
 
     public void playMusic() {
