@@ -7,7 +7,7 @@ public class Test {
     public static void main(String[] args) {
         DownloadMusic downloadMusic = new DownloadMusic("http://music.163.com/song/media/outer/url?id=1919555631", "./data");
         File file = downloadMusic.downloadMusicFile();
-        PlayMusic playMusic = new PlayMusic(file.getPath());
+        PlayMusic playMusic = new PlayMusic(file.getAbsolutePath());
         Scanner in = new Scanner(System.in);
         while (true) {
             String s = in.nextLine();
