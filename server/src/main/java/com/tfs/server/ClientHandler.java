@@ -82,22 +82,22 @@ public class ClientHandler implements Runnable{
                     Datapack vertificationPack = new Datapack(reader.readLine());
                     UserInfo userInfo = vertificationPack.deserializeContent(UserInfo.class);
                     this.user = new User(userInfo.getName(), clientSocket.getInetAddress(), this);
-                    User confiltUser = Server.instance().nameToUser.get(user.getName());
+                    User confiltUser = ServerHandler.instance().nameToUser.get(user.getName());
                     if(confiltUser != null){
                         confiltUser.getHandler().askForKillConnection(
                             new ControlConnect("A user with the same name logged in")
                         );
                     }
                     // 如果已经有相同名称的用户，将其踢出（异地登录）
-                    synchronized(Server.instance().receivedDatapacks){
-                        Server.instance().receivedDatapacks.add(vertificationPack);
+                    synchronized(ServerHandler.instance().receivedDatapacks){
+                        ServerHandler.instance().receivedDatapacks.add(vertificationPack);
                     }
                     this.writer.println(new Datapack("AccessInstruction", new AccessInstruction("Granted", "")).toJson());
-                    synchronized(Server.instance().nameToUser){
-                        Server.instance().nameToUser.put(this.user.getName(), this.user);
+                    synchronized(ServerHandler.instance().nameToUser){
+                        ServerHandler.instance().nameToUser.put(this.user.getName(), this.user);
                     }
-                    synchronized(Server.instance().connectedUsers){
-                        Server.instance().connectedUsers.add(this.user);
+                    synchronized(ServerHandler.instance().connectedUsers){
+                        ServerHandler.instance().connectedUsers.add(this.user);
                     }
                     vertified = true;
                     break;
@@ -210,11 +210,11 @@ public class ClientHandler implements Runnable{
         try {
             //断开连接
             this.clientSocket.close();
-            synchronized(Server.instance().connectedUsers) {
-                Server.instance().connectedUsers.remove(this.user);
+            synchronized(ServerHandler.instance().connectedUsers) {
+                ServerHandler.instance().connectedUsers.remove(this.user);
             }
-            synchronized(Server.instance().nameToUser) {
-                Server.instance().nameToUser.remove(this.user.getName());
+            synchronized(ServerHandler.instance().nameToUser) {
+                ServerHandler.instance().nameToUser.remove(this.user.getName());
             }
             this.user.setConnected(false);
             Logger.logInfo("%s disconnected from the server", this.user.getName());
@@ -267,8 +267,8 @@ public class ClientHandler implements Runnable{
      */
     private void popReceiveTick(){
         if(this.receive.size() > 0){
-            synchronized(Server.instance().receivedDatapacks){
-                Server.instance().receivedDatapacks.add(receive.remove());
+            synchronized(ServerHandler.instance().receivedDatapacks){
+                ServerHandler.instance().receivedDatapacks.add(receive.remove());
             }
         }
     }

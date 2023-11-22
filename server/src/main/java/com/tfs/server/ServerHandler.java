@@ -21,9 +21,9 @@ import com.tfs.exceptions.AccessToOfflineUserException;
 import com.tfs.logger.Logger;
 
 /**Impart Music 服务器 */
-public class Server {
+public class ServerHandler {
     /**服务器的唯一实例 */
-    private static Server INSTANCE = null;
+    private static ServerHandler INSTANCE = null;
     /**服务器每两个tick（逻辑运行）的间隔时间 */
     public static int tickIntervalMilliseconds = 50;
     private ServerSocket server;
@@ -38,8 +38,9 @@ public class Server {
     /**
      * 服务器实例构造，也是启动服务器的入口。注意，这是一个阻塞方法，所以应该考虑是否放入一个独立的线程。
      * @param port 服务器监听的端口
+     * @param onServerTick 自定义服务器每个tick内的额外逻辑，不得为阻塞方法
      */
-    public Server(int port){
+    public ServerHandler(int port, Runnable onServerTick){
         if(INSTANCE != null){
             Logger.logError("You can't run two or more servers in one process");
             return;
@@ -59,6 +60,9 @@ public class Server {
                     } catch (AccessToOfflineUserException e) {
                         e.printStackTrace();
                     }
+                }
+                if(onServerTick != null){
+                    onServerTick.run();
                 }
             }
         }, 0, 50);
@@ -114,7 +118,7 @@ public class Server {
      * 获取服务器的实例
      * @return 服务器实例
      */
-    public static Server instance(){
+    public static ServerHandler instance(){
         return INSTANCE;
     }
 

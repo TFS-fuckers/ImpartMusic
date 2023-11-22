@@ -1,11 +1,11 @@
 import java.util.Scanner;
 
 import com.tfs.datapack.Datapack;
-import com.tfs.server.Server;
+import com.tfs.server.ServerHandler;
 
 public class ServerTest {
     public static void main(String[] args){
-        new Thread(() -> new Server(25585)).start();
+        new Thread(() -> new ServerHandler(25585, null)).start();
         Scanner sc = new Scanner(System.in);
         while(true){
             String in = sc.nextLine();
@@ -13,9 +13,9 @@ public class ServerTest {
                 break;
             }
             if(in.equals("stop")) {
-                Server.instance().kill();
+                ServerHandler.instance().kill();
             }
-            Server.instance().sendToAll(new Datapack("SimpleString", in));
+            ServerHandler.instance().sendToAll(new Datapack("SimpleString", in));
         }
         sc.close();
     }
