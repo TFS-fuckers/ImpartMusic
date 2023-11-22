@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+import com.tfs.datapack.Datapack;
 import com.tfs.server.Server;
 
 public class ServerTest {
@@ -11,7 +12,10 @@ public class ServerTest {
             if(in.equals("ok")){
                 break;
             }
-            Server.instance().sentToAll(in);
+            if(in.equals("stop")) {
+                Server.instance().kill();
+            }
+            Server.instance().sendToAll(new Datapack("SimpleString", in));
         }
         sc.close();
     }
