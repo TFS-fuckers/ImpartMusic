@@ -12,20 +12,21 @@ public class PlayMusic {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
-        player.setOnPlaying(() -> isPlaying = true);
-        player.setOnPaused(() -> isPlaying = false);
-        player.setOnStopped(() -> isPlaying = false);
-        player.setOnEndOfMedia(() -> isPlaying = false);
+        this.setPlayer(media);
     }
 
+    private void setPlayer(Media media) {
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setOnPlaying(() -> isPlaying = true);
+        mediaPlayer.setOnPaused(() -> isPlaying = false);
+        mediaPlayer.setOnStopped(() -> isPlaying = false);
+        mediaPlayer.setOnEndOfMedia(() -> isPlaying = false);
+    }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
-        player.setOnPlaying(() -> isPlaying = true);
-        player.setOnPaused(() -> isPlaying = false);
-        player.setOnStopped(() -> isPlaying = false);
-        player.setOnEndOfMedia(() -> isPlaying = false);
+        this.setPlayer(media);
     }
 
     public boolean isPlaying() {
@@ -42,10 +43,14 @@ public class PlayMusic {
         player.play();
     }
     public void setPositionMusic(int seconds) {
-        player.seek(Duration.seconds(seconds));
+        player.pause();
+        player.setStartTime(Duration.seconds(seconds));
+        player.play();
     }
     public void setPositionMusic(int minutes, int seconds) {
         seconds += 60 * minutes;
-        player.seek(Duration.seconds(seconds));
+        player.pause();
+        player.setStartTime(Duration.seconds(seconds));
+        player.play();
     }
 }
