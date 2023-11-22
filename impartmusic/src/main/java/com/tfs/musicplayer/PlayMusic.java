@@ -29,6 +29,10 @@ public class PlayMusic {
         this.setPlayer(media);
     }
 
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
     public void playMusic() {
         player.play();
     }
