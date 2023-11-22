@@ -38,10 +38,14 @@ public class PlayMusic {
         player.play();
     }
     public void setPositionMusic(int seconds) {
-        player.seek(Duration.seconds(seconds));
+        player.pause();
+        player.setStartTime(Duration.seconds(seconds));
+        player.play();
     }
     public void setPositionMusic(int minutes, int seconds) {
         seconds += 60 * minutes;
-        player.seek(Duration.seconds(seconds));
+        player.pause();
+        player.setStartTime(Duration.seconds(seconds));
+        player.play();
     }
 }

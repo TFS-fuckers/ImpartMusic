@@ -24,10 +24,12 @@ public class DownloadMusic {
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
             httpURLConnection.connect();
             int fileLength = httpURLConnection.getContentLength();
-            String fileUrlPath = httpURLConnection.getURL().getFile();
-            String fileName = fileUrlPath.substring(fileUrlPath.lastIndexOf(File.separatorChar) + 1);
+//            String fileUrlPath = httpURLConnection.getURL().getFile();
+//            String fileName = fileUrlPath.substring(fileUrlPath.lastIndexOf(File.separatorChar) + 1);
             URLConnection urlConnection = url.openConnection();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+            String[] strings = urlPath.split("=");
+            String fileName = "/" + strings[1] + ".mp3";
             path = this.downloadPath + fileName;
             System.out.println(fileName);
             file = new File(path);
