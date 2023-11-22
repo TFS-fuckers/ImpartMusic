@@ -13,7 +13,7 @@ public class Client {
     public Client(){
         INSTANCE = this;
 
-        this.connection = new Connection("localhost", 25585);
+        this.connection = new Connection("localhost", 25585, new UserInfo("yufan_nb", "login"));
 
         while(true){
             try {
@@ -26,11 +26,7 @@ public class Client {
                 PackageResolver.resolveDatapack(datapack);
             }
             //break条件待定
-            if(true){
-                break;
-            }
         }
-        INSTANCE = null;
     }
 
     public static Client INSTANCE(){
@@ -59,7 +55,7 @@ public class Client {
     }
 
     protected void controlConnect(ControlConnect controlconnect){
-        Logger.logInfo("You are kicked out the sever!");
+        Logger.logInfo("You are kicked out the sever! Cause: %s", controlconnect.getCause());
         connection.killConnection();
     }
 

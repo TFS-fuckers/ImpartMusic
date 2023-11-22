@@ -8,7 +8,10 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.tfs.datapack.AccessInstruction;
 import com.tfs.datapack.Datapack;
+import com.tfs.datapack.ControlConnect;
+import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
 import java.lang.Thread;
@@ -22,6 +25,7 @@ public class ClientHandler implements Runnable{
     private final Queue<Datapack> toSend = new LinkedList<>();
     /**接受字符串队列 */
     private final Queue<Datapack> receive = new LinkedList<>();
+    private User user;
 
     /** 请勿更改 收取信息的触发器，用于检测是否有信息流入*/
     private boolean receiveTrigger = false;
@@ -48,6 +52,11 @@ public class ClientHandler implements Runnable{
     public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
 
     /**
+     * 客户端没有发送验证信息的最大次数容忍限度
+     */
+    public static final int NO_VERTIFICATION_MAX_COUNT = 10;
+
+    /**
      * 初始化方法
      * 
      * 将本实例放入Server实例的连接实例表中，加入服务器tick统一监听
@@ -57,8 +66,6 @@ public class ClientHandler implements Runnable{
     public void run(){
         this.mainThreadName = String.format("ClientHandler IP %s", clientSocket.getInetAddress().toString());
         Thread.currentThread().setName(this.mainThreadName);
-        //将自己加入服务器单例的clients实例名单，方便通过Server单例进行统一管理
-        Server.instance().connectedClients.add(this);
         try {
             this.writer = new PrintWriter(clientSocket.getOutputStream(), true);
             this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -67,6 +74,50 @@ public class ClientHandler implements Runnable{
             this.killConnection();
         }
         int noResponseCount = 0;
+        boolean vertified = false;
+        Logger.logInfo("User connected, vertifying...");
+        for(int i = 0; i < NO_VERTIFICATION_MAX_COUNT; i++) {
+            try {
+                if(this.reader.ready()) {
+                    Datapack vertificationPack = new Datapack(reader.readLine());
+                    UserInfo userInfo = vertificationPack.deserializeContent(UserInfo.class);
+                    this.user = new User(userInfo.getName(), clientSocket.getInetAddress(), this);
+                    User confiltUser = ServerHandler.instance().nameToUser.get(user.getName());
+                    if(confiltUser != null){
+                        confiltUser.getHandler().askForKillConnection(
+                            new ControlConnect("A user with the same name logged in")
+                        );
+                    }
+                    // 如果已经有相同名称的用户，将其踢出（异地登录）
+                    synchronized(ServerHandler.instance().receivedDatapacks){
+                        ServerHandler.instance().receivedDatapacks.add(vertificationPack);
+                    }
+                    this.writer.println(new Datapack("AccessInstruction", new AccessInstruction("Granted", "")).toJson());
+                    synchronized(ServerHandler.instance().nameToUser){
+                        ServerHandler.instance().nameToUser.put(this.user.getName(), this.user);
+                    }
+                    synchronized(ServerHandler.instance().connectedUsers){
+                        ServerHandler.instance().connectedUsers.add(this.user);
+                    }
+                    vertified = true;
+                    break;
+                }
+                Thread.sleep(200);
+            } catch (Exception e) {
+                Logger.logError("Error while receiving vertification info");
+                this.killConnection();
+                return;
+            }
+        }
+
+        if(!vertified) {
+            Logger.logInfo("User is not sending vertification info, kicked.");
+            this.killConnection();
+            return;
+        }
+        Logger.logInfo("User %s logged in", this.user.getName());
+        
+        //将自己加入服务器单例的clients实例名单，方便通过Server单例进行统一管理
         while(this.isConnected()){
             try {
                 //主线程进行初始化后就进入监视模式，时刻监视是否还与客户端保持连接
@@ -117,7 +168,9 @@ public class ClientHandler implements Runnable{
     private void sendMessageTick(){
         //如果队列中有待发送的消息，就发送一个
         if(this.toSend.size() != 0){
-            this.writer.println(toSend.remove().toJson());
+            synchronized(this.toSend){
+                this.writer.println(toSend.remove().toJson());
+            }
         }
     }
 
@@ -136,7 +189,9 @@ public class ClientHandler implements Runnable{
                 return;
             }
             Logger.logInfo("received message from client: %s", received);
-            this.receive.add(received);
+            synchronized(this.receive){
+                this.receive.add(received);
+            }
         }
     }
 
@@ -145,7 +200,7 @@ public class ClientHandler implements Runnable{
      * @return 连接状态
      */
     public boolean isConnected(){
-        return this.clientSocket.isConnected();
+        return this.clientSocket.isConnected() && !this.clientSocket.isClosed();
     }
 
     /**
@@ -155,12 +210,28 @@ public class ClientHandler implements Runnable{
         try {
             //断开连接
             this.clientSocket.close();
-            Server.instance().connectedClients.remove(this);
-            Logger.logInfo("%s disconnected from the server", this.clientSocket.getInetAddress().toString());
+            synchronized(ServerHandler.instance().connectedUsers) {
+                ServerHandler.instance().connectedUsers.remove(this.user);
+            }
+            synchronized(ServerHandler.instance().nameToUser) {
+                ServerHandler.instance().nameToUser.remove(this.user.getName());
+            }
+            this.user.setConnected(false);
+            Logger.logInfo("%s disconnected from the server", this.user.getName());
         } catch (IOException err) {
             Logger.logError("Error while closing socket");
             Logger.logError(err.getMessage());
         }
+    }
+
+    /**
+     * 命令用户断开连接(相对于强行中断的killConnection，向客户端说明了原因)
+     * @param killConnectionDatapack 断开连接的最后原因
+     */
+    public void askForKillConnection(ControlConnect killConnectionCommand){
+        this.sendImmediateMessage(new Datapack("ControlConnect", killConnectionCommand));
+        Logger.logInfo("kicked user %s from server, cause: %s", user.getName(), killConnectionCommand.getCause());
+        this.killConnection();
     }
 
     /**
@@ -175,7 +246,9 @@ public class ClientHandler implements Runnable{
             Logger.logError("Can't send null message");
             return;
         }
-        this.toSend.add(Datapack.toDatapack(message));
+        synchronized(this.toSend){
+            this.toSend.add(Datapack.toDatapack(message));
+        }
     }
 
     /**
@@ -184,7 +257,9 @@ public class ClientHandler implements Runnable{
      * @param datapack 待发送的数据包
      */
     public void sendMessage(Datapack datapack){
-        this.toSend.add(datapack);
+        synchronized(this.toSend){
+            this.toSend.add(datapack);
+        }
     }
 
     /**
@@ -192,7 +267,20 @@ public class ClientHandler implements Runnable{
      */
     private void popReceiveTick(){
         if(this.receive.size() > 0){
-            Server.instance().receivedDatapacks.add(receive.remove());
+            synchronized(ServerHandler.instance().receivedDatapacks){
+                ServerHandler.instance().receivedDatapacks.add(receive.remove());
+            }
+        }
+    }
+
+    /**
+     * 立即向客户端发送信息而无需等待
+     * @param datapack 发送的数据包
+     */
+    public void sendImmediateMessage(Datapack datapack) {
+        synchronized(this.writer){
+            this.writer.println(datapack.toJson());
+            this.writer.flush();
         }
     }
 }

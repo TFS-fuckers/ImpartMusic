@@ -12,4 +12,16 @@ public class UserInfo {
         return "User " + name + action;
     }
 
+    public UserInfo(String name, String action) {
+        this.name = name;
+        this.action = action;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAction() {
+        return action;
+    }
 }
