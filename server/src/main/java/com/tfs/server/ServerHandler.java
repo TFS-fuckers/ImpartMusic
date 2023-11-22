@@ -249,18 +249,15 @@ public class ServerHandler {
     }
 
     /**
-     * @return 返回第一个用户实例，如果没有找到，返回null
-     */
-    public User getFirstUser(){
-        return this.connectedUsers.get(0);
-    }
-
-    /**
      * 
      * @param index
      * @return
      */
     public User getUser(int index) {
         return this.connectedUsers.get(index);
+    }
+
+    public int getUserNum() {
+        return this.connectedUsers.size();
     }
 }
