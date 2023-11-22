@@ -2,8 +2,8 @@ package com.tfs.client;
 
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
-import com.tfs.datapack.PlayMusic;
-import com.tfs.datapack.SynchronizeMusic;
+import com.tfs.datapack.PlayMusicInstruction;
+import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
@@ -40,7 +40,7 @@ public class Client {
     }
 
 
-    protected void playMusic(PlayMusic playMusic){
+    protected void playMusic(PlayMusicInstruction playMusic){
         switch(playMusic.opType){
             case "continue":
 
@@ -55,7 +55,8 @@ public class Client {
                 break;
 
             default:
-                Logger.logError("wrong opType of PlayMusic: " + playMusic.opType);
+                Logger.logError("Wrong opType of PlayMusic: " + playMusic.opType);
+                break;
         }
     }
 
@@ -64,11 +65,17 @@ public class Client {
         connection.killConnection();
     }
 
-    protected void synchronizeMusic(SynchronizeMusic synchronizeMusic){
-        // if(getMusicId() != synchronizeMusic.musicId){
-        //     changeMusic(musicId);
-        // }
+    protected void synchronizeMusicProgress(MusicProgress musicProgress){
+        
+    }
 
+    protected void getMusicProcess(){
+        connection.sendMessage(new Datapack("GetMusicProcess",
+            new MusicProgress(null, null)));
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     protected void checkLoginInfo(UserInfo loginInfo){
