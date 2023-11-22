@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class DownloadMusic {
     private String downloadPath;
@@ -26,7 +25,6 @@ public class DownloadMusic {
             int fileLength = httpURLConnection.getContentLength();
             String fileUrlPath = httpURLConnection.getURL().getFile();
             String fileName = fileUrlPath.substring(fileUrlPath.lastIndexOf(File.separatorChar) + 1);
-            URLConnection urlConnection = url.openConnection();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
             path = this.downloadPath + fileName;
             System.out.println(fileName);
@@ -52,7 +50,7 @@ public class DownloadMusic {
             e.printStackTrace();
         } finally {
             System.out.println(path);
-            return file;
         }
+        return file;
     }
 }

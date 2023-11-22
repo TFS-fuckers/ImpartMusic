@@ -28,6 +28,10 @@ public class PlayMusic {
         player.setOnEndOfMedia(() -> isPlaying = false);
     }
 
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
     public void playMusic() {
         player.play();
     }
