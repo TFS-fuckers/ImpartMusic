@@ -42,15 +42,21 @@ public class PlayMusic {
     public void resumeMusic() {
         player.play();
     }
-    public void setPositionMusic(int seconds) {
+    public void setPositionMusic(double seconds) {
         player.pause();
         player.setStartTime(Duration.seconds(seconds));
         player.play();
     }
-    public void setPositionMusic(int minutes, int seconds) {
+    public void setPositionMusic(double minutes, double seconds) {
         seconds += 60 * minutes;
         player.pause();
         player.setStartTime(Duration.seconds(seconds));
         player.play();
+    }
+    public String getAbsoluteFilePath() {
+        return this.absoluteFilePath;
+    }
+    public double getCurrentTime() {
+        return player.getCurrentTime().toSeconds();
     }
 }
