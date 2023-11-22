@@ -9,8 +9,6 @@ import com.tfs.logger.Logger;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Client {
     private static Client INSTANCE = null;

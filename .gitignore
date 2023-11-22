@@ -1,3 +1,5 @@
 
 *.class
-*.class
+data
+target
+*.mp3
