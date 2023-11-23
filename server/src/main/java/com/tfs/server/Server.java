@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetProgress;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.PlayMusicInstruction;
 
 public class Server {
     private static Server INSTANCE = null;
@@ -89,5 +90,11 @@ public class Server {
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
         this.autoSyncInSleepTrigger = true;
+        ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
+    }
+
+    protected void playMusicInstruction(PlayMusicInstruction playMusicInstruction){
+        this.autoSyncInSleepTrigger = true;
+        ServerHandler.instance().sendToAllImmediately(new Datapack("PlayMusicInstruction", playMusicInstruction));
     }
 }

@@ -56,6 +56,9 @@ public class PlayMusic {
     public String getAbsoluteFilePath() {
         return this.absoluteFilePath;
     }
+    public String getMusicId(){
+        return this.absoluteFilePath.substring(this.absoluteFilePath.lastIndexOf("\\") + 1, this.absoluteFilePath.lastIndexOf("."));
+    }
     public double getCurrentTime() {
         return player.getCurrentTime().toSeconds();
     }

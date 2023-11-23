@@ -6,6 +6,7 @@ import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
+import com.tfs.musicplayer.*;
 
 import java.io.*;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ public class Client {
     private static Client INSTANCE = null;
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
+    private PlayMusic music = null;
+    final private double MAX_SYNC_INTERVAL = 0.5;
     public Client(){
         INSTANCE = this;
 
@@ -38,22 +41,23 @@ public class Client {
     }
 
 
-    protected void playMusic(PlayMusicInstruction playMusic){
-        switch(playMusic.opType){
+    protected void playMusic(PlayMusicInstruction playMusicInstruction){
+        switch(playMusicInstruction.opType){
             case "continue":
-
+                music.resumeMusic();
                 break;
             
             case "pause":
-
+                music.pauseMusic();
                 break;
 
             case "change":
-
+                music = getPlayMusic(playMusicInstruction.musicId);
+                music.playMusic();
                 break;
 
             default:
-                Logger.logError("Wrong opType of PlayMusic: " + playMusic.opType);
+                Logger.logError("Wrong opType of PlayMusic: " + playMusicInstruction.opType);
                 break;
         }
     }
@@ -64,12 +68,20 @@ public class Client {
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
-        
+        if(musicProgress.getMusicId().equals(music.getMusicId()) == false){
+            music = getPlayMusic(musicProgress.getMusicId());
+            music.playMusic();
+        }
+        else{
+            if(Math.abs(music.getCurrentTime()-musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL){
+                music.setPositionMusic(musicProgress.getMusicTime());
+            }
+        }
     }
 
     protected void getMusicProcess(){
         connection.sendMessage(new Datapack("GetMusicProcess",
-            new MusicProgress(null, null)));
+            new MusicProgress(music.getMusicId(), music.getCurrentTime())));
     }
 
     public Connection getConnection() {
@@ -111,6 +123,18 @@ public class Client {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    private PlayMusic getPlayMusic(String musicId){
+        String downloadPath = "./data";
+        if(musicFileHashMap.containsKey(musicId)){
+            return new PlayMusic(musicFileHashMap.get(musicId).getAbsolutePath());
+        }
+        else{
+            File musicFile = new DownloadMusic("http://music.163.com/song/media/outer/url?id=" + musicId, downloadPath).downloadMusicFile();
+            musicFileHashMap.put(musicId, musicFile);
+            return new PlayMusic(musicFile.getAbsolutePath());
         }
     }
 }

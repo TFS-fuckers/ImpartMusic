@@ -2,6 +2,7 @@ package com.tfs.server;
 
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.logger.Logger;
 
 public class PackageResolver {
@@ -10,6 +11,10 @@ public class PackageResolver {
         switch (datapack.identifier) {
             case "SynchronizeMusic":
                 server.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));
+                break;
+
+            case "PlayMusic":
+                server.playMusicInstruction(datapack.deserializeContent(PlayMusicInstruction.class));
                 break;
         
             default:

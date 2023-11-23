@@ -31,8 +31,12 @@ public class PackageResolver {
                 client.getMusicProcess();
                 break;
             
+            case "SimpleString":
+                Logger.logInfo(datapack.content);
+                break;
+                
             default:
-                Logger.logError("wrong datapack identifer");
+                Logger.logError("wrong datapack identifer: " + datapack.identifier);
                 break;
         }
     }
