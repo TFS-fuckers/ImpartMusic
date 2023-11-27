@@ -5,11 +5,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class DownloadMusic {
+public class MusicDownloader {
     private String downloadPath;
     private String urlPath;
     private double downloadProgress;
-    public DownloadMusic(String urlPath, String downloadPath) {
+    public MusicDownloader(String urlPath, String downloadPath) {
         this.urlPath = urlPath;
         this.downloadPath = downloadPath;
     }

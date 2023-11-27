@@ -49,11 +49,8 @@ public class Server {
                 }
                 if(userIndex > serverHandler.getUserNum() - 1){
                     userIndex = 0;
-                    standardUser = serverHandler.getUser(userIndex);
                 }
-                else{
-                    standardUser = serverHandler.getUser(userIndex);
-                }
+                standardUser = serverHandler.getUser(userIndex);
                 
                 if(syncReceiveTrigger) {
                     syncReceiveTrigger = false;

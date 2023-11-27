@@ -6,7 +6,7 @@ import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
-import com.tfs.musicplayer.*;
+import com.tfs.musicplayer.MusicPlayer;
 
 import java.io.*;
 import java.util.HashMap;
@@ -15,38 +15,38 @@ public class Client {
     private static Client INSTANCE = null;
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
-    private PlayMusic music = null;
+    private MusicPlayer music = null;
     final private double MAX_SYNC_INTERVAL = 0.5;
-    public Client(){
-        INSTANCE = this;
 
+    public Client() {
+        INSTANCE = this;
+        this.readMusicList();
         this.connection = new Connection("localhost", 25585, new UserInfo("yufan_nb", "login"));
 
-        while(true){
+        while (true) {
             try {
                 Thread.sleep(20);
             } catch (Exception e) {
                 Logger.logError("Thread sleep error: " + e.getMessage());
             }
             Datapack datapack = connection.popReceive();
-            if(datapack != null){
+            if (datapack != null) {
                 PackageResolver.resolveDatapack(datapack);
             }
-            //break条件待定
+            // break条件待定
         }
     }
 
-    public static Client INSTANCE(){
+    public static Client INSTANCE() {
         return INSTANCE;
     }
 
-
-    protected void playMusic(PlayMusicInstruction playMusicInstruction){
-        switch(playMusicInstruction.opType){
+    protected void playMusic(PlayMusicInstruction playMusicInstruction) {
+        switch (playMusicInstruction.opType) {
             case "continue":
                 music.resumeMusic();
                 break;
-            
+
             case "pause":
                 music.pauseMusic();
                 break;
@@ -62,33 +62,37 @@ public class Client {
         }
     }
 
-    protected void controlConnect(ControlConnect controlconnect){
+    protected void controlConnect(ControlConnect controlconnect) {
         Logger.logInfo("You are kicked out the sever! Cause: %s", controlconnect.getCause());
         connection.killConnection();
     }
 
-    protected void synchronizeMusicProgress(MusicProgress musicProgress){
-        if(musicProgress.getMusicId().equals(music.getMusicId()) == false){
+    protected void synchronizeMusicProgress(MusicProgress musicProgress) {
+        if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
             music.playMusic();
-        }
-        else{
-            if(Math.abs(music.getCurrentTime()-musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL){
+        } else {
+            if (Math.abs(music.getCurrentTime() - musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL) {
                 music.setPositionMusic(musicProgress.getMusicTime());
             }
         }
     }
 
-    protected void getMusicProcess(){
-        connection.sendMessage(new Datapack("GetMusicProcess",
-            new MusicProgress(music.getMusicId(), music.getCurrentTime())));
+    protected void getMusicProcess() {
+        connection.sendMessage(
+            new Datapack("GetMusicProcess",
+                new MusicProgress(
+                    music.getMusicId(), music.getCurrentTime()
+                )
+            )
+        );
     }
 
     public Connection getConnection() {
         return connection;
     }
 
-    protected void checkLoginInfo(UserInfo loginInfo){
+    protected void checkLoginInfo(UserInfo loginInfo) {
         Logger.logInfo(loginInfo.toString());
     }
 
@@ -109,12 +113,39 @@ public class Client {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void readMusicList() {
-        String path = ".data/MusicList";
+        String path = "./data/MusicList";
+        File file = new File(path);
+        if (!file.exists()) {
+            Logger.logWarning("Music list file not found, using default...");
+            try {
+                File parent = file.getParentFile();
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
+                file.createNewFile();
+            } catch (Exception e) {
+                Logger.logError("Error while creating new music list file");
+                e.printStackTrace();
+            } finally {
+                this.musicFileHashMap = new HashMap<>();
+                this.initializeNewMusicList();
+            }
+            return;
+        }
+
         try {
             FileInputStream in = new FileInputStream(path);
-            ObjectInputStream input=new ObjectInputStream(in);
-            this.musicFileHashMap = (HashMap<String, File>) (input.readObject());
+            ObjectInputStream input = new ObjectInputStream(in);
+            Object object = input.readObject();
+            if (object instanceof HashMap<?, ?>) {
+                this.musicFileHashMap = HashMap.class.cast(object);
+            } else {
+                Logger.logError("Error while reading music hash map set, creating new hashmap");
+                this.musicFileHashMap = new HashMap<>();
+                this.initializeNewMusicList();
+            }
             input.close();
             in.close();
         } catch (FileNotFoundException e) {
@@ -126,15 +157,33 @@ public class Client {
         }
     }
 
-    private PlayMusic getPlayMusic(String musicId){
-        String downloadPath = "./data";
-        if(musicFileHashMap.containsKey(musicId)){
-            return new PlayMusic(musicFileHashMap.get(musicId).getAbsolutePath());
+    private void initializeNewMusicList() {
+        File path = new File("./data");
+        for (File child : path.listFiles()) {
+            String fileName = child.getName();
+            int dotIndex = fileName.indexOf('.');
+            if (dotIndex == -1) {
+                continue;
+            }
+            String type = fileName.substring(dotIndex + 1);
+            if (type.equals("mp3")) {
+                String id = fileName.substring(0, dotIndex);
+                this.musicFileHashMap.put(id, child);
+                Logger.logInfo("Found music file %s.mp3", id);
+            }
         }
-        else{
-            File musicFile = new DownloadMusic("http://music.163.com/song/media/outer/url?id=" + musicId, downloadPath).downloadMusicFile();
+    }
+
+    private MusicPlayer getPlayMusic(String musicId) {
+        String downloadPath = "./data";
+        if (musicFileHashMap.containsKey(musicId)) {
+            return new MusicPlayer(musicFileHashMap.get(musicId).getAbsolutePath());
+        } else {
+            File musicFile = new MusicDownloader("http://music.163.com/song/media/outer/url?id=" + musicId,
+                    downloadPath)
+                    .downloadMusicFile();
             musicFileHashMap.put(musicId, musicFile);
-            return new PlayMusic(musicFile.getAbsolutePath());
+            return new MusicPlayer(musicFile.getAbsolutePath());
         }
     }
 }

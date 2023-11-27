@@ -3,12 +3,12 @@ package com.tfs.musicplayer;
 import javafx.scene.media.*;
 import javafx.util.Duration;
 
-public class PlayMusic {
+public class MusicPlayer {
     private boolean isPlaying = false;
     private MediaPlayer player;
     private String absoluteFilePath;
     
-    public PlayMusic(String absoluteFilePath) {
+    public MusicPlayer(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
