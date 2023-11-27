@@ -6,6 +6,7 @@ import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
+import com.tfs.musicplayer.MusicDownloader;
 import com.tfs.musicplayer.MusicPlayer;
 
 import java.io.*;
