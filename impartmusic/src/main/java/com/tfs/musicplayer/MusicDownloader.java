@@ -4,15 +4,39 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import com.tfs.logger.Logger;
 
 public class MusicDownloader {
     private String downloadPath;
     private String urlPath;
     private double downloadProgress;
+    private static final Queue<MusicDownloader> ASYNC_QUEUE = new LinkedList<>();
+
+    static {
+        new Thread(() -> {
+            Thread.currentThread().setName("async-downloader");
+            while(true) {
+                try {
+                    Thread.sleep(1000);
+                    while(ASYNC_QUEUE.size() > 0) {
+                        ASYNC_QUEUE.remove().downloadMusicFile();
+                    }
+                } catch (Exception e) {
+                    Logger.logError("Error downloading music file asynchronously");
+                    e.printStackTrace();
+                }
+            }
+        }).start();     
+    }
+    
     public MusicDownloader(String urlPath, String downloadPath) {
         this.urlPath = urlPath;
         this.downloadPath = downloadPath;
     }
+
     public File downloadMusicFile() {
         File file = null;
         String path = null;
@@ -52,5 +76,9 @@ public class MusicDownloader {
             System.out.println(path);
         }
         return file;
+    }
+
+    public static void downloadMusicFileAsync(String urlPath, String downloadPath) {
+        ASYNC_QUEUE.add(new MusicDownloader(urlPath, downloadPath));
     }
 }
