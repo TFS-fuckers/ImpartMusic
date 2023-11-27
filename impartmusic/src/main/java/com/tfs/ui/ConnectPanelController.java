@@ -1,9 +1,10 @@
+package com.tfs.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-public class Controller {
+public class ConnectPanelController {
     @FXML
     private Label la;
 
@@ -14,5 +15,4 @@ public class Controller {
     void click(ActionEvent event) {
         System.out.println("Fuck mcdedaxia");
     }
-
 }
