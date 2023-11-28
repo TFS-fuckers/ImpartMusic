@@ -5,8 +5,9 @@ package com.tfs.datapack;
 public class MusicProgress {
     private String musicId;
     private double musicTime;
+    private String musicStatus;
     
-    public MusicProgress(String musicId, double musicTime){
+    public MusicProgress(String musicId, double musicTime, String playingType){
         this.musicId = musicId;
         this.musicTime = musicTime;
     }
@@ -16,5 +17,8 @@ public class MusicProgress {
     }
     public double getMusicTime(){
         return musicTime;
+    }
+    public String getMusicStatus(){
+        return musicStatus;
     }
 }

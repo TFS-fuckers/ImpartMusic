@@ -3,11 +3,15 @@ import java.util.Scanner;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.PlayMusicInstruction;
+import com.tfs.logger.Logger;
+import com.tfs.server.Server;
 import com.tfs.server.ServerHandler;
 
 public class ServerTest {
     public static void main(String[] args){
-        new Thread(() -> new ServerHandler(25585, null)).start();
+        new Server(25585);
+        
+        new Thread(() -> new Server(25585)).start();
         Scanner sc = new Scanner(System.in);
         while(true){
             String in = sc.nextLine();

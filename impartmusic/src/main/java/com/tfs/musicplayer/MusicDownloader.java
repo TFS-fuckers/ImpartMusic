@@ -40,7 +40,7 @@ public class MusicDownloader {
                 length += size;
                 outputStream.write(buf, 0, size);
                 downloadProgress = length * 100 / fileLength;
-                System.out.println(downloadProgress + "%");
+                // System.out.println(downloadProgress + "%");
             }
             bufferedInputStream.close();
             outputStream.close();

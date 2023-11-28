@@ -62,4 +62,10 @@ public class MusicPlayer {
     public double getCurrentTime() {
         return player.getCurrentTime().toSeconds();
     }
+    public String getStatus() {
+        if (isPlaying) {
+            return "play";
+        }
+        return "pause";
+    }
 }

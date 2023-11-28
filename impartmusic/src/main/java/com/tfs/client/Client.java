@@ -22,7 +22,7 @@ public class Client {
     public Client() {
         INSTANCE = this;
         this.readMusicList();
-        this.connection = new Connection("localhost", 25585, new UserInfo("yufan_nb", "login"));
+        this.connection = new Connection("localhost", 25585, new UserInfo("test0", "login"));
 
         while (true) {
             try {
@@ -71,19 +71,30 @@ public class Client {
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
-            music.playMusic();
         } else {
             if (Math.abs(music.getCurrentTime() - musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL) {
                 music.setPositionMusic(musicProgress.getMusicTime());
             }
         }
+        switch (musicProgress.getMusicStatus()) {
+            case "pause":
+                music.pauseMusic();
+                break;
+
+            case "play":
+                music.resumeMusic();
+        
+            default:
+                break;
+        }
+        
     }
 
     protected void getMusicProcess() {
         connection.sendMessage(
             new Datapack("GetMusicProcess",
                 new MusicProgress(
-                    music.getMusicId(), music.getCurrentTime()
+                    music.getMusicId(), music.getCurrentTime(), music.getStatus()
                 )
             )
         );

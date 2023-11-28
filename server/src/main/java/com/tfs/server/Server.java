@@ -7,6 +7,7 @@ import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetProgress;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.PlayMusicInstruction;
+import com.tfs.logger.Logger;
 
 public class Server {
     private static Server INSTANCE = null;
@@ -22,6 +23,12 @@ public class Server {
         INSTANCE = this;
         new Thread(() -> new ServerHandler(port, null)).start();
         Timer synchronizeMusicTimer = new Timer();
+        
+        try {
+            Thread.sleep(20);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         synchronizeMusicTimer.scheduleAtFixedRate(new TimerTask() {
             private int sleepCount = 0;
             private boolean inSleep = false;
