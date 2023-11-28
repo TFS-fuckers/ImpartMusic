@@ -25,6 +25,13 @@ public class Client {
         INSTANCE = this;
         ImpartUI.showUI();
         this.readMusicList();
+        // TODO: delete this 测试用，暂时先注释掉，防止测试时忘记加入
+        // this.connect("localhost", 25585, "zyl");
+        try {
+            Thread.sleep(20);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while(true) {
             clientMainLoop();
         }
@@ -50,6 +57,8 @@ public class Client {
     }
 
     protected void playMusic(PlayMusicInstruction playMusicInstruction) {
+        if(music == null)
+            return;
         switch (playMusicInstruction.opType) {
             case "continue":
                 music.resumeMusic();
@@ -76,6 +85,8 @@ public class Client {
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
+        if(music == null)
+            return;
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
         } else {
@@ -90,21 +101,28 @@ public class Client {
 
             case "play":
                 music.resumeMusic();
+                break;
         
             default:
+                Logger.logError("Wrong status: "+musicProgress.getMusicStatus());
                 break;
         }
         
     }
 
     protected void getMusicProcess() {
-        connection.sendMessage(
-            new Datapack("GetMusicProcess",
+        if(music == null){
+            connection.sendMessage(new Datapack("SynchronizeMusic",new MusicProgress()));
+        }
+        else{
+            connection.sendMessage(
+            new Datapack("SynchronizeMusic",
                 new MusicProgress(
                     music.getMusicId(), music.getCurrentTime(), music.getStatus()
                 )
             )
         );
+        }
     }
 
     public Connection getConnection() {

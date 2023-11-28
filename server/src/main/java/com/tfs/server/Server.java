@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.tfs.datapack.Datapack;
-import com.tfs.datapack.GetProgress;
+import com.tfs.datapack.GetMusicProcess;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.logger.Logger;
@@ -41,13 +41,13 @@ public class Server {
                 }
                 if (inSleep) {
                     sleepCount++;
+                    Logger.logTest();
                     if (sleepCount > AUTO_SYNC_SLEEP_TICK) {
                         inSleep = false;
                         sleepCount = 0;
                     }
                     return;
                 }
-
                 ServerHandler serverHandler = ServerHandler.instance();
                 User standardUser;
                 //确保getUser()不越界
@@ -66,11 +66,12 @@ public class Server {
                     syncMusicPlayerNoResponseCount++;
                     if(syncMusicPlayerNoResponseCount > MAX_SYNC_NO_RESPONSE) {
                         userIndex++;
+                        syncReceiveTrigger = true;
                         return;
                     }
                 }
                 if(standardUser != null){
-                    serverHandler.sendToUserImmediately(standardUser.getName(),new Datapack("GetProgress",new GetProgress()));
+                    serverHandler.sendToUserImmediately(standardUser.getName(),new Datapack("GetMusicProcess",new GetMusicProcess()));
                 }
             }
         },0,2000);
@@ -78,8 +79,8 @@ public class Server {
             try {
                 Thread.sleep(20);
                 Datapack pack = ServerHandler.instance().receivedDatapacks.remove();
-                if(pack.identifier.equals("MusicProgess")) {
-                    this.syncReceiveTrigger = true;                    
+                if(pack != null){
+                    PackageResolver.packageResolver(pack);
                 }
 
             } catch (Exception e) {
@@ -93,8 +94,17 @@ public class Server {
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
+        //逻辑有点乱，具体而言，如果类型为AUTO，不触发自动同步进度的睡眠，如果类型不是AUTO，不改变检测是否接收到pack的状态
+        this.syncReceiveTrigger = true;
+        //看起来也有些奇怪，想要把音乐信息封装成一个内部类，直接判断这个类是不是null，但不知道会不会有过度设计的问题
+        if(musicProgress.isEmpty() == false)
+            ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
+    }
+
+    protected void setMusicProgress(MusicProgress musicProgress){
         this.autoSyncInSleepTrigger = true;
-        ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
+        if(musicProgress.isEmpty() == false)
+            ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
     }
 
     protected void playMusicInstruction(PlayMusicInstruction playMusicInstruction){
