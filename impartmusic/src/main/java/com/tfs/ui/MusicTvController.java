@@ -1,6 +1,10 @@
 package com.tfs.ui;
+import java.io.IOException;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -9,7 +13,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.fxml.FXMLLoader;
+import javafx.stage.Stage;
 
 public class MusicTvController {
 
@@ -96,6 +103,17 @@ public class MusicTvController {
 
     @FXML
     void buildnewInputPane(ActionEvent event) {
-        
+        connect_button.setOnAction(e->{
+            try {
+                AnchorPane root = FXMLLoader.load(getClass().getResource("connect.fxml"));
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("连接到服务端");
+                stage.show();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
     }
 }
