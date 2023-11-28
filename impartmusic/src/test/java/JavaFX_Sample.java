@@ -16,7 +16,9 @@ public class JavaFX_Sample extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("music_table.fxml"));
         primaryStage.setTitle("hello world");
+        //Scene scene = new Scene(root,765,387);
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
