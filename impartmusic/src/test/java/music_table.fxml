@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="music_pane"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="MusicTvController">
+<BorderPane fx:id="music_pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="MusicTvController">
    <center>
        <AnchorPane cache="true" prefHeight="150.0" prefWidth="150.0" style="-fx-background-color: #cfcfcf;" BorderPane.alignment="CENTER">
            <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" layoutY="-6.0" prefHeight="387.3333333333333" prefWidth="714.6666666666666" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -29,7 +29,7 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
            </TableView>
-         <Pagination fx:id="music_lists" layoutY="308.0" prefHeight="387.3333333333333" prefWidth="765.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         <Pagination layoutY="308.0" prefHeight="387.3333333333333" prefWidth="765.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
        </AnchorPane>
    </center>
    <top>
@@ -40,38 +40,37 @@
                      <padding>
                          <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
-                     <Label fx:id="music_name_label" layoutX="33.0" layoutY="18.0" prefHeight="34.0" prefWidth="41.0" text="标题：" />
-                     <Label fx:id="music_title" layoutX="92.0" layoutY="14.0" prefHeight="33.0" prefWidth="127.0" text="fuck mc de da xia" textOverrun="CLIP" AnchorPane.leftAnchor="92.0" AnchorPane.topAnchor="14.0">
+                     <Label layoutX="33.0" layoutY="18.0" prefHeight="34.0" prefWidth="41.0" text="标题：" />
+                     <Label fx:id="labTitle" layoutX="92.0" layoutY="14.0" prefHeight="33.0" prefWidth="127.0" text="fuck mc de da xia" textOverrun="CLIP" AnchorPane.leftAnchor="92.0" AnchorPane.topAnchor="14.0">
                          <font>
                              <Font size="13.0" />
                          </font>
                      </Label>
-                     <Label fx:id="music_introduction_label" layoutX="33.0" layoutY="58.0" text="介绍：" />
-                  <TextArea fx:id="music_introduction_text" layoutX="73.0" layoutY="58.0" prefHeight="208.0" prefWidth="499.0" />
-                  <Slider fx:id="music_slider" layoutX="113.0" layoutY="314.0" prefHeight="24.0" prefWidth="330.0" />
-                  <Button fx:id="music_playmode_button" layoutX="518.0" layoutY="311.0" mnemonicParsing="false" text="Playmode" />
-                  <Label fx:id="music_playing_time_label" layoutX="53.0" layoutY="317.0" text="当前时间" />
-                  <Label fx:id="music_whole_time_label" layoutX="443.0" layoutY="317.0" text="全曲时间" />
+                     <Label layoutX="33.0" layoutY="58.0" text="介绍：" />
+                  <TextArea fx:id="jfxTextAreaIntro" layoutX="73.0" layoutY="58.0" prefHeight="208.0" prefWidth="499.0" />
+                  <Slider layoutX="113.0" layoutY="314.0" prefHeight="24.0" prefWidth="330.0" />
+                  <Button layoutX="518.0" layoutY="311.0" mnemonicParsing="false" text="Playmode" />
+                  <Label layoutX="53.0" layoutY="317.0" text="当前时间" />
+                  <Label layoutX="443.0" layoutY="317.0" text="全曲时间" />
                  </AnchorPane>
             </center>
             <left>
                <AnchorPane prefHeight="371.0" prefWidth="211.0" BorderPane.alignment="CENTER">
                   <children>
-                        <ImageView fx:id="music_image" fitHeight="211.0" fitWidth="253.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="imgViewIcon" fitHeight="211.0" fitWidth="253.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../icon/icon2.png" />
                         </ImageView>
-                     <Button fx:id="store_button" layoutX="139.0" layoutY="288.0" minHeight="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="收藏" />
-                     <Button fx:id="last_button" layoutX="48.0" layoutY="229.0" mnemonicParsing="false" text="上一首" />
-                     <Button fx:id="next_button" layoutX="140.0" layoutY="229.0" mnemonicParsing="false" text="下一首" />
-                     <Button fx:id="playmusic_button" layoutX="48.0" layoutY="289.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="56.0" text="播放" />
+                     <Button layoutX="139.0" layoutY="288.0" minHeight="15.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="收藏" />
+                     <Button layoutX="48.0" layoutY="229.0" mnemonicParsing="false" text="上一首" />
+                     <Button layoutX="140.0" layoutY="229.0" mnemonicParsing="false" text="下一首" />
+                     <Button layoutX="48.0" layoutY="289.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="56.0" text="播放" />
                   </children>
                </AnchorPane>
             </left>
             <right>
                <AnchorPane prefHeight="397.0" prefWidth="320.0" BorderPane.alignment="CENTER">
                   <children>
-                     <TextArea fx:id="online_information_text" prefHeight="233.0" prefWidth="321.0" text="欢迎xxx加入线上music&#10;impart！&#10;" AnchorPane.bottomAnchor="166.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     <TextArea fx:id="text_to_online_textarea" layoutX="7.0" layoutY="233.0" prefHeight="164.0" prefWidth="313.0" text="虾头男唱歌贼好听" />
+                     <TextArea prefHeight="398.6666666666667" prefWidth="210.0" text="欢迎xxx加入线上music&#10;impart！&#10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                   </children>
                </AnchorPane>
             </right>
@@ -83,7 +82,7 @@
          <top>
             <AnchorPane BorderPane.alignment="CENTER">
                <children>
-                  <TableView fx:id="onlineusers_lists" prefHeight="309.3333333333333" prefWidth="215.33333333333334" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView prefHeight="309.3333333333333" prefWidth="215.33333333333334" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columns>
                       <TableColumn prefWidth="109.3333740234375" text="用户名" />
                       <TableColumn prefWidth="41.333251953125" text="host" />
@@ -95,11 +94,11 @@
          <bottom>
             <AnchorPane prefHeight="116.0" prefWidth="183.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="disconnect_button" contentDisplay="TOP" layoutX="123.0" layoutY="56.0" mnemonicParsing="false" text="断开连接" />
-                  <Button fx:id="connect_button" contentDisplay="TOP" layoutX="23.0" layoutY="56.0" mnemonicParsing="false" onAction="#buildnewInputPane" text="连接服务器" />
+                  <Button contentDisplay="TOP" layoutX="124.0" layoutY="56.0" mnemonicParsing="false" text="断开连接" />
+                  <Button contentDisplay="TOP" layoutX="23.0" layoutY="56.0" mnemonicParsing="false" onAction="#buildnewInputPane" text="连接端口" />
                   <Label layoutX="36.0" layoutY="155.0" prefHeight="18.0" prefWidth="67.0" />
-                  <Label fx:id="connection_state_label" alignment="CENTER" layoutX="37.0" layoutY="122.0" text="状态：" />
-                  <Label fx:id="connection_state_info_label" alignment="CENTER" layoutX="91.0" layoutY="122.0" text="fuckmcdedaxia" />
+                  <Label alignment="CENTER" layoutX="37.0" layoutY="122.0" text="状态：" />
+                  <Label alignment="CENTER" layoutX="91.0" layoutY="122.0" text="fuckmcdedaxia" />
                </children>
             </AnchorPane>
          </bottom>
