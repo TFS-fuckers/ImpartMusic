@@ -20,29 +20,42 @@ public class Client {
     private MusicPlayer music = null;
     final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
     final public double MAX_SYNC_INTERVAL = 0.5;
+    private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
 
     public Client() {
         INSTANCE = this;
         ImpartUI.showUI();
         this.readMusicList();
+        try {
+            Thread.sleep(20);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         while(true) {
             clientMainLoop();
         }
     }
 
     private void clientMainLoop() {
-        if(this.connection != null && this.connection.isConnected()) {
-            try {
-                Thread.sleep(50);
-                Datapack pack = this.connection.popReceive();
-                if(pack != null) {
-                    PackageResolver.resolveDatapack(pack);
+        if(this.connection == null) {
+            return;
+        }
+        synchronized(this.connection) {
+            if(this.connection.isConnected()) {
+                try {
+                    Thread.sleep(50);
+                    Datapack pack = this.connection.popReceive();
+                    if(pack != null) {
+                        PackageResolver.resolveDatapack(pack);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    this.connection.killConnection();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                this.connection.killConnection();
             }
         }
+        this.connection.notify();
     }
 
     public static Client INSTANCE() {
@@ -198,6 +211,21 @@ public class Client {
     }
 
     public void connect(String host, int port, String loginAs) {
-        this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
+        if(this.connection != null) {
+            synchronized(this.connection) {
+                this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
+            }
+            this.connection.notify();
+        } else {
+            this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
+        }
+    }
+
+    public void setStatus(ClientConnectionStatus status) {
+        this.status = status;
+    }
+
+    public ClientConnectionStatus getStatus() {
+        return status;
     }
 }

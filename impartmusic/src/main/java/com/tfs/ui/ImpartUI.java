@@ -20,6 +20,7 @@ public class ImpartUI extends Application {
     @Override
     public void init() throws Exception{
         super.init();
+        
         System.out.println("init()...");
     }
 

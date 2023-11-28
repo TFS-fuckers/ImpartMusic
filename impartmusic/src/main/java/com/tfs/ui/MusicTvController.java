@@ -15,7 +15,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 public class MusicTvController {
@@ -103,17 +102,14 @@ public class MusicTvController {
 
     @FXML
     void buildnewInputPane(ActionEvent event) {
-        connect_button.setOnAction(e->{
-            try {
-                AnchorPane root = FXMLLoader.load(getClass().getResource("connect.fxml"));
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.setTitle("连接到服务端");
-                stage.show();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        });
+        try {
+            AnchorPane root = FXMLLoader.load(getClass().getResource("connect.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("连接到服务端");
+            stage.show();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 }

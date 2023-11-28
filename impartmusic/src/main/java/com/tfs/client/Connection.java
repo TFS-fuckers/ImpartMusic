@@ -116,6 +116,8 @@ public class Connection {
         } catch (IOException e) {
             Logger.logError("Error while closing connection");
             Logger.logError(e.toString());
+        } finally {
+            Client.INSTANCE().setStatus(ClientConnectionStatus.UNCONNECTED);
         }
     }
 
@@ -125,8 +127,10 @@ public class Connection {
      * HEARTBEAT验证数据包
      */
     private void mainThread(){
+        Client.INSTANCE().setStatus(ClientConnectionStatus.CONNECTING);
         this.connect(5, 3000);
         if(!this.isConnected()){
+            Client.INSTANCE().setStatus(ClientConnectionStatus.CONNECTFAIL);
             return;
         }
         Timer timer = new Timer();

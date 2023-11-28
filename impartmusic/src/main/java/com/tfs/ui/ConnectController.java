@@ -1,10 +1,14 @@
 package com.tfs.ui;
 
+import com.tfs.client.Client;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class ConnectController {
 
@@ -34,12 +38,19 @@ public class ConnectController {
 
     @FXML
     void cancel_link(ActionEvent event) {
-
+        closeWindow(event);
     }
 
     @FXML
     void make_link(ActionEvent event) {
-
+        if(Client.INSTANCE() != null) {
+             Client.INSTANCE().connect(IP_text.getText(), Integer.parseInt(port_text.getText()), users_name_text.getText());
+        }
+        closeWindow(event);
     }
 
+    private void closeWindow(ActionEvent event) {
+        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+    }
 }
