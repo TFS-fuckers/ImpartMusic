@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="297.0" prefWidth="358.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+   <children>
+      <Label fx:id="IP_label" layoutX="86.0" layoutY="104.0" prefHeight="15.0" prefWidth="23.0" text="IP:" />
+      <Label fx:id="user_name_label" layoutX="73.0" layoutY="159.0" prefHeight="27.0" prefWidth="49.0" text="用户名：" />
+      <TextField fx:id="IP_text" layoutX="136.0" layoutY="100.0" />
+      <TextField fx:id="users_name_text" layoutX="136.0" layoutY="161.0" />
+   </children>
+</AnchorPane>
