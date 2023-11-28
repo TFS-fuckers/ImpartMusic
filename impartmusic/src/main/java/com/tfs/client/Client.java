@@ -8,6 +8,7 @@ import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicDownloader;
 import com.tfs.musicplayer.MusicPlayer;
+import com.tfs.ui.ImpartUI;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,24 +18,30 @@ public class Client {
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
     private MusicPlayer music = null;
-    final private double MAX_SYNC_INTERVAL = 0.5;
+    final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
+    final public double MAX_SYNC_INTERVAL = 0.5;
 
     public Client() {
         INSTANCE = this;
+        ImpartUI.showUI();
         this.readMusicList();
-        this.connection = new Connection("localhost", 25585, new UserInfo("yufan_nb", "login"));
+        while(true) {
+            clientMainLoop();
+        }
+    }
 
-        while (true) {
+    private void clientMainLoop() {
+        if(this.connection != null && this.connection.isConnected()) {
             try {
-                Thread.sleep(20);
+                Thread.sleep(50);
+                Datapack pack = this.connection.popReceive();
+                if(pack != null) {
+                    PackageResolver.resolveDatapack(pack);
+                }
             } catch (Exception e) {
-                Logger.logError("Thread sleep error: " + e.getMessage());
+                e.printStackTrace();
+                this.connection.killConnection();
             }
-            Datapack datapack = connection.popReceive();
-            if (datapack != null) {
-                PackageResolver.resolveDatapack(datapack);
-            }
-            // break条件待定
         }
     }
 
@@ -97,8 +104,8 @@ public class Client {
         Logger.logInfo(loginInfo.toString());
     }
 
-    protected void saveMusicList() {
-        String path = ".data/MusicList";
+    public void saveMusicList() {
+        String path = MUSIC_LIST_PATH;
         File file = new File(path);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -116,7 +123,7 @@ public class Client {
 
     @SuppressWarnings("unchecked")
     protected void readMusicList() {
-        String path = "./data/MusicList";
+        String path = MUSIC_LIST_PATH;
         File file = new File(path);
         if (!file.exists()) {
             Logger.logWarning("Music list file not found, using default...");
@@ -137,7 +144,7 @@ public class Client {
         }
 
         try {
-            FileInputStream in = new FileInputStream(path);
+            FileInputStream in = new FileInputStream(file);
             ObjectInputStream input = new ObjectInputStream(in);
             Object object = input.readObject();
             if (object instanceof HashMap<?, ?>) {
@@ -149,11 +156,13 @@ public class Client {
             }
             input.close();
             in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (EOFException eof) {
+            Logger.logError("Empty music list file, creating new hashmap");
+            this.musicFileHashMap = new HashMap<>();
+            musicFileHashMap.put("nothing", null);
+            this.initializeNewMusicList();
+            this.saveMusicList();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -186,5 +195,9 @@ public class Client {
             musicFileHashMap.put(musicId, musicFile);
             return new MusicPlayer(musicFile.getAbsolutePath());
         }
+    }
+
+    public void connect(String host, int port, String loginAs) {
+        this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
     }
 }

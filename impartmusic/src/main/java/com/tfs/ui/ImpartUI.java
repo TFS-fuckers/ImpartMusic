@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
-public class ImpartMusicMainUI extends Application {
+public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("music_table.fxml"));
@@ -29,11 +29,11 @@ public class ImpartMusicMainUI extends Application {
         System.out.println("stop()...");
     }
     
-    public static void ShowUI() {
+    public static void showUI() {
         new Thread(() -> {
             Thread.currentThread().setName("UIThread");
             Logger.logInfo("UI started");
-            Application.launch(ImpartMusicMainUI.class);
+            Application.launch(ImpartUI.class);
         }).start();
     }
 }
