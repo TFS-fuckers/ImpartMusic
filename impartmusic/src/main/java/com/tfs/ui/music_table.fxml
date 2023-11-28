@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="music_pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="MusicTvController">
+<BorderPane fx:id="music_pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tfs.ui.ImpartMainUIController">
    <center>
        <AnchorPane cache="true" prefHeight="150.0" prefWidth="150.0" style="-fx-background-color: #cfcfcf;" BorderPane.alignment="CENTER">
            <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" layoutY="-6.0" prefHeight="387.3333333333333" prefWidth="714.6666666666666" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

@@ -1,22 +1,17 @@
+package com.tfs.ui;
 import javafx.application.Application;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
-public class JavaFX_Sample extends Application {
+public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("music_table.fxml"));
         primaryStage.setTitle("hello world");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
@@ -31,9 +26,8 @@ public class JavaFX_Sample extends Application {
         super.stop();
         System.out.println("stop()...");
     }
-    
-    public static void main(String[] args) {
-        new JFXPanel();
-        Application.launch(JavaFX_Sample.class);
+
+    public static void showUI() {
+        new Thread(() -> Application.launch(ImpartUI.class)).start();
     }
 }

@@ -1,3 +1,4 @@
+package com.tfs.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -7,7 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
-public class MusicTvController {
+public class ImpartMainUIController {
 
     @FXML
     private ImageView imgViewIcon;
@@ -40,5 +41,4 @@ public class MusicTvController {
     void buildnewInputPane(ActionEvent event) {
 
     }
-
 }
