@@ -1,10 +1,10 @@
 import javafx.embed.swing.JFXPanel;
 
-import com.tfs.client.Client;
+import com.tfs.ui.ImpartMusicMainUI;
 
 public class ClientTest {
     public static void main(String[] args) {
         new JFXPanel();
-        new Client();
+        ImpartMusicMainUI.ShowUI();
     }
 }
