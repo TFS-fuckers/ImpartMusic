@@ -39,6 +39,6 @@ public class ImpartMainUIController {
 
     @FXML
     void buildnewInputPane(ActionEvent event) {
-        
+
     }
 }
