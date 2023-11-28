@@ -35,12 +35,15 @@ public class MusicPlayer {
 
     public void playMusic() {
         player.play();
+        isPlaying = true;
     }
     public void pauseMusic() {
         player.pause();
+        isPlaying = false;
     }
     public void resumeMusic() {
         player.play();
+        isPlaying = true;
     }
     public void setPositionMusic(double seconds) {
         player.pause();
@@ -61,5 +64,12 @@ public class MusicPlayer {
     }
     public double getCurrentTime() {
         return player.getCurrentTime().toSeconds();
+    }
+
+    public String getStatus() {
+        if (isPlaying) {
+            return "play";
+        }
+        return "pause";
     }
 }

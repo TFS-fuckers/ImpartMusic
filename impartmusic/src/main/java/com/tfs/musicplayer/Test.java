@@ -3,6 +3,7 @@ package com.tfs.musicplayer;
 import javafx.embed.swing.JFXPanel;
 
 import java.io.File;
+import java.util.Scanner;
 
 public class Test {
     public static void main(String[] args) {
@@ -18,9 +19,16 @@ public class Test {
         System.out.println(musicPlayer.getAbsoluteFilePath());
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("\\"));
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("."));
-        // Scanner in = new Scanner(System.in);
+         Scanner in = new Scanner(System.in);
         while (true) {
-            // String s = in.nextLine();
+             String s = in.nextLine();
+             if (s.equals("pause")) {
+                 musicPlayer.pauseMusic();
+             } else {
+                 musicPlayer.playMusic();
+             }
+            System.out.println(musicPlayer.getStatus());
+            System.out.println("----------");
             // if (s.equals("get")) {
                 // System.out.println(playMusic.getAbsoluteFilePath());
                 // System.out.println(playMusic.getCurrentTime());
