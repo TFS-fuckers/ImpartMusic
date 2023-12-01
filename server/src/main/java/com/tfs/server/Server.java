@@ -81,9 +81,15 @@ public class Server {
     private class CustomServerTick implements Runnable {
         @Override
         public void run() {
-            Datapack pack = ServerHandler.instance().receivedDatapacks.remove();
-            if(pack != null){
-                PackageResolver.packageResolver(pack);
+            synchronized(ServerHandler.instance().receivedDatapacks) {
+                Datapack pack = null;
+                if(ServerHandler.instance().receivedDatapacks.size() > 0) {
+                    pack = ServerHandler.instance().receivedDatapacks.remove();
+                }
+                if(pack != null){
+                    PackageResolver.packageResolver(pack);
+                }
+                ServerHandler.instance().receivedDatapacks.notify();
             }
         }
     }
@@ -110,11 +116,13 @@ public class Server {
     }
 
     protected void broadcastUserConnection(UserInfo info) {
-        
+
     }
 
     public void onUserLogin(UserInfo info) {
-
+        User user = ServerHandler.instance().getUser(info.getName());
+        // TODO: to this user
+        ServerHandler.instance().sendToAll(null);
     }
 
     public void onUserDisconnect(User info) {

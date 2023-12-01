@@ -65,7 +65,7 @@ public class ServerHandler {
                     onServerTick.run();
                 }
             }
-        }, 0, 50);
+        }, 50, 50);
         
         Logger.logInfo("Server tick started");
         try {
