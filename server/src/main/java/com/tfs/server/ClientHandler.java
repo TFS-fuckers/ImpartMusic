@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -89,10 +90,9 @@ public class ClientHandler implements Runnable{
                         );
                     }
                     // 如果已经有相同名称的用户，将其踢出（异地登录）
-                    synchronized(ServerHandler.instance().receivedDatapacks){
-                        ServerHandler.instance().receivedDatapacks.add(vertificationPack);
-                    }
+                    Server.INSTANCE().onUserLogin(userInfo);
                     this.writer.println(new Datapack("AccessInstruction", new AccessInstruction("Granted", "")).toJson());
+                    Logger.logInfo(userInfo.toString());
                     synchronized(ServerHandler.instance().nameToUser){
                         ServerHandler.instance().nameToUser.put(this.user.getName(), this.user);
                     }
@@ -210,6 +210,7 @@ public class ClientHandler implements Runnable{
         try {
             //断开连接
             this.clientSocket.close();
+            Server.INSTANCE().onUserDisconnect(this.user);
             synchronized(ServerHandler.instance().connectedUsers) {
                 ServerHandler.instance().connectedUsers.remove(this.user);
             }

@@ -13,7 +13,7 @@ import com.tfs.ui.ImpartUI;
 import java.io.*;
 import java.util.HashMap;
 
-public class Client {
+public class Client implements ClientInterface{
     private static Client INSTANCE = null;
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
@@ -26,6 +26,8 @@ public class Client {
         INSTANCE = this;
         ImpartUI.showUI();
         this.readMusicList();
+        // TODO: delete this 测试用，暂时先注释掉，防止测试时忘记加入
+        this.connect("localhost", 25585, "glj");
         try {
             Thread.sleep(20);
         } catch (Exception e) {
@@ -63,6 +65,8 @@ public class Client {
     }
 
     protected void playMusic(PlayMusicInstruction playMusicInstruction) {
+        if(music == null)
+            return;
         switch (playMusicInstruction.opType) {
             case "continue":
                 music.resumeMusic();
@@ -89,24 +93,44 @@ public class Client {
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
+        if(music == null)
+            return;
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
-            music.playMusic();
         } else {
             if (Math.abs(music.getCurrentTime() - musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL) {
                 music.setPositionMusic(musicProgress.getMusicTime());
             }
         }
+        switch (musicProgress.getMusicStatus()) {
+            case "pause":
+                music.pauseMusic();
+                break;
+
+            case "play":
+                music.resumeMusic();
+                break;
+        
+            default:
+                Logger.logError("Wrong status: "+musicProgress.getMusicStatus());
+                break;
+        }
+        
     }
 
     protected void getMusicProcess() {
-        connection.sendMessage(
-            new Datapack("GetMusicProcess",
+        if(music == null){
+            connection.sendMessage(new Datapack("SynchronizeMusic",new MusicProgress()));
+        }
+        else{
+            connection.sendMessage(
+            new Datapack("SynchronizeMusic",
                 new MusicProgress(
-                    music.getMusicId(), music.getCurrentTime()
+                    music.getMusicId(), music.getCurrentTime(), music.getStatus()
                 )
             )
         );
+        }
     }
 
     public Connection getConnection() {
@@ -227,5 +251,15 @@ public class Client {
 
     public ClientConnectionStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void onSetProgress(MusicProgress progress){
+        connection.sendMessage(new Datapack("SetMusic",progress));
+        synchronizeMusicProgress(progress);
+    }
+    @Override
+    public void onSetVolume(float volume){
+        music.setVolume(volume);
     }
 }

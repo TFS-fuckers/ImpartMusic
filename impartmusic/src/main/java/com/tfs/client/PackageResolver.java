@@ -34,6 +34,14 @@ public class PackageResolver {
             case "SimpleString":
                 Logger.logInfo(datapack.content);
                 break;
+
+            case "UserInfo":
+                Logger.logInfo(datapack.deserializeContent(UserInfo.class).toString());
+                break;
+            
+            case "UserList":
+                Logger.logInfo("get user list");
+                break;
                 
             default:
                 Logger.logError("wrong datapack identifer: " + datapack.identifier);
