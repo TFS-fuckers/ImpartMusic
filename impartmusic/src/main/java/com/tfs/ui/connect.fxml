@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="297.0" prefWidth="433.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tfs.ui.ConnectController">
+   <children>
+      <Label fx:id="IP_label" layoutX="85.0" layoutY="57.0" prefHeight="15.0" prefWidth="23.0" text="IP:" />
+      <Label fx:id="user_name_label" layoutX="72.0" layoutY="159.0" prefHeight="27.0" prefWidth="49.0" text="用户名：" />
+      <TextField fx:id="IP_text" layoutX="136.0" layoutY="53.0" />
+      <TextField fx:id="users_name_text" layoutX="136.0" layoutY="161.0" />
+      <Button fx:id="make_link_button" layoutX="239.0" layoutY="226.0" mnemonicParsing="false" onAction="#make_link" prefHeight="35.0" prefWidth="49.0" text="确认" />
+      <Button fx:id="cancel_link" layoutX="332.0" layoutY="226.0" mnemonicParsing="false" onAction="#cancel_link" prefHeight="35.0" prefWidth="49.0" text="取消" />
+      <Label fx:id="port_label" layoutX="83.0" layoutY="113.0" text="端口:" />
+      <TextField fx:id="port_text" layoutX="136.0" layoutY="109.0" />
+   </children>
+</AnchorPane>

@@ -1,4 +1,7 @@
 package com.tfs.ui;
+
+import com.tfs.logger.Logger;
+
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,13 +14,13 @@ public class ImpartUI extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("music_table.fxml"));
         primaryStage.setTitle("hello world");
         primaryStage.setScene(new Scene(root));
-        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     @Override
     public void init() throws Exception{
         super.init();
+        
         System.out.println("init()...");
     }
 
@@ -26,8 +29,12 @@ public class ImpartUI extends Application {
         super.stop();
         System.out.println("stop()...");
     }
-
+    
     public static void showUI() {
-        new Thread(() -> Application.launch(ImpartUI.class)).start();
+        new Thread(() -> {
+            Thread.currentThread().setName("UIThread");
+            Logger.logInfo("UI started");
+            Application.launch(ImpartUI.class);
+        }).start();
     }
 }
