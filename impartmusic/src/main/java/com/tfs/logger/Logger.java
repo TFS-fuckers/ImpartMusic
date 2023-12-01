@@ -12,6 +12,10 @@ public class Logger {
      */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    public static void logTest(){
+        log("test","INFO");
+    }
+
     /**
      * 向控制台发送一个错误信息
      * @param message 错误信息

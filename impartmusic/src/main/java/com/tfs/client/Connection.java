@@ -196,6 +196,14 @@ public class Connection {
         }
     }
 
+    public UserInfo getUserInfo(){
+        return userInfo;
+    }
+
+    public void setUserInfo(String name){
+        userInfo.setName(name);
+    }
+
     /**
      * 内部方法，代表一个refresh内客户端接受信息的逻辑
      * @throws IOException 可能出现的reader错误

@@ -13,10 +13,15 @@ public class PackageResolver {
                 server.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));
                 break;
 
+            case "SetMusic":
+                server.setMusicProgress(datapack.deserializeContent(MusicProgress.class));
+                break;
+
             case "PlayMusic":
                 server.playMusicInstruction(datapack.deserializeContent(PlayMusicInstruction.class));
                 break;
         
+            
             default:
                 Logger.logError("Wrong Identifier in packageResolver: " + datapack.identifier);
                 break;
