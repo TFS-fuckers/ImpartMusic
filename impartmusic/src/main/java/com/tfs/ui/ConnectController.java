@@ -11,7 +11,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ConnectController {
-
     @FXML
     private Label IP_label;
 

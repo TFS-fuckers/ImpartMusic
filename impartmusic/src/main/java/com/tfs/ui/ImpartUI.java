@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("music_table.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
         primaryStage.setTitle("hello world");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

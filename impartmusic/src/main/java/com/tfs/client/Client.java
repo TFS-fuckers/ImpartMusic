@@ -9,6 +9,9 @@ import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicDownloader;
 import com.tfs.musicplayer.MusicPlayer;
 import com.tfs.ui.ImpartUI;
+import com.tfs.ui.MusicTvController;
+
+import javafx.application.Platform;
 
 import java.io.*;
 import java.util.HashMap;
@@ -26,17 +29,17 @@ public class Client {
         INSTANCE = this;
         ImpartUI.showUI();
         this.readMusicList();
+        while(MusicTvController.instance() == null);
         try {
-            Thread.sleep(20);
+            Thread.sleep(50);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         while(true) {
             clientMainLoop();
         }
     }
-
+                                    
     private void clientMainLoop() {
         if(this.connection == null) {
             return;
@@ -223,9 +226,27 @@ public class Client {
 
     public void setStatus(ClientConnectionStatus status) {
         this.status = status;
+        switch(this.status) {
+        case UNCONNECTED:
+            Platform.runLater(() -> MusicTvController.instance().getConnection_state_info_label().setText("未连接"));
+            break;    
+        case CONNECTED:
+            Platform.runLater(() -> MusicTvController.instance().getConnection_state_info_label().setText("已连接"));
+            break;
+        case CONNECTING:
+            Platform.runLater(() -> MusicTvController.instance().getConnection_state_info_label().setText("连接中"));
+            break;
+        case CONNECTFAIL:
+            Platform.runLater(() -> MusicTvController.instance().getConnection_state_info_label().setText("连接中断"));
+            break;
+        }
     }
 
     public ClientConnectionStatus getStatus() {
         return status;
+    }
+
+    public void onSetProgress(MusicProgress musicProgress) {
+
     }
 }
