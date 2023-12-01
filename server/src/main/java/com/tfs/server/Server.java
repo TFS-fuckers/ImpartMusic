@@ -7,6 +7,7 @@ import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetMusicProcess;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.PlayMusicInstruction;
+import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
 public class Server {
@@ -21,7 +22,7 @@ public class Server {
 
     public Server(int port){
         INSTANCE = this;
-        new Thread(() -> new ServerHandler(port, null)).start();
+        new Thread(() -> new ServerHandler(port, new CustomServerTick())).start();
         Timer synchronizeMusicTimer = new Timer();
         
         try {
@@ -74,19 +75,17 @@ public class Server {
                     serverHandler.sendToUserImmediately(standardUser.getName(),new Datapack("GetMusicProcess",new GetMusicProcess()));
                 }
             }
-        },0,2000);
-        while(true) {
-            try {
-                Thread.sleep(20);
-                Datapack pack = ServerHandler.instance().receivedDatapacks.remove();
-                if(pack != null){
-                    PackageResolver.packageResolver(pack);
-                }
+        },0,2000);      
+    }
 
-            } catch (Exception e) {
-                
+    private class CustomServerTick implements Runnable {
+        @Override
+        public void run() {
+            Datapack pack = ServerHandler.instance().receivedDatapacks.remove();
+            if(pack != null){
+                PackageResolver.packageResolver(pack);
             }
-        }        
+        }
     }
 
     public static Server INSTANCE(){
@@ -94,9 +93,7 @@ public class Server {
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
-        //逻辑有点乱，具体而言，如果类型为AUTO，不触发自动同步进度的睡眠，如果类型不是AUTO，不改变检测是否接收到pack的状态
         this.syncReceiveTrigger = true;
-        //看起来也有些奇怪，想要把音乐信息封装成一个内部类，直接判断这个类是不是null，但不知道会不会有过度设计的问题
         if(musicProgress.isEmpty() == false)
             ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
     }
@@ -110,5 +107,17 @@ public class Server {
     protected void playMusicInstruction(PlayMusicInstruction playMusicInstruction){
         this.autoSyncInSleepTrigger = true;
         ServerHandler.instance().sendToAllImmediately(new Datapack("PlayMusicInstruction", playMusicInstruction));
+    }
+
+    protected void broadcastUserConnection(UserInfo info) {
+        
+    }
+
+    public void onUserLogin(UserInfo info) {
+
+    }
+
+    public void onUserDisconnect(User info) {
+
     }
 }

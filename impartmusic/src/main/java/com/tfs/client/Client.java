@@ -13,7 +13,7 @@ import com.tfs.ui.ImpartUI;
 import java.io.*;
 import java.util.HashMap;
 
-public class Client {
+public class Client implements ClientInterface{
     private static Client INSTANCE = null;
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
@@ -26,7 +26,7 @@ public class Client {
         ImpartUI.showUI();
         this.readMusicList();
         // TODO: delete this 测试用，暂时先注释掉，防止测试时忘记加入
-        // this.connect("localhost", 25585, "zyl");
+        this.connect("localhost", 25585, "glj");
         try {
             Thread.sleep(20);
         } catch (Exception e) {
@@ -228,5 +228,15 @@ public class Client {
 
     public void connect(String host, int port, String loginAs) {
         this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
+    }
+
+    @Override
+    public void onSetProgress(MusicProgress progress){
+        connection.sendMessage(new Datapack("SetMusic",progress));
+        synchronizeMusicProgress(progress);
+    }
+    @Override
+    public void onSetVolume(float volume){
+        music.setVolume(volume);
     }
 }

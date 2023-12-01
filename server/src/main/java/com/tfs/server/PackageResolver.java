@@ -21,6 +21,7 @@ public class PackageResolver {
                 server.playMusicInstruction(datapack.deserializeContent(PlayMusicInstruction.class));
                 break;
         
+            
             default:
                 Logger.logError("Wrong Identifier in packageResolver: " + datapack.identifier);
                 break;

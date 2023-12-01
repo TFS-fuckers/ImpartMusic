@@ -53,6 +53,9 @@ public class MusicPlayer {
         player.setStartTime(Duration.seconds(seconds));
         player.play();
     }
+    public void setVolume(float volume){
+        player.setVolume(volume);
+    }
     public String getAbsoluteFilePath() {
         return this.absoluteFilePath;
     }
@@ -67,5 +70,8 @@ public class MusicPlayer {
             return "play";
         }
         return "pause";
+    }
+    public float getVolume(){
+        return Double.valueOf(player.getVolume()).floatValue();
     }
 }
