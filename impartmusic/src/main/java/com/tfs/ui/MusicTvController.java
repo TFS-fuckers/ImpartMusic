@@ -103,7 +103,7 @@ public class MusicTvController {
     @FXML
     void buildnewInputPane(ActionEvent event) {
         try {
-            AnchorPane root = FXMLLoader.load(getClass().getResource("connect.fxml"));
+            AnchorPane root = FXMLLoader.load(getClass().getResource("/connect.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("连接到服务端");

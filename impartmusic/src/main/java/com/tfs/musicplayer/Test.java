@@ -15,18 +15,24 @@ public class Test {
         System.out.println("--------");
         System.out.println(file.getAbsolutePath());
         System.out.println(file.getPath());
+        System.out.println(musicPlayer.getTotalTime());
         musicPlayer.playMusic();
         System.out.println(musicPlayer.getAbsoluteFilePath());
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("\\"));
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("."));
          Scanner in = new Scanner(System.in);
         while (true) {
-             String s = in.nextLine();
-             if (s.equals("pause")) {
-                 musicPlayer.pauseMusic();
-             } else {
-                 musicPlayer.playMusic();
-             }
+            String s = in.nextLine();
+            if (s.equals("pause")) {
+                musicPlayer.pauseMusic();
+            } else {
+                musicPlayer.playMusic();
+            }
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+
+            }
             System.out.println(musicPlayer.getStatus());
             System.out.println("----------");
             // if (s.equals("get")) {

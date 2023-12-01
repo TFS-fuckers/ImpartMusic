@@ -11,6 +11,7 @@ import com.tfs.musicplayer.MusicPlayer;
 import com.tfs.ui.ImpartUI;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Client implements ClientInterface{
@@ -21,9 +22,10 @@ public class Client implements ClientInterface{
     final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
     final public double MAX_SYNC_INTERVAL = 0.5;
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
-
+    private ArrayList<String> musicList;
     public Client() {
         INSTANCE = this;
+        musicList = new ArrayList<>();
         ImpartUI.showUI();
         this.readMusicList();
         // TODO: delete this 测试用，暂时先注释掉，防止测试时忘记加入
@@ -56,8 +58,8 @@ public class Client implements ClientInterface{
                     this.connection.killConnection();
                 }
             }
+            this.connection.notify();
         }
-        this.connection.notify();
     }
 
     public static Client INSTANCE() {
@@ -93,8 +95,13 @@ public class Client implements ClientInterface{
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
-        if(music == null)
+        if(music == null){
+            music = getPlayMusic(musicProgress.getMusicId());
+            music.setPositionMusic(musicProgress.getMusicTime());
+
             return;
+        }
+
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
         } else {
@@ -224,13 +231,17 @@ public class Client implements ClientInterface{
     private MusicPlayer getPlayMusic(String musicId) {
         String downloadPath = "./data";
         if (musicFileHashMap.containsKey(musicId)) {
-            return new MusicPlayer(musicFileHashMap.get(musicId).getAbsolutePath());
+            MusicPlayer tmp = new MusicPlayer(musicFileHashMap.get(musicId).getAbsolutePath());
+            tmp.playMusic();
+            return tmp;
         } else {
             File musicFile = new MusicDownloader("http://music.163.com/song/media/outer/url?id=" + musicId,
                     downloadPath)
                     .downloadMusicFile();
             musicFileHashMap.put(musicId, musicFile);
-            return new MusicPlayer(musicFile.getAbsolutePath());
+            MusicPlayer tmp = new MusicPlayer(musicFile.getAbsolutePath());
+            tmp.playMusic();
+            return tmp;
         }
     }
 
@@ -261,5 +272,34 @@ public class Client implements ClientInterface{
     @Override
     public void onSetVolume(float volume){
         music.setVolume(volume);
+    }
+    public ArrayList<String> getMusicList() {
+        return musicList;
+    }
+
+    public void addMusic(String id) {
+        if (!findMusic(id)) {
+            musicList.add(id);
+        }
+    }
+
+    public boolean findMusic(String id) {
+        if (musicList.contains(id)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteMusic(String id) {
+        if (findMusic(id)) {
+            musicList.remove(id);
+        }
+    }
+    public String getMusic(int i) {
+        if (!musicList.isEmpty()) {
+            i = i % musicList.size();
+            return musicList.get(i);
+        }
+        return null;
     }
 }
