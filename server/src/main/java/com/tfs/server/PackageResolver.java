@@ -2,7 +2,6 @@ package com.tfs.server;
 
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
-import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.logger.Logger;
 
 public class PackageResolver {
@@ -13,12 +12,11 @@ public class PackageResolver {
                 server.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));
                 break;
 
-            case "SetMusic":
-                server.setMusicProgress(datapack.deserializeContent(MusicProgress.class));
+            case "StrandardRequest":
+                server.setStandardUserIndex(ServerHandler.instance().getUserIndex(datapack.senderTag));
                 break;
 
             case "PlayMusic":
-                server.playMusicInstruction(datapack.deserializeContent(PlayMusicInstruction.class));
                 break;
         
             

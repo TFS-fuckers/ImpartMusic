@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -269,7 +268,10 @@ public class ClientHandler implements Runnable{
     private void popReceiveTick(){
         if(this.receive.size() > 0){
             synchronized(ServerHandler.instance().receivedDatapacks){
+                Datapack received = receive.remove();
+                received.senderTag = this.user.getName();
                 ServerHandler.instance().receivedDatapacks.add(receive.remove());
+                ServerHandler.instance().receivedDatapacks.notify();
             }
         }
     }

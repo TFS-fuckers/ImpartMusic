@@ -1,5 +1,4 @@
 import javafx.embed.swing.JFXPanel;
-
 import com.tfs.client.Client;
 
 public class ClientTest {

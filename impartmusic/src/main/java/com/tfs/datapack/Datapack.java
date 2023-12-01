@@ -9,6 +9,8 @@ public class Datapack {
     public String identifier;
     /**数据包的主体内容 */
     public String content;
+    /**数据包的发出者 */
+    public String senderTag;
     
     /**
      * 从json文本生成数据包实例

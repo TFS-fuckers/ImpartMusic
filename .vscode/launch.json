@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "ClientTest",
+      "request": "launch",
+      "mainClass": "ClientTest",
+      "projectName": "impartmusic"
+    },
+    {
+      "type": "java",
       "name": "ServerTest",
       "request": "launch",
       "mainClass": "ServerTest",

@@ -260,4 +260,18 @@ public class ServerHandler {
     public int getUserNum() {
         return this.connectedUsers.size();
     }
+
+    /**
+     * 获取某个用户的index编号
+     * @param userName 用户名称
+     * @return 用户编号，如果用户不存在，返回-1
+     */
+    public int getUserIndex(String userName) {
+        for(int i = 0; i < this.connectedUsers.size(); i++) {
+            if(this.connectedUsers.get(i).getName().equals(userName)){
+                return i;
+            }
+        }
+        return -1;
+    }
 }

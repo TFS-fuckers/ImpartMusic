@@ -6,19 +6,17 @@ import java.util.TimerTask;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetMusicProcess;
 import com.tfs.datapack.MusicProgress;
-import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 
 public class Server {
     private static Server INSTANCE = null;
     private int syncMusicPlayerNoResponseCount = 0;
-    private boolean syncReceiveTrigger = false;
-    private boolean autoSyncInSleepTrigger = false;
-    public static final int AUTO_SYNC_SLEEP_TICK = 5;
 
+    private boolean syncReceiveTrigger = false;
+    public static final int AUTO_SYNC_SLEEP_TICK = 5;
     public static final int MAX_SYNC_NO_RESPONSE = 5;
-    private int userIndex = 0;
+    private int standardUserIndex = 0;
 
     public Server(int port){
         INSTANCE = this;
@@ -31,48 +29,38 @@ public class Server {
             e.printStackTrace();
         }
         synchronizeMusicTimer.scheduleAtFixedRate(new TimerTask() {
-            private int sleepCount = 0;
-            private boolean inSleep = false;
             @Override
             public void run(){
-                if (autoSyncInSleepTrigger) {
-                    sleepCount = 0;
-                    inSleep = true;
-                    autoSyncInSleepTrigger = false;
-                }
-                if (inSleep) {
-                    sleepCount++;
-                    Logger.logTest();
-                    if (sleepCount > AUTO_SYNC_SLEEP_TICK) {
-                        inSleep = false;
-                        sleepCount = 0;
-                    }
-                    return;
-                }
                 ServerHandler serverHandler = ServerHandler.instance();
                 User standardUser;
+
                 //确保getUser()不越界
                 if(serverHandler.getUserNum() == 0){
                     return;
                 }
-                if(userIndex > serverHandler.getUserNum() - 1){
-                    userIndex = 0;
+                if(standardUserIndex > serverHandler.getUserNum() - 1){
+                    standardUserIndex = 0;
                 }
-                standardUser = serverHandler.getUser(userIndex);
-                
+                // protector
+
+                standardUser = serverHandler.getUser(standardUserIndex);
+                if(standardUser != null){
+                    serverHandler.sendToUserImmediately(
+                        standardUser.getName(),
+                        new Datapack("GetMusicProcess",new GetMusicProcess())
+                    );
+                }
+
                 if(syncReceiveTrigger) {
                     syncReceiveTrigger = false;
                     syncMusicPlayerNoResponseCount = 0;
                 } else {
                     syncMusicPlayerNoResponseCount++;
                     if(syncMusicPlayerNoResponseCount > MAX_SYNC_NO_RESPONSE) {
-                        userIndex++;
+                        standardUserIndex++;
                         syncReceiveTrigger = true;
                         return;
                     }
-                }
-                if(standardUser != null){
-                    serverHandler.sendToUserImmediately(standardUser.getName(),new Datapack("GetMusicProcess",new GetMusicProcess()));
                 }
             }
         },0,2000);      
@@ -104,17 +92,6 @@ public class Server {
             ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
     }
 
-    protected void setMusicProgress(MusicProgress musicProgress){
-        this.autoSyncInSleepTrigger = true;
-        if(musicProgress.isEmpty() == false)
-            ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
-    }
-
-    protected void playMusicInstruction(PlayMusicInstruction playMusicInstruction){
-        this.autoSyncInSleepTrigger = true;
-        ServerHandler.instance().sendToAllImmediately(new Datapack("PlayMusicInstruction", playMusicInstruction));
-    }
-
     protected void broadcastUserConnection(UserInfo info) {
 
     }
@@ -127,5 +104,17 @@ public class Server {
 
     public void onUserDisconnect(User info) {
 
+    }
+
+    public int getStandardUserIndex() {
+        return this.standardUserIndex;
+    }
+
+    public void setStandardUserIndex(int index) {
+        if(index == -1) {
+            Logger.logError("Cannot set standard user index to -1");
+            return;
+        }
+        this.standardUserIndex = index;
     }
 }

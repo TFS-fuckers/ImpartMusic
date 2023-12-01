@@ -2,7 +2,6 @@ package com.tfs.client;
 
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
-import com.tfs.datapack.PlayMusicInstruction;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
@@ -57,35 +56,12 @@ public class Client implements ClientInterface{
                     this.connection.killConnection();
                 }
             }
+            this.connection.notify();
         }
-        this.connection.notify();
     }
 
     public static Client INSTANCE() {
         return INSTANCE;
-    }
-
-    protected void playMusic(PlayMusicInstruction playMusicInstruction) {
-        if(music == null)
-            return;
-        switch (playMusicInstruction.opType) {
-            case "continue":
-                music.resumeMusic();
-                break;
-
-            case "pause":
-                music.pauseMusic();
-                break;
-
-            case "change":
-                music = getPlayMusic(playMusicInstruction.musicId);
-                music.playMusic();
-                break;
-
-            default:
-                Logger.logError("Wrong opType of PlayMusic: " + playMusicInstruction.opType);
-                break;
-        }
     }
 
     protected void controlConnect(ControlConnect controlconnect) {
@@ -239,8 +215,8 @@ public class Client implements ClientInterface{
         if(this.connection != null) {
             synchronized(this.connection) {
                 this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
+                this.connection.notify();
             }
-            this.connection.notify();
         } else {
             this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
         }
@@ -268,15 +244,12 @@ public class Client implements ClientInterface{
         return status;
     }
 
-    public void onSetProgress(MusicProgress musicProgress) {
-
-    }
-
     @Override
     public void onSetProgress(MusicProgress progress){
-        connection.sendMessage(new Datapack("SetMusic",progress));
+        connection.sendMessage(new Datapack("StrandardRequest", null));
         synchronizeMusicProgress(progress);
     }
+
     @Override
     public void onSetVolume(float volume){
         music.setVolume(volume);
