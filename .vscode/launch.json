@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "GSONtest",
+      "request": "launch",
+      "mainClass": "GSONtest",
+      "projectName": "server"
+    },
+    {
+      "type": "java",
       "name": "ServerTest",
       "request": "launch",
       "mainClass": "ServerTest",
