@@ -1,11 +1,14 @@
-package com.tfs.musicplayer;
+
 
 import javafx.embed.swing.JFXPanel;
 
 import java.io.File;
 import java.util.Scanner;
 
-public class Test {
+import com.tfs.musicplayer.MusicDownloader;
+import com.tfs.musicplayer.MusicPlayer;
+
+public class MusicPlayerTest {
     public static void main(String[] args) {
         new JFXPanel();
         MusicDownloader musicDownloader = new MusicDownloader("http://music.163.com/song/media/outer/url?id=436346833", "./data");
