@@ -24,7 +24,7 @@ public class Server {
         INSTANCE = this;
         new Thread(() -> new ServerHandler(port, new CustomServerTick())).start();
         Timer synchronizeMusicTimer = new Timer();
-        
+
         try {
             Thread.sleep(20);
         } catch (Exception e) {
@@ -132,4 +132,5 @@ public class Server {
         }
         this.standardUserIndex = index;
     }
+
 }
