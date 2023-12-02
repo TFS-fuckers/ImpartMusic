@@ -23,7 +23,7 @@ public class MusicPlayerTest {
         System.out.println(musicPlayer.getAbsoluteFilePath());
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("\\"));
         // System.out.println(playMusic.getAbsoluteFilePath().indexOf("."));
-         Scanner in = new Scanner(System.in);
+        Scanner in = new Scanner(System.in);
         while (true) {
             String s = in.nextLine();
             if (s.equals("pause")) {

@@ -36,6 +36,7 @@ public class MusicTvController {
                     Client.INSTANCE().getConnection().killConnection();
                 }
             });
+            ImpartUI.infoToUI("欢迎使用Impart Music", false);
         });
     }
 

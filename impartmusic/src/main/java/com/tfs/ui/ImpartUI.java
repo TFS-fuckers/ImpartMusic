@@ -37,4 +37,20 @@ public class ImpartUI extends Application {
             Application.launch(ImpartUI.class);
         }).start();
     }
+
+    private static StringBuilder messageStringBuilder = new StringBuilder();
+    public static void infoToUI(String message, boolean append) {
+        if(!append) {
+            messageStringBuilder.delete(0, messageStringBuilder.length());
+        }
+        messageStringBuilder.append(message);
+        messageStringBuilder.append('\n');
+        MusicTvController.instance().getOnline_information_text().setText(
+            messageStringBuilder.toString()
+        );
+    }
+
+    public static void infoToUI(String message) {
+        infoToUI(message, true);
+    }
 }

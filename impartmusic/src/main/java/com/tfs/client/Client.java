@@ -7,6 +7,7 @@ import com.tfs.datapack.UserInfo;
 import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicDownloader;
 import com.tfs.musicplayer.MusicPlayer;
+import com.tfs.musicplayer.Netease;
 import com.tfs.ui.ImpartUI;
 import com.tfs.ui.MusicTvController;
 
@@ -207,19 +208,39 @@ public class Client implements ClientInterface{
 
     private MusicPlayer getPlayMusic(String musicId) {
         String downloadPath = "./data";
-        if (musicFileHashMap.containsKey(musicId)) {
-            MusicPlayer tmp = new MusicPlayer(musicFileHashMap.get(musicId).getAbsolutePath());
-            tmp.playMusic();
-            return tmp;
-        } else {
-            File musicFile = new MusicDownloader("http://music.163.com/song/media/outer/url?id=" + musicId,
-                    downloadPath)
-                    .downloadMusicFile();
-            musicFileHashMap.put(musicId, musicFile);
-            MusicPlayer tmp = new MusicPlayer(musicFile.getAbsolutePath());
-            tmp.playMusic();
-            return tmp;
+        File musicFile = null;
+        if(musicFileHashMap.containsKey(musicId)) {
+            musicFile = musicFileHashMap.get(musicId);
+            if(!musicFile.exists()) {
+                musicFile = null;
+                musicFileHashMap.remove(musicId);
+            }
         }
+        if(musicFile == null) {
+            MusicDownloader asyncDownloading = MusicDownloader.getAsyncDownloading();
+            boolean asyncDownloaded = false;
+            if(asyncDownloading != null && Netease.downloadURLtoID(asyncDownloading.getUrlPath()).equals(musicId)) {
+                try {
+                    MusicDownloader.downloadCondition.await();
+                    musicFile = musicFileHashMap.get(musicId);                   
+                    asyncDownloaded = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Logger.logError(e.getMessage());
+                    asyncDownloaded = false;
+                }
+            }
+            if(!asyncDownloaded) {
+                musicFile = new MusicDownloader(Netease.buildNeteaseURL(musicId), downloadPath).downloadMusicFile();
+                if(!musicFile.exists()) {
+                    Logger.logError("No music file was downloaded due to downloader error");
+                    return null;
+                }
+                musicFileHashMap.put(musicId, musicFile);
+            }
+        }
+        return new MusicPlayer(musicFile.getAbsolutePath());
+
     }
 
     public void connect(String host, int port, String loginAs) {
@@ -274,14 +295,12 @@ public class Client implements ClientInterface{
             musicList.add(id);
         }
     }
-
     public boolean findMusic(String id) {
         if (musicList.contains(id)) {
             return true;
         }
         return false;
     }
-
     public void deleteMusic(String id) {
         if (findMusic(id)) {
             musicList.remove(id);
@@ -293,5 +312,14 @@ public class Client implements ClientInterface{
             return musicList.get(i);
         }
         return null;
+    }
+    public void swapMusic(int a, int b) {
+        String idA = this.musicList.get(a);
+        String idB = this.musicList.get(b);
+        this.musicList.set(a, idB);
+        this.musicList.set(b, idA);
+    }
+    public void insertMusic(String id, int place) {
+        this.musicList.add(place, id);
     }
 }
