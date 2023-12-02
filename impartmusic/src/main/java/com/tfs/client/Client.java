@@ -70,8 +70,9 @@ public class Client implements ClientInterface{
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
-        if(music == null)
-            return;
+        if(music == null){
+            
+        }
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
             music = getPlayMusic(musicProgress.getMusicId());
         } else {

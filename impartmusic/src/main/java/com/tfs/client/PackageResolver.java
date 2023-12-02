@@ -30,8 +30,16 @@ public class PackageResolver {
                 Logger.logInfo(datapack.content);
                 break;
 
-            case "UserInfo":
-                Logger.logInfo(datapack.deserializeContent(UserInfo.class).toString());
+            case "LoginUser":
+                UserInfo userInfo = datapack.deserializeContent(UserInfo.class);
+                if(Client.INSTANCE().getConnection().getUserInfo().getName().equals(userInfo.getName()) == false)
+                    Logger.logInfo("User " + userInfo.getName() + " joins in.");
+                break;
+
+            case "LogoutUser":
+                userInfo = datapack.deserializeContent(UserInfo.class);
+                if(Client.INSTANCE().getConnection().getUserInfo().getName().equals(userInfo.getName()) == false)
+                    Logger.logInfo("User " + userInfo.getName() + " is out.");
                 break;
             
             case "UserList":

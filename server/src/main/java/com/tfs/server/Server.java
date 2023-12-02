@@ -1,5 +1,6 @@
 package com.tfs.server;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -7,6 +8,7 @@ import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetMusicProcess;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
+import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 
 public class Server {
@@ -99,11 +101,24 @@ public class Server {
     public void onUserLogin(UserInfo info) {
         User user = ServerHandler.instance().getUser(info.getName());
         // TODO: to this user
-        ServerHandler.instance().sendToAll(null);
+        ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
+        for(User tmp:ServerHandler.instance().nameToUser.values()){
+            userInfoList.add(new UserSimpleInfo(tmp.getName(), tmp.getAddress().getHostAddress()));
+        }
+        ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
+        ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
+        // TODO: 发送内容等待修改后补充
+        
     }
 
-    public void onUserDisconnect(User info) {
-
+    public void onUserDisconnect(UserInfo info) {
+        ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
+        for(User tmp:ServerHandler.instance().nameToUser.values()){
+            userInfoList.add(new UserSimpleInfo(tmp.getName(), tmp.getAddress().getHostAddress()));
+        }
+        ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
+        ServerHandler.instance().sendToAll(new Datapack("LogoutUser",info));
+        // ServerHandler.instance().sendToAll(new Datapack);
     }
 
     public int getStandardUserIndex() {
