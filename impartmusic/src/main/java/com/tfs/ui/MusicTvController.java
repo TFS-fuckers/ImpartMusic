@@ -1,6 +1,8 @@
 package com.tfs.ui;
 import java.io.IOException;
 
+import com.tfs.client.Client;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,6 +31,11 @@ public class MusicTvController {
         instance = this;
         Platform.runLater(() -> {
             this.connection_state_info_label.setText("未连接");
+            this.getDisconnect_button().setOnMouseClicked((event) -> {
+                if(Client.INSTANCE() != null && Client.INSTANCE().getConnection() != null) {
+                    Client.INSTANCE().getConnection().killConnection();
+                }
+            });
         });
     }
 

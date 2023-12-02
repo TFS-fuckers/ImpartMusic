@@ -214,9 +214,9 @@ public class Client implements ClientInterface{
 
     public void connect(String host, int port, String loginAs) {
         if(this.connection != null) {
-            synchronized(this.connection) {
+            synchronized(this) {
                 this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
-                this.connection.notify();
+                this.notify();
             }
         } else {
             this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));

@@ -61,7 +61,7 @@ public class Connection {
     }
 
     /**
-     * 尝试连接服务器
+     * 尝试连接服务器（没有验证程序）
      * @param maxTries 最大尝试次数
      * @param timeout 每次尝试的最大响应时间，超过无响应即尝试失败
      */
@@ -175,6 +175,7 @@ public class Connection {
 
         timer.scheduleAtFixedRate(new RefreshTask(), 0, 50);
         int noResponseCount = 0;
+        Client.INSTANCE().setStatus(ClientConnectionStatus.CONNECTED);
         while(this.isConnected()){
             try {
                 Thread.sleep(HEART_BEAT_INTERVAL_MILLISECONDS);
@@ -244,7 +245,7 @@ public class Connection {
      * @return 是否已连接
      */
     public boolean isConnected(){
-        return this.socket.isConnected();
+        return this.socket.isConnected() && !this.socket.isClosed();
     }
 
     /**
