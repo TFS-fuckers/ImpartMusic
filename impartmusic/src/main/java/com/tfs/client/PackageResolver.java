@@ -1,14 +1,20 @@
 package com.tfs.client;
 
+import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
+import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 
 public class PackageResolver {
     protected static void resolveDatapack(Datapack datapack){
         Client client = Client.INSTANCE();
+        Logger.logInfo("Resolving datapack");
         switch (datapack.identifier) {
             case "ControlConnect":
                 client.controlConnect(datapack.deserializeContent(ControlConnect.class));
@@ -43,7 +49,7 @@ public class PackageResolver {
                 break;
             
             case "UserList":
-                Logger.logInfo("get user list");
+                Client.INSTANCE().displayUserList(datapack.deserializeToList(UserSimpleInfo.class));
                 break;
                 
             default:

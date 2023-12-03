@@ -85,8 +85,6 @@
                <children>
                   <TableView fx:id="onlineusers_lists" prefHeight="309.3333333333333" prefWidth="215.33333333333334" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columns>
-                      <TableColumn prefWidth="109.3333740234375" text="用户名" />
-                      <TableColumn prefWidth="41.333251953125" text="host" />
                     </columns>
                   </TableView>
                </children>

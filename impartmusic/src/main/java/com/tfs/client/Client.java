@@ -4,6 +4,7 @@ import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
+import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicDownloader;
 import com.tfs.musicplayer.MusicPlayer;
@@ -16,6 +17,7 @@ import javafx.application.Platform;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Client implements ClientInterface{
     private static Client INSTANCE = null;
@@ -31,7 +33,6 @@ public class Client implements ClientInterface{
         musicList = new ArrayList<>();
         ImpartUI.showUI();
         this.readMusicList();
-        while(MusicTvController.instance() == null);
         try {
             Thread.sleep(50);
         } catch (Exception e) {
@@ -43,23 +44,21 @@ public class Client implements ClientInterface{
     }
                                     
     private void clientMainLoop() {
-        if(this.connection == null) {
-            return;
+        try {
+            Thread.sleep(50);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        synchronized(this.connection) {
-            if(this.connection.isConnected()) {
-                try {
-                    Thread.sleep(50);
-                    Datapack pack = this.connection.popReceive();
-                    if(pack != null) {
-                        PackageResolver.resolveDatapack(pack);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    this.connection.killConnection();
+        if(this.connection != null && this.connection.isConnected()) {
+            try {
+                Datapack pack = this.connection.popReceive();
+                if(pack != null) {
+                    PackageResolver.resolveDatapack(pack);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.connection.killConnection();
             }
-            this.connection.notify();
         }
     }
 
@@ -321,5 +320,9 @@ public class Client implements ClientInterface{
     }
     public void insertMusic(String id, int place) {
         this.musicList.add(place, id);
+    }
+
+    public void displayUserList(List<UserSimpleInfo> list) {
+        ImpartUI.displayUserList(list);
     }
 }

@@ -1,5 +1,9 @@
 package com.tfs.datapack;
+import java.lang.reflect.Type;
+import java.util.List;
+
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**服务器数据包 */
 public class Datapack {
@@ -67,6 +71,11 @@ public class Datapack {
      */
     public <T> T deserializeContent(Class<T> targetClass){
         return GSON.fromJson(this.content, targetClass);
+    }
+
+    public <T> List<T> deserializeToList(Class<T> elementClass) {
+        Type type = new TypeToken<List<UserSimpleInfo>>() {}.getType();
+        return GSON.fromJson(this.content, type);
     }
 
     /**

@@ -1,14 +1,25 @@
 package com.tfs.ui;
 
+import java.util.List;
+
+import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 public class ImpartUI extends Application {
+    static class ThreadDispatcher {
+        public static void invoke(Runnable function) {
+            Platform.runLater(function);
+        }
+    }
+    
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
@@ -39,18 +50,29 @@ public class ImpartUI extends Application {
     }
 
     private static StringBuilder messageStringBuilder = new StringBuilder();
+
     public static void infoToUI(String message, boolean append) {
-        if(!append) {
-            messageStringBuilder.delete(0, messageStringBuilder.length());
-        }
-        messageStringBuilder.append(message);
-        messageStringBuilder.append('\n');
-        MusicTvController.instance().getOnline_information_text().setText(
-            messageStringBuilder.toString()
-        );
+        ThreadDispatcher.invoke(() -> {
+            if(!append) {
+                messageStringBuilder.delete(0, messageStringBuilder.length());
+            }
+            messageStringBuilder.append(message);
+            messageStringBuilder.append('\n');
+            MusicTvController.instance().getOnline_information_text().setText(
+                messageStringBuilder.toString()
+            );
+        });
     }
 
     public static void infoToUI(String message) {
         infoToUI(message, true);
+    }
+
+    public static void displayUserList(List<UserSimpleInfo> userList) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().getOnlineusers_lists().setItems(
+                FXCollections.observableList(userList)
+            );
+        });
     }
 }

@@ -1,9 +1,12 @@
 package com.tfs.ui;
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.tfs.client.Client;
+import com.tfs.datapack.UserSimpleInfo;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -36,6 +39,21 @@ public class MusicTvController {
                     Client.INSTANCE().getConnection().killConnection();
                 }
             });
+            TableColumn<UserSimpleInfo, String> nameColumn = new TableColumn<>();
+            TableColumn<UserSimpleInfo, String> hostColumn = new TableColumn<>();
+            nameColumn.setCellValueFactory((data) -> {
+                return new SimpleStringProperty(data.getValue().getUserName());
+            });
+            hostColumn.setCellValueFactory((data) -> {
+                return new SimpleStringProperty(data.getValue().getUserIP());
+            });
+            nameColumn.setVisible(true);
+            hostColumn.setVisible(true);
+            nameColumn.setText("在线用户");
+            hostColumn.setText("IP");
+            this.getOnlineusers_lists().getColumns().setAll(
+                Arrays.asList(nameColumn, hostColumn)
+            );
             ImpartUI.infoToUI("欢迎使用Impart Music", false);
         });
     }
@@ -135,8 +153,8 @@ public class MusicTvController {
         return online_information_text;
     }
     @FXML
-    private TableView<?> onlineusers_lists;
-    public TableView<?> getOnlineusers_lists() {
+    private TableView<UserSimpleInfo> onlineusers_lists;
+    public TableView<UserSimpleInfo> getOnlineusers_lists() {
         return onlineusers_lists;
     }
     @FXML

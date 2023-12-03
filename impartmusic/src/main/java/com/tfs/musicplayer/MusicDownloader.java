@@ -75,7 +75,6 @@ public class MusicDownloader {
                 length += size;
                 outputStream.write(buf, 0, size);
                 downloadProgress = length * 100 / fileLength;
-                // System.out.println(downloadProgress + "%");
             }
             bufferedInputStream.close();
             outputStream.close();
@@ -95,5 +94,9 @@ public class MusicDownloader {
     
     public String getUrlPath() {
         return urlPath;
+    }
+
+    public double getDownloadProgress() {
+        return downloadProgress;
     }
 }

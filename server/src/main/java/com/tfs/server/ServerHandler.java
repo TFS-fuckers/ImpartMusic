@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,15 +55,24 @@ public class ServerHandler {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){
-                for(User handler : connectedUsers){
-                    try {
-                        handler.getHandler().onTick();
-                    } catch (AccessToOfflineUserException e) {
-                        e.printStackTrace();
+                try {
+                    synchronized(connectedUsers) {
+                        for(User handler : connectedUsers){
+                            handler.getHandler().onTick();
+                        }
+                        if(onServerTick != null){
+                            onServerTick.run();
+                        }
                     }
-                }
-                if(onServerTick != null){
-                    onServerTick.run();
+                } catch (ConcurrentModificationException e) {
+                    Logger.logWarning("Concurrent modification occured while processing: %s", e.getMessage());
+                } catch (AccessToOfflineUserException e) {
+                    Logger.logError("A user was already offline but server is still trying to get access to it");
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    Logger.logError("Fatal error %s", e.getMessage());
+                    e.printStackTrace();
+                    ServerHandler.instance().kill();
                 }
             }
         }, 50, 50);

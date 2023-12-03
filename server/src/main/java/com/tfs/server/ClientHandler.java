@@ -86,7 +86,7 @@ public class ClientHandler implements Runnable{
                     if(confiltUser != null){
                         confiltUser.getHandler().askForKillConnection(
                             new ControlConnect("A user with the same name logged in")
-                        );
+                            );
                     }
                     // 如果已经有相同名称的用户，将其踢出（异地登录）
                     this.writer.println(new Datapack("AccessInstruction", new AccessInstruction("Granted", "")).toJson());
@@ -97,6 +97,7 @@ public class ClientHandler implements Runnable{
                     synchronized(ServerHandler.instance().connectedUsers){
                         ServerHandler.instance().connectedUsers.add(this.user);
                     }
+                    //将自己加入服务器单例的clients实例名单，方便通过Server单例进行统一管理
                     Server.INSTANCE().onUserLogin(userInfo);
                     vertified = true;
                     break;
@@ -116,7 +117,6 @@ public class ClientHandler implements Runnable{
         }
         Logger.logInfo("User %s logged in", this.user.getName());
         
-        //将自己加入服务器单例的clients实例名单，方便通过Server单例进行统一管理
         while(this.isConnected()){
             try {
                 //主线程进行初始化后就进入监视模式，时刻监视是否还与客户端保持连接
@@ -190,6 +190,7 @@ public class ClientHandler implements Runnable{
             Logger.logInfo("received message from client: %s", received);
             synchronized(this.receive){
                 this.receive.add(received);
+                this.receive.notify();
             }
         }
     }
@@ -211,9 +212,11 @@ public class ClientHandler implements Runnable{
             this.clientSocket.close();
             synchronized(ServerHandler.instance().connectedUsers) {
                 ServerHandler.instance().connectedUsers.remove(this.user);
+                ServerHandler.instance().connectedUsers.notify();
             }
             synchronized(ServerHandler.instance().nameToUser) {
                 ServerHandler.instance().nameToUser.remove(this.user.getName());
+                ServerHandler.instance().nameToUser.notify();
             }
             Server.INSTANCE().onUserDisconnect(new UserInfo(user.getName(), null));
             this.user.setConnected(false);
@@ -268,9 +271,12 @@ public class ClientHandler implements Runnable{
     private void popReceiveTick(){
         if(this.receive.size() > 0){
             synchronized(ServerHandler.instance().receivedDatapacks){
-                Datapack received = receive.remove();
-                received.senderTag = this.user.getName();
-                ServerHandler.instance().receivedDatapacks.add(receive.remove());
+                synchronized(this.receive) {
+                    Datapack received = receive.remove();
+                    received.senderTag = this.user.getName();
+                    ServerHandler.instance().receivedDatapacks.add(received);
+                    this.receive.notify();
+                }
                 ServerHandler.instance().receivedDatapacks.notify();
             }
         }

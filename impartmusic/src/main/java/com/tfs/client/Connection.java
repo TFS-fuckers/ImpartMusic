@@ -99,11 +99,16 @@ public class Connection {
      * @return 获取的内容，应为Datapack的Json信息
      */
     public Datapack popReceive(){
-        if(this.received.size() == 0){
-            return null;
+        Datapack removed = null;
+        synchronized(this.received) {
+            if(this.received.size() == 0){
+                return null;
+            }
+            removed = this.received.remove();
+            this.received.notify();
         }
-        return this.received.remove();
         //从收取的队列中弹出一个信息
+        return removed;
     }
 
     /**
@@ -218,8 +223,10 @@ public class Connection {
                 // Logger.logInfo("responding server's heartbeat");
                 return;
             }
-            Logger.logInfo("message from server: %s", receive);
-            this.received.add(receive);
+            synchronized(this.received) {
+                this.received.add(receive);
+                this.received.notify();
+            }
         }
     }
 
@@ -245,7 +252,7 @@ public class Connection {
      * @return 是否已连接
      */
     public boolean isConnected(){
-        return this.socket.isConnected() && !this.socket.isClosed();
+        return (this.socket != null) && this.socket.isConnected() && !this.socket.isClosed();
     }
 
     /**
