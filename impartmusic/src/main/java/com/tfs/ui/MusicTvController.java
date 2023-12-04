@@ -32,9 +32,14 @@ public class MusicTvController {
     private static MusicTvController instance = null;
     public MusicTvController() {
         instance = this;
-        Platform.runLater(() -> {
-            this.connection_state_info_label.setText("未连接");
-            this.getDisconnect_button().setOnMouseClicked((event) -> {
+        Platform.runLater(new UIInitializationTask());
+    }
+
+    private class UIInitializationTask implements Runnable {
+        @Override
+        public void run() {
+            connection_state_info_label.setText("未连接");
+            getDisconnect_button().setOnMouseClicked((event) -> {
                 if(Client.INSTANCE() != null && Client.INSTANCE().getConnection() != null) {
                     Client.INSTANCE().getConnection().killConnection();
                 }
@@ -51,11 +56,11 @@ public class MusicTvController {
             hostColumn.setVisible(true);
             nameColumn.setText("在线用户");
             hostColumn.setText("IP");
-            this.getOnlineusers_lists().getColumns().setAll(
+            getOnlineusers_lists().getColumns().setAll(
                 Arrays.asList(nameColumn, hostColumn)
             );
             ImpartUI.infoToUI("欢迎使用Impart Music", false);
-        });
+        }
     }
 
     public static MusicTvController instance() {
