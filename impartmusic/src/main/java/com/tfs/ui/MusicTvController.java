@@ -55,6 +55,9 @@ public class MusicTvController {
     }
 
     @FXML
+    private Button add_music_to_pack;
+
+    @FXML
     private Button connect_button;
 
     @FXML
@@ -85,9 +88,6 @@ public class MusicTvController {
 
     @FXML
     private Button last_button;
-
-    @FXML
-    private ImageView music_image;
 
     @FXML
     private Label music_introduction_label;
@@ -139,6 +139,7 @@ public class MusicTvController {
 
     @FXML
     private TableColumn<?, ?> tColumn_collect;
+    
 
     @FXML
     private TableColumn<?, ?> tColumn_first;
@@ -206,5 +207,10 @@ public class MusicTvController {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    @FXML
+    void add_music_to_pack(ActionEvent event) {
+
     }
 }
