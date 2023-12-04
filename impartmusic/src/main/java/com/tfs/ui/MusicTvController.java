@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,6 +27,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -41,6 +43,16 @@ public class MusicTvController {
         instance = this;
         Platform.runLater(() -> {
             this.connection_state_info_label.setText("未连接");
+            music_playing_time_label.setText("0:00");
+            File audioFile = new File("./data/436346833.mp3");
+            String path = "file:///" + audioFile.getAbsolutePath().replace("\\", "/");
+            Media media = new Media(path);
+            mediaPlayer = new MediaPlayer(media);
+            //mediaPlayer.setAutoPlay(false);
+            // 获取媒体总时长
+            mediaPlayer.setOnReady(() -> {
+                duration = media.getDuration();
+            });
         });
     }
 
@@ -156,18 +168,10 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
-        music_playing_time_label.setText("0:00");
-        File audioFile = new File("./data/436346833.mp3");
-        String path = "file:///" + audioFile.getAbsolutePath().replace("\\", "/");
-        Media media = new Media(path);
-        mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setAutoPlay(false);
-         // 获取媒体总时长
-        duration = media.getDuration();
+        mediaPlayer.play();
         music_whole_time_label.setText(formatDuration(duration));
-
-        //music_slider.setShowTickLabels(true);
-        //music_slider.setShowTickMarks(true);
+        music_slider.setMin(0.0);
+        music_slider.setMax(duration.toSeconds());
         music_slider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -186,10 +190,20 @@ public class MusicTvController {
                 music_playing_time_label.setText(formatDuration(newValue));
             }
         });
-        mediaPlayer.play();
+        music_slider.setOnMouseClicked( e -> {
+            double mouseX = e.getX();
+            double totalWidth = music_slider.getWidth();
+            double percentage = mouseX / totalWidth;
+            double newTime = percentage * duration.toSeconds();
+            mediaPlayer.seek(Duration.seconds(newTime));
+        });
+        //mediaPlayer.play();
     }
 
     private String formatDuration(Duration duration) {
+        if(duration == null) {
+            return "xx:xx";
+        }
         int minutes = (int) duration.toMinutes();
         int seconds = (int) (duration.toSeconds() % 60);
         return String.format("%d:%02d", minutes, seconds);
