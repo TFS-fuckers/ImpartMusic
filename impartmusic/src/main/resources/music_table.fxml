@@ -16,7 +16,7 @@
 <BorderPane fx:id="music_pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tfs.ui.MusicTvController">
    <center>
        <AnchorPane cache="true" prefHeight="150.0" prefWidth="150.0" style="-fx-background-color: #cfcfcf;" BorderPane.alignment="CENTER">
-           <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" layoutY="-6.0" onSort="#Music_Sort" prefHeight="387.3333333333333" prefWidth="714.6666666666666" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+           <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" layoutY="-6.0" onSort="#Music_Sort" prefHeight="506.0" prefWidth="921.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="0.0">
                <columns>
                    <TableColumn fx:id="tColumn_first" maxWidth="408.66669714450836" minWidth="70" prefWidth="243.33336889743805" sortable="false" styleClass="firstColumn" text="序号" />
                    <TableColumn fx:id="tColumn_music" minWidth="107.33330535888672" prefWidth="551.3332366943359" sortable="false" styleClass="firstColumn" text="歌曲标题" />
@@ -27,7 +27,7 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
            </TableView>
-         <Pagination fx:id="music_lists" layoutY="308.0" prefHeight="573.3333333333334" prefWidth="973.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         <Pagination fx:id="music_lists" layoutY="522.0" prefHeight="51.0" prefWidth="920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="522.0" />
        </AnchorPane>
    </center>
    <top>
@@ -45,7 +45,7 @@
                          </font>
                      </Label>
                      <Label fx:id="music_introduction_label" layoutX="33.0" layoutY="58.0" text="介绍：" />
-                  <TextArea fx:id="music_introduction_text" layoutX="73.0" layoutY="58.0" prefHeight="208.0" prefWidth="499.0" />
+                  <TextArea fx:id="music_introduction_text" layoutX="73.0" layoutY="58.0" prefHeight="221.0" prefWidth="499.0" />
                   <Slider fx:id="music_slider" layoutX="113.0" layoutY="314.0" prefHeight="24.0" prefWidth="330.0" />
                   <Button fx:id="music_playmode_button" layoutX="518.0" layoutY="311.0" mnemonicParsing="false" onAction="#Playmode_change" text="Playmode" />
                   <Label fx:id="music_playing_time_label" layoutX="53.0" layoutY="317.0" text="当前时间" />
@@ -59,7 +59,7 @@
                      <Button fx:id="last_button" layoutX="39.0" layoutY="107.0" minWidth="49.0" mnemonicParsing="false" onAction="#To_last_music" prefHeight="36.0" prefWidth="60.0" text="上一首" />
                      <Button fx:id="next_button" layoutX="127.0" layoutY="106.0" mnemonicParsing="false" onAction="#To_next_music" prefHeight="37.0" prefWidth="61.0" text="下一首" />
                      <Button fx:id="playmusic_button" layoutX="39.0" layoutY="173.0" minWidth="50.0" mnemonicParsing="false" onAction="#Play_music" prefHeight="36.0" prefWidth="59.0" text="播放" />
-                     <Button fx:id="add_music_to_pack" layoutX="58.0" layoutY="249.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="39.0" prefWidth="105.0" text="加入歌单" />
+                     <Button fx:id="add_music_to_pack" layoutX="58.0" layoutY="249.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="37.0" prefWidth="101.0" text="加入歌单" />
                   </children>
                </AnchorPane>
             </left>
