@@ -32,7 +32,7 @@ public class Client implements ClientInterface{
         INSTANCE = this;
         musicList = new ArrayList<>();
         ImpartUI.showUI();
-        this.readMusicList();
+        this.readMusicHashMap();
         try {
             Thread.sleep(50);
         } catch (Exception e) {
@@ -73,14 +73,14 @@ public class Client implements ClientInterface{
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
         if(music == null){
-            music = getPlayMusic(musicProgress.getMusicId());
+            music = getMusicPlayer(musicProgress.getMusicId());
             music.setPositionMusic(musicProgress.getMusicTime());
 
             return;
         }
 
         if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
-            music = getPlayMusic(musicProgress.getMusicId());
+            music = getMusicPlayer(musicProgress.getMusicId());
         } else {
             if (Math.abs(music.getCurrentTime() - musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL) {
                 music.setPositionMusic(musicProgress.getMusicTime());
@@ -125,7 +125,7 @@ public class Client implements ClientInterface{
         Logger.logInfo(loginInfo.toString());
     }
 
-    public void saveMusicList() {
+    public void saveMusicHashMap() {
         String path = MUSIC_LIST_PATH;
         File file = new File(path);
         if (!file.exists()) {
@@ -143,7 +143,7 @@ public class Client implements ClientInterface{
     }
 
     @SuppressWarnings("unchecked")
-    protected void readMusicList() {
+    protected void readMusicHashMap() {
         String path = MUSIC_LIST_PATH;
         File file = new File(path);
         if (!file.exists()) {
@@ -159,7 +159,7 @@ public class Client implements ClientInterface{
                 e.printStackTrace();
             } finally {
                 this.musicFileHashMap = new HashMap<>();
-                this.initializeNewMusicList();
+                this.initializeNewMusicHashMap();
             }
             return;
         }
@@ -173,7 +173,7 @@ public class Client implements ClientInterface{
             } else {
                 Logger.logError("Error while reading music hash map set, creating new hashmap");
                 this.musicFileHashMap = new HashMap<>();
-                this.initializeNewMusicList();
+                this.initializeNewMusicHashMap();
             }
             input.close();
             in.close();
@@ -181,14 +181,14 @@ public class Client implements ClientInterface{
             Logger.logError("Empty music list file, creating new hashmap");
             this.musicFileHashMap = new HashMap<>();
             musicFileHashMap.put("nothing", null);
-            this.initializeNewMusicList();
-            this.saveMusicList();
+            this.initializeNewMusicHashMap();
+            this.saveMusicHashMap();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void initializeNewMusicList() {
+    private void initializeNewMusicHashMap() {
         File path = new File("./data");
         for (File child : path.listFiles()) {
             String fileName = child.getName();
@@ -205,7 +205,7 @@ public class Client implements ClientInterface{
         }
     }
 
-    private MusicPlayer getPlayMusic(String musicId) {
+    private MusicPlayer getMusicPlayer(String musicId) {
         String downloadPath = "./data";
         File musicFile = null;
         if(musicFileHashMap.containsKey(musicId)) {
