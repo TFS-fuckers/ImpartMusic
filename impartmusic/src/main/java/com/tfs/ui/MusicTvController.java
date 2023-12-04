@@ -4,20 +4,10 @@ import java.io.File;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import java.io.IOException;
-import java.util.Arrays;
 
 import com.tfs.client.Client;
-import com.tfs.datapack.UserSimpleInfo;
 
-import com.tfs.client.Client;
-import com.tfs.musicplayer.MusicPlayer;
-
-import javazoom.jl.decoder.Bitstream;
-import javazoom.jl.player.advanced.AdvancedPlayer;
-import javazoom.jl.player.advanced.PlaybackEvent;
-import javazoom.jl.player.advanced.PlaybackListener;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
