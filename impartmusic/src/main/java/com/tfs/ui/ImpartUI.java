@@ -7,6 +7,7 @@ import com.tfs.logger.Logger;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
@@ -57,7 +58,9 @@ public class ImpartUI extends Application {
             }
             messageStringBuilder.append(message);
             messageStringBuilder.append('\n');
-            //TODO: fix
+            MusicTvController.instance().getOnline_information_text().setText(
+                messageStringBuilder.toString()
+            );
         });
     }
 
@@ -67,7 +70,9 @@ public class ImpartUI extends Application {
 
     public static void displayUserList(List<UserSimpleInfo> userList) {
         ThreadDispatcher.invoke(() -> {
-            //TODO: fix
+            MusicTvController.instance().getOnlineusers_lists().setItems(
+                FXCollections.observableList(userList)
+            );
         });
     }
 }

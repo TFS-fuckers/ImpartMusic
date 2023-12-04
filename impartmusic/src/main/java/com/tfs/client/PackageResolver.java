@@ -1,9 +1,5 @@
 package com.tfs.client;
 
-import java.util.List;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;

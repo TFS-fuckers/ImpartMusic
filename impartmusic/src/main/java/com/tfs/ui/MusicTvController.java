@@ -1,15 +1,13 @@
 package com.tfs.ui;
-import javafx.scene.media.Media;
-import java.io.File;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import java.io.IOException;
 
 import com.tfs.client.Client;
+import com.tfs.datapack.UserSimpleInfo;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,16 +41,18 @@ public class MusicTvController {
         public void run() {
             connection_state_info_label.setText("未连接");
             ImpartUI.infoToUI("欢迎使用Impart Music", false);
+            users_name.setCellValueFactory((data) -> {
+                return new SimpleStringProperty(data.getValue().getUserName());
+            });
+            host.setCellValueFactory((data) -> {
+                return new SimpleStringProperty(data.getValue().getUserIP());
+            });
         }
     }
 
     public static MusicTvController instance() {
         return instance;
     }
-/*******************/
-    private MediaPlayer mediaPlayer;
-    private Duration duration;
-/*******************/
 
     @FXML
     private Button connect_button;
@@ -72,7 +72,16 @@ public class MusicTvController {
     private Button disconnect_button;
 
     @FXML
-    private TableColumn<?, ?> host;
+    private TableView<UserSimpleInfo> onlineusers_lists;
+    public TableView<UserSimpleInfo> getOnlineusers_lists() {
+        return onlineusers_lists;
+    }
+
+    @FXML
+    private TableColumn<UserSimpleInfo, String> users_name;
+    
+    @FXML
+    private TableColumn<UserSimpleInfo, String> host;
 
     @FXML
     private Button last_button;
@@ -115,9 +124,9 @@ public class MusicTvController {
 
     @FXML
     private TextArea online_information_text;
-
-    @FXML
-    private TableView<?> onlineusers_lists;
+    public TextArea getOnline_information_text() {
+        return online_information_text;
+    }
 
     @FXML
     private Button playmusic_button;
@@ -144,9 +153,6 @@ public class MusicTvController {
     private TextArea text_to_online_textarea;
 
     @FXML
-    private TableColumn<?, ?> users_name;
-
-    @FXML
     void Collect_music(ActionEvent event) {
 
     }
@@ -158,37 +164,7 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
-        music_playing_time_label.setText("0:00");
-        File audioFile = new File("./data/436346833.mp3");
-        String path = "file:///" + audioFile.getAbsolutePath().replace("\\", "/");
-        Media media = new Media(path);
-        mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setAutoPlay(false);
-         // 获取媒体总时长
-        duration = media.getDuration();
-        music_whole_time_label.setText(formatDuration(duration));
-
-        //music_slider.setShowTickLabels(true);
-        //music_slider.setShowTickMarks(true);
-        music_slider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (music_slider.isValueChanging()) {
-                    // 用户正在拖动Slider，设置播放位置
-                    mediaPlayer.seek(Duration.seconds(newValue.doubleValue()));
-                }
-            }
-        });
-        // 监听MediaPlayer的当前时间变化事件
-        mediaPlayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
-            @Override
-            public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-                // 更新Slider和Label显示
-                music_slider.setValue(newValue.toSeconds());
-                music_playing_time_label.setText(formatDuration(newValue));
-            }
-        });
-        mediaPlayer.play();
+        
     }
 
     private String formatDuration(Duration duration) {
@@ -216,7 +192,7 @@ public class MusicTvController {
     @FXML
     void cut_link(ActionEvent event) {
         if(Client.INSTANCE() != null && Client.INSTANCE().getConnection() != null) {
-                    Client.INSTANCE().getConnection().killConnection();
+            Client.INSTANCE().getConnection().killConnection();
         }
     }
     @FXML
