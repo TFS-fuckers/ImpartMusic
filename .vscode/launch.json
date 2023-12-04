@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "NeteaseTest",
+      "request": "launch",
+      "mainClass": "NeteaseTest",
+      "projectName": "impartmusic"
+    },
+    {
+      "type": "java",
       "name": "ClientTest",
       "request": "launch",
       "mainClass": "ClientTest",

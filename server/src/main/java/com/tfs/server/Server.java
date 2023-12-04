@@ -90,8 +90,7 @@ public class Server {
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
         this.syncReceiveTrigger = true;
-        if(musicProgress.isEmpty() == false)
-            ServerHandler.instance().sendToAllImmediately(new Datapack("SynchronizeMusic",musicProgress));
+        ServerHandler.instance().sendToAll(new Datapack("SynchronizeMusic", musicProgress));
     }
 
     protected void broadcastUserConnection(UserInfo info) {
@@ -108,7 +107,6 @@ public class Server {
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
         ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
         // TODO: 发送内容等待修改后补充
-        
     }
 
     public void onUserDisconnect(UserInfo info) {

@@ -27,20 +27,22 @@ public class Client implements ClientInterface{
     final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
     final public double MAX_SYNC_INTERVAL = 0.5;
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
-    private ArrayList<String> musicList;
+    private List<String> musicList = new ArrayList<>();
     private boolean killed = false;
     public Client() {
         INSTANCE = this;
-        musicList = new ArrayList<>();
         ImpartUI.showUI();
         this.readMusicHashMap();
         Logger.logInfo("UI started, main loop running...");
         while(!killed) {
             clientMainLoop();
         }
+        this.connection.killConnection();
+        this.connection = null;
     }
     
     public void kill() {
+        Logger.logInfo("Killed client main loop");
         this.killed = true;
     }
     
@@ -93,49 +95,70 @@ public class Client implements ClientInterface{
     }
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
-        if(music == null){
-            music = getMusicPlayer(musicProgress.getMusicId());
-            music.setPositionMusic(musicProgress.getMusicTime());
-
+        if(musicProgress.isEmpty()) {
+            if(music != null) {
+                music.pauseMusic();
+                music = null;
+            }
+            setMusicList(null);
             return;
         }
 
-        if (musicProgress.getMusicId().equals(music.getMusicId()) == false) {
-            music = getMusicPlayer(musicProgress.getMusicId());
-        } else {
-            if (Math.abs(music.getCurrentTime() - musicProgress.getMusicTime()) >= MAX_SYNC_INTERVAL) {
-                music.setPositionMusic(musicProgress.getMusicTime());
+        for(String id : musicProgress.getMusicList()) {
+            if(!musicFileHashMap.containsKey(id)) {
+                MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
             }
         }
-        switch (musicProgress.getMusicStatus()) {
-            case "pause":
-                music.pauseMusic();
-                break;
 
-            case "play":
-                music.resumeMusic();
-                break;
-        
-            default:
-                Logger.logError("Wrong status: "+musicProgress.getMusicStatus());
-                break;
+        if(music == null && musicProgress.getMusicId() != null) {
+            music = getMusicPlayer(musicProgress.getMusicId());
         }
-        
+        if(musicProgress.getMusicStatus() != null) {
+            switch (musicProgress.getMusicStatus()) {
+                case "pause":
+                    music.pauseMusic();
+                    break;
+
+                case "play":
+                    music.resumeMusic();
+                    break;
+            
+                default:
+                    Logger.logError("Wrong status: "+musicProgress.getMusicStatus());
+                    break;
+            }
+        }
+        if(this.musicList == null || !this.musicList.equals(musicProgress.getMusicList())) {
+            this.musicList = musicProgress.getMusicList();
+            ImpartUI.displaySongList(musicList);
+        }
+    }
+
+    private void setMusicList(List<String> idList) {
+        this.musicList = idList;
+        ImpartUI.displaySongList(musicList);
     }
 
     protected void getMusicProcess() {
-        if(music == null){
-            connection.sendMessage(new Datapack("SynchronizeMusic",new MusicProgress()));
+        if(music == null && this.musicList == null){
+            connection.sendMessage(new Datapack("SynchronizeMusic", new MusicProgress()));
+            return;
         }
-        else{
-            connection.sendMessage(
-            new Datapack("SynchronizeMusic",
-                new MusicProgress(
-                    music.getMusicId(), music.getCurrentTime(), music.getStatus()
-                )
+
+        MusicProgress toSend = music == null ? 
+        new MusicProgress(null, 0.0, null, this.musicList) : 
+        new MusicProgress(
+            music.getMusicId(),
+            music.getCurrentTime(),
+            music.getStatus(),
+            this.musicList
+        );
+        connection.sendMessage(
+            new Datapack(
+                "SynchronizeMusic",
+                toSend
             )
         );
-        }
     }
 
     public Connection getConnection() {
@@ -306,24 +329,24 @@ public class Client implements ClientInterface{
     public void onSetVolume(float volume){
         music.setVolume(volume);
     }
-    public ArrayList<String> getMusicList() {
+    public List<String> getMusicList() {
         return musicList;
     }
 
     public void addMusic(String id) {
-        if (!findMusic(id)) {
-            musicList.add(id);
+        if (findMusic(id)) {
+            ImpartUI.infoToUI("歌曲已经存在于歌单中");
         }
+        musicList.add(id);
+        ImpartUI.displaySongList(musicList);
     }
     public boolean findMusic(String id) {
-        if (musicList.contains(id)) {
-            return true;
-        }
-        return false;
+        return musicList.contains(id);
     }
     public void deleteMusic(String id) {
         if (findMusic(id)) {
             musicList.remove(id);
+            ImpartUI.displaySongList(musicList);
         }
     }
     public String getMusic(int i) {
@@ -338,9 +361,11 @@ public class Client implements ClientInterface{
         String idB = this.musicList.get(b);
         this.musicList.set(a, idB);
         this.musicList.set(b, idA);
+        ImpartUI.displaySongList(musicList);
     }
     public void insertMusic(String id, int place) {
         this.musicList.add(place, id);
+        ImpartUI.displaySongList(musicList);
     }
 
     public void displayUserList(List<UserSimpleInfo> list) {
@@ -354,5 +379,17 @@ public class Client implements ClientInterface{
 
     public boolean isConnected() {
         return this.connection != null && this.connection.isConnected();
+    }
+
+    public boolean fileExists(String id) {
+        return this.musicFileHashMap.containsKey(id);
+    }
+
+    public File getCachedFile(String id) {
+        return this.musicFileHashMap.get(id);
+    }
+
+    public void cacheFile(String id, File file) {
+        this.musicFileHashMap.put(id, file);
     }
 }

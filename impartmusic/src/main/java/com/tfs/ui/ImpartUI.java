@@ -1,10 +1,13 @@
 package com.tfs.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
+import com.tfs.musicplayer.Netease;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,7 +23,9 @@ public class ImpartUI extends Application {
             Platform.runLater(function);
         }
     }
-    
+
+    public static final HashMap<String, MusicDetails> MUSIC_DETAILS_CACHE = new HashMap<>();
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
@@ -83,6 +88,26 @@ public class ImpartUI extends Application {
     public static void clearUserList() {
         ThreadDispatcher.invoke(() -> {
             MusicTvController.instance().getOnlineusers_lists().setItems(null);
+        });
+    }
+
+    public static void displaySongList(List<String> idList) {
+        List<MusicDetails> songsDetails = new ArrayList<>();
+        for(String id : idList) {
+            if(!MUSIC_DETAILS_CACHE.containsKey(id)) {
+                MusicDetails downloaded = Netease.getMusicDetails(id);
+                if(downloaded == null) {
+                    Logger.logError("Music details not exists, ignoring.");
+                    Client.INSTANCE().deleteMusic(id);
+                    return;
+                }
+                MUSIC_DETAILS_CACHE.put(id, downloaded);
+            }
+            songsDetails.add(MUSIC_DETAILS_CACHE.get(id));
+        }
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().setDataList(songsDetails);
+            MusicTvController.instance().refreshTableView();
         });
     }
 }

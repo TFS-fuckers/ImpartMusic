@@ -2,17 +2,17 @@ package com.tfs.ui;
 
 import javafx.util.Duration;
 import java.io.IOException;
+import java.util.List;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
-import com.tfs.logger.Logger;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -29,7 +29,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MusicTvController {
-    ObservableList<MusicDetails> data = FXCollections.observableArrayList();
+    private List<MusicDetails> data; 
     public static final int ITEMS_PER_PAGE = 10;
 
     private static MusicTvController instance = null;
@@ -42,15 +42,11 @@ public class MusicTvController {
     private class UIInitializationTask implements Runnable {
         @Override
         public void run() {
-
-            music_lists.setOnMouseClicked(event -> {
-                EventTarget target = event.getTarget();
-                
-            });
-
-            tableView.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
-                Logger.logInfo("TableView clicked");
-                event.consume(); // 阻止事件传递给下一层的节点
+            music_lists.currentPageIndexProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> value, Number oldVal, Number newVal) {
+                    setMusicListDisplayPage(newVal.intValue());
+                }
             });
             setMusicListDisplayPage(0);
             connection_state_info_label.setText("未连接");
@@ -61,16 +57,24 @@ public class MusicTvController {
             host.setCellValueFactory((data) -> {
                 return new SimpleStringProperty(data.getValue().getUserIP());
             });
-            tColumn_collect.setCellFactory((tableColumn) -> new TableCell<MusicDetails, Button>() {
-                private final Button button = new Button("fuck");
+            tableViewButton.setCellFactory((tableColumn) -> new TableCell<MusicDetails, Button>() {
+                private String getTargetID() {
+                    return ((MusicDetails) getTableRow().getItem()).getId();
+                }
+                
+                private final Button button = new Button("×");
                 {
                     button.setOnAction(event -> {
-                        Logger.logInfo("Clicked");
                         try {
-                            AnchorPane root = FXMLLoader.load(getClass().getResource("/delete_music.fxml"));
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/delete_music.fxml"));
+                            AnchorPane root = loader.load();
+                            Delete_music_Controller controller = loader.getController();
+                            controller.setDeleteAction(() -> {
+                                Client.INSTANCE().deleteMusic(this.getTargetID());
+                            });
                             Stage stage = new Stage();
                             stage.setScene(new Scene(root));
-                            stage.setTitle("删除歌曲");
+                            stage.setTitle("删除确认");
                             stage.show();
                         } catch (IOException e1) {
                             e1.printStackTrace();
@@ -84,18 +88,44 @@ public class MusicTvController {
                     setGraphic(empty ? null : button);
                 }
             });
-            tableView.getItems().add(new MusicDetails());
+            tableViewMusicID.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getId()));
+            tableViewMusicTitle.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getName()));
+        }
+    }
+
+    public void setMusicListDisplayPage(int page) {
+        if(data == null) {
+            return;
         }
 
-        private void setMusicListDisplayPage(int page) {
-            int fromIndex = page * ITEMS_PER_PAGE;
-            int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, data.size());
-            tableView.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        int fromIndex = page * ITEMS_PER_PAGE;
+
+        if(data.size() == 0) {
+            tableView.setItems(null);    
+            return;
         }
+        
+        while(fromIndex >= data.size()) {
+            fromIndex -= ITEMS_PER_PAGE;
+            page--;
+        }
+        this.music_lists.setCurrentPageIndex(page);
+        int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, data.size());
+        tableView.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+    }
+
+    public void refreshTableView() {
+        this.setMusicListDisplayPage(
+            this.music_lists.getCurrentPageIndex()
+        );
     }
 
     public static MusicTvController instance() {
         return instance;
+    }
+
+    public void setDataList(List<MusicDetails> data) {
+        this.data = data;
     }
 
     @FXML
@@ -184,19 +214,19 @@ public class MusicTvController {
     private Button store_button;
 
     @FXML
-    private TableColumn<?, ?> tColumn_add_to_queue;
+    private TableColumn<MusicDetails, Button> tableViewButton;
 
     @FXML
-    private TableColumn<MusicDetails, Button> tColumn_collect;
+    private TableColumn<MusicDetails, String> tableViewMusicID;
 
     @FXML
-    private TableColumn<?, ?> tColumn_first;
-
-    @FXML
-    private TableColumn<?, ?> tColumn_music;
+    private TableColumn<MusicDetails, String> tableViewMusicTitle;
 
     @FXML
     private TableView<MusicDetails> tableView;
+    public TableView<MusicDetails> getMusicTableView() {
+        return tableView;
+    }
 
     @FXML
     private TextArea text_to_online_textarea;
@@ -257,11 +287,15 @@ public class MusicTvController {
 
     @FXML
     void add_music_to_pack(ActionEvent event) {
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("请先连接服务器！");
+            return;
+        }
         try {
             AnchorPane root = FXMLLoader.load(getClass().getResource("/add_music.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            stage.setTitle("收藏歌曲");
+            stage.setTitle("添加歌曲");
             stage.show();
         } catch (IOException e1) {
             e1.printStackTrace();

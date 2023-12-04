@@ -7,8 +7,10 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.tfs.client.Client;
 import com.tfs.logger.Logger;
 
 public class MusicDownloader {
@@ -17,7 +19,8 @@ public class MusicDownloader {
     private double downloadProgress;
     private static final Queue<MusicDownloader> ASYNC_QUEUE = new LinkedList<>();
     private static MusicDownloader asyncDownloadTask = null;
-    public static final Condition downloadCondition = new ReentrantLock().newCondition();
+    private static final Lock conditionLock = new ReentrantLock();
+    public static final Condition downloadCondition = conditionLock.newCondition();
     
     public static MusicDownloader getAsyncDownloading() {
         return asyncDownloadTask;
@@ -31,9 +34,17 @@ public class MusicDownloader {
                     Thread.sleep(1000);
                     while(ASYNC_QUEUE.size() > 0) {
                         asyncDownloadTask = ASYNC_QUEUE.peek();
-                        ASYNC_QUEUE.remove().downloadMusicFile();
+                        conditionLock.lock();
+                        MusicDownloader asyncTask = ASYNC_QUEUE.remove();
+                        File downloaded = asyncTask.downloadMusicFile();
+                        if(downloaded != null) {
+                            Client.INSTANCE().cacheFile(
+                                Netease.downloadURLtoID(asyncTask.getUrlPath()),
+                                downloaded
+                            );
+                        }
                         asyncDownloadTask = null;
-                        downloadCondition.signalAll();
+                        downloadCondition.signal();
                     }
                 } catch (Exception e) {
                     Logger.logError("Error downloading music file asynchronously");
@@ -52,6 +63,12 @@ public class MusicDownloader {
         File file = null;
         String path = null;
         try {
+            String[] strings = urlPath.split("=");
+            if(Client.INSTANCE().fileExists(strings[1])) {
+                return Client.INSTANCE().getCachedFile(strings[1]);
+            }
+
+            String fileName = "/" + strings[1] + ".mp3";
             URL url = new URL(this.urlPath);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("POST");
@@ -59,10 +76,7 @@ public class MusicDownloader {
             httpURLConnection.connect();
             int fileLength = httpURLConnection.getContentLength();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
-            String[] strings = urlPath.split("=");
-            String fileName = "/" + strings[1] + ".mp3";
             path = this.downloadPath + fileName;
-            System.out.println(fileName);
             file = new File(path);
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -82,8 +96,6 @@ public class MusicDownloader {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            System.out.println(path);
         }
         return file;
     }

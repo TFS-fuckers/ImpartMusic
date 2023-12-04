@@ -18,10 +18,9 @@
        <AnchorPane cache="true" prefHeight="150.0" prefWidth="150.0" style="-fx-background-color: #cfcfcf;" BorderPane.alignment="CENTER">
            <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" layoutY="-6.0" onSort="#Music_Sort" prefHeight="506.0" prefWidth="921.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="0.0">
                <columns>
-                   <TableColumn fx:id="tColumn_first" maxWidth="408.66669714450836" minWidth="70" prefWidth="243.33336889743805" sortable="false" styleClass="firstColumn" text="序号" />
-                   <TableColumn fx:id="tColumn_music" minWidth="107.33330535888672" prefWidth="551.3332366943359" sortable="false" styleClass="firstColumn" text="歌曲标题" />
-                   <TableColumn fx:id="tColumn_collect" maxWidth="428.0" minWidth="0.0" prefWidth="122.6666259765625" sortable="false" styleClass="firstColumn" text="多种选项" />
-                   <TableColumn fx:id="tColumn_add_to_queue" maxWidth="50" minWidth="0.0" prefWidth="0.0" sortable="false" styleClass="firstColumn" text="  " />
+                   <TableColumn fx:id="tableViewMusicID" maxWidth="408.66669714450836" minWidth="70" prefWidth="243.33336889743805" sortable="false" styleClass="firstColumn" text="序号" />
+                   <TableColumn fx:id="tableViewMusicTitle" minWidth="107.33330535888672" prefWidth="551.3332366943359" sortable="false" styleClass="firstColumn" text="歌曲标题" />
+                   <TableColumn fx:id="tableViewButton" maxWidth="428.0" minWidth="0.0" prefWidth="122.6666259765625" sortable="false" styleClass="firstColumn" text="多种选项" />
                </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
