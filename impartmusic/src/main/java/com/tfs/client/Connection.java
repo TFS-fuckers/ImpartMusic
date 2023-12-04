@@ -234,8 +234,14 @@ public class Connection {
      * 内部方法，代表一次refresh内客户端的发送信息的逻辑
      */
     private void sendMessageTick(){
-        if(this.toSend.size() > 0){
-            this.writer.println(this.toSend.remove().toJson());
+        synchronized(this.toSend) {
+            synchronized(this.writer) {
+                if(this.toSend.size() > 0){
+                    this.writer.println(this.toSend.remove().toJson());
+                }
+                this.writer.notify();
+            }
+            this.toSend.notify();
         }
     }
 
@@ -244,7 +250,17 @@ public class Connection {
      * @param datapack 待发送的数据包
      */
     public void sendMessage(Datapack datapack){
-        this.toSend.add(datapack);
+        synchronized(this.toSend) {
+            this.toSend.add(datapack);
+            this.toSend.notify();
+        }
+    }
+
+    public void sendMessageImmediately(Datapack datapack) {
+        synchronized(this.writer) {
+            this.writer.println(datapack.toJson());
+            this.writer.notify();
+        }
     }
 
     /**

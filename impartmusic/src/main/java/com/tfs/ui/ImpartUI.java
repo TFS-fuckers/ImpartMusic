@@ -2,6 +2,7 @@ package com.tfs.ui;
 
 import java.util.List;
 
+import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 
@@ -31,13 +32,16 @@ public class ImpartUI extends Application {
     @Override
     public void init() throws Exception{
         super.init();
-        
         System.out.println("init()...");
     }
 
     @Override
     public void stop() throws Exception{
         super.stop();
+        if(Client.INSTANCE().isConnected()) {
+            Client.INSTANCE().disconnect();
+        }
+        Client.INSTANCE().kill();
         System.out.println("stop()...");
     }
     
@@ -73,6 +77,12 @@ public class ImpartUI extends Application {
             MusicTvController.instance().getOnlineusers_lists().setItems(
                 FXCollections.observableList(userList)
             );
+        });
+    }
+
+    public static void clearUserList() {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().getOnlineusers_lists().setItems(null);
         });
     }
 }

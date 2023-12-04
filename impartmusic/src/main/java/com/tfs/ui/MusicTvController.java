@@ -1,10 +1,10 @@
 package com.tfs.ui;
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import java.io.IOException;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
+import com.tfs.logger.Logger;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -138,7 +139,7 @@ public class MusicTvController {
     private TableColumn<?, ?> tColumn_add_to_queue;
 
     @FXML
-    private TableColumn<?, ?> tColumn_collect;
+    private TableColumn<MusicDetails, Button> tColumn_collect;
 
     @FXML
     private TableColumn<?, ?> tColumn_first;
@@ -147,7 +148,7 @@ public class MusicTvController {
     private TableColumn<?, ?> tColumn_music;
 
     @FXML
-    private TableView<?> tableView;
+    private TableView<MusicDetails> tableView;
 
     @FXML
     private TextArea text_to_online_textarea;
@@ -191,9 +192,7 @@ public class MusicTvController {
 
     @FXML
     void cut_link(ActionEvent event) {
-        if(Client.INSTANCE() != null && Client.INSTANCE().getConnection() != null) {
-            Client.INSTANCE().getConnection().killConnection();
-        }
+        Client.INSTANCE().disconnect();
     }
     @FXML
     void buildnewInputPane(ActionEvent event) {

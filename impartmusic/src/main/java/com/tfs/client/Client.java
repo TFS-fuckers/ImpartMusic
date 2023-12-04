@@ -28,21 +28,22 @@ public class Client implements ClientInterface{
     final public double MAX_SYNC_INTERVAL = 0.5;
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
     private ArrayList<String> musicList;
+    private boolean killed = false;
     public Client() {
         INSTANCE = this;
         musicList = new ArrayList<>();
         ImpartUI.showUI();
         this.readMusicHashMap();
-        try {
-            Thread.sleep(50);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        while(true) {
+        Logger.logInfo("UI started, main loop running...");
+        while(!killed) {
             clientMainLoop();
         }
     }
-                                    
+    
+    public void kill() {
+        this.killed = true;
+    }
+    
     private void clientMainLoop() {
         try {
             Thread.sleep(50);
@@ -64,6 +65,26 @@ public class Client implements ClientInterface{
 
     public static Client INSTANCE() {
         return INSTANCE;
+    }
+
+    public void disconnect() {
+        synchronized(this.connection) {
+            if(this.connection != null && this.connection.isConnected()) {
+                this.connection.sendMessageImmediately(new Datapack(
+                    "ControlConnect",
+                    new ControlConnect("Disconnected")
+                ));
+            }
+            try {
+                Thread.sleep(500);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logger.logError("Error occurred while disconnecting");
+            }
+            this.clearUserList();
+            this.connection.killConnection();
+            this.connection.notify();
+        }
     }
 
     protected void controlConnect(ControlConnect controlconnect) {
@@ -324,5 +345,14 @@ public class Client implements ClientInterface{
 
     public void displayUserList(List<UserSimpleInfo> list) {
         ImpartUI.displayUserList(list);
+    }
+
+    public void clearUserList() {
+        Logger.logInfo("Cleared user list");
+        ImpartUI.clearUserList();
+    }
+
+    public boolean isConnected() {
+        return this.connection != null && this.connection.isConnected();
     }
 }
