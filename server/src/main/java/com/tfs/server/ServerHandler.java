@@ -268,6 +268,8 @@ public class ServerHandler {
     }
 
     public int getUserNum() {
+        if(connectedUsers == null)
+            return 0;
         return this.connectedUsers.size();
     }
 
