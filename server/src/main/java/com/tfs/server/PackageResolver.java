@@ -12,7 +12,7 @@ public class PackageResolver {
                 server.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));
                 break;
 
-            case "StrandardRequest":
+            case "StrandardRequest": 
                 server.setStandardUserIndex(ServerHandler.instance().getUserIndex(datapack.senderTag));
                 break;
 
