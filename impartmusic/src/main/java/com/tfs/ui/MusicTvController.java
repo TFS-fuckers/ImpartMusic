@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
+import com.tfs.musicplayer.MusicPlayer;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,7 +14,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,7 +25,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -186,12 +185,18 @@ public class MusicTvController {
 
     @FXML
     private Label music_playing_time_label;
+    public Label getMusic_playing_time_label() {
+        return music_playing_time_label;
+    }
 
     @FXML
     private Button music_playmode_button;
 
     @FXML
     private Slider music_slider;
+    public Slider getMusic_slider() {
+        return music_slider;
+    }
 
     @FXML
     private Label music_title;
@@ -245,27 +250,22 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
-        // music_slider.valueProperty().addListener(new ChangeListener<Number>() {
-        //     @Override
-        //     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        //         if (music_slider.isValueChanging()) {
-        //             // 用户正在拖动Slider，设置播放位置
-        //             mediaPlayer.seek(Duration.seconds(newValue.doubleValue()));
-        //         }
-        //     }
-        // });
-        // // 监听MediaPlayer的当前时间变化事件
-        // mediaPlayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
-        //     @Override
-        //     public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-        //         // 更新Slider和Label显示
-        //         music_slider.setValue(newValue.toSeconds());
-        //         music_playing_time_label.setText(formatDuration(newValue));
-        //     }
-        // });
+        music_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (music_slider.isValueChanging()) {
+                    // 用户正在拖动Slider，设置播放位置
+                    MusicPlayer currentPlaying = Client.INSTANCE().getCurrentMusic();
+                    if(currentPlaying != null) {
+                        currentPlaying.setPositionMusic(newValue.doubleValue());
+                    }
+                }
+            }
+        });
+        
     }
 
-    private String formatDuration(Duration duration) {
+    public static String formatDuration(Duration duration) {
         if(duration == null) {
             return "xx:xx";
         }
