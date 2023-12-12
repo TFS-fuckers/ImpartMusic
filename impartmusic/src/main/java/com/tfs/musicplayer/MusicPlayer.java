@@ -9,7 +9,6 @@ import javafx.util.Duration;
 
 public class MusicPlayer {
     private boolean isPlaying = false;
-    private boolean isPlayerReady = false;
     private MediaPlayer player;
     private String absoluteFilePath;
     private ChangeListener<Duration> processChangeListener = null;
@@ -21,10 +20,6 @@ public class MusicPlayer {
         this.player = new MediaPlayer(media);
         isPlaying = false;
         this.playingID = playingID;
-        this.player.setOnReady(() -> {
-            Logger.logInfo("Music player is now ready");
-            isPlayerReady = true;
-        });
     }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;

@@ -13,9 +13,6 @@ import com.tfs.ui.ImpartUI;
 import com.tfs.ui.MusicTvController;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.util.Duration;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -406,8 +403,9 @@ public class Client implements ClientInterface{
         if(doRequest) {
             this.requestStandardUser();
         }
-        onChangeMusic(old, this.music);
+        this.playingMusicIndex = this.musicList.indexOf(id);
         this.music = newPlayer;
+        onChangeMusic(old, this.music);
     }
 
     public void displayUserList(List<UserSimpleInfo> list) {

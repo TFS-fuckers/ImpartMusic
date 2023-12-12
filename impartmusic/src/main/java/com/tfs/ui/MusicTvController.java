@@ -9,7 +9,6 @@ import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.musicplayer.MusicPlayer;
 
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -91,7 +90,26 @@ public class MusicTvController {
                             AnchorPane root = loader.load();
                             Delete_music_Controller controller = loader.getController();
                             controller.setDeleteAction(() -> {
-                                Client.INSTANCE().deleteMusic(this.getTargetID());
+                                Client instance = Client.INSTANCE();
+                                instance.deleteMusic(this.getTargetID());
+                                if(instance.getMusicList().size() == 0) {
+                                    ImpartUI.bindLabel(null);
+                                    ImpartUI.bindProgressDisplay(null);
+                                    ImpartUI.bindProgressSetter(null);
+                                    return;
+                                }
+
+                                if(instance.getCurrentMusic().getPlayingID().equals(this.getTargetID())) {
+                                    instance.useTargetMusic(instance.getMusicList().get(
+                                        Math.min(
+                                            instance.getPlayingMusicIndex(),
+                                            instance.getMusicList().size() - 1
+                                        )
+                                    ), false);
+                                }
+                                if(instance.getCurrentMusic().isPlaying()) {
+                                    instance.playMusic(false);
+                                }
                             });
                             Stage stage = new Stage();
                             stage.setScene(new Scene(root));
