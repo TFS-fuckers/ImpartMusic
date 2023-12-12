@@ -30,6 +30,7 @@ public class Client implements ClientInterface{
     final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
     final public double MAX_SYNC_INTERVAL = 0.5;
     final public int REQUEST_STD_IGNORE_COUNT = 2;
+    final public double SYNC_RANGE_SECOND = 1.0;
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
     private List<String> musicList = new ArrayList<>();
     private boolean killed = false;
@@ -43,8 +44,10 @@ public class Client implements ClientInterface{
         while(!killed) {
             clientMainLoop();
         }
-        this.connection.killConnection();
-        this.connection = null;
+        if(this.connection != null) {
+            this.connection.killConnection();
+            this.connection = null;
+        }
     }
     
     public void kill() {
@@ -142,7 +145,7 @@ public class Client implements ClientInterface{
         }
 
         //sync musicplayer process
-        if(this.music != null && this.music.getCurrentTime() != musicProgress.getMusicTime()) {
+        if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND)) {
             this.music.setPositionMusic(musicProgress.getMusicTime());
         }
     }
@@ -436,12 +439,33 @@ public class Client implements ClientInterface{
         return this.music;
     }
 
+    private final Runnable nextMusicStrategy = new Runnable() {
+        @Override
+        public void run() {
+            MusicPlayer old = Client.this.getCurrentMusic();
+            Client.this.playingMusicIndex++;
+            Client.this.playingMusicIndex %= Client.this.getMusicList().size();
+            Client.this.pauseMusic(false);
+            Client.this.useTargetMusic(Client.this.getMusicList().get(Client.this.playingMusicIndex), false);
+            Client.this.playMusic(false);
+            Client.this.onChangeMusic(old, Client.this.music);
+        }
+    };
+
     public void onChangeMusic(MusicPlayer oldVal, MusicPlayer newVal) {
         if(oldVal != null) {
-            oldVal.clearMusicProcessListener();
+            oldVal.setOnEnd(null);
+            oldVal.setOnReady(null);
         }
+
         if(newVal != null) {
-            newVal.setMusicProcessListener(new PlayerProgressUIBoundTask());
+            newVal.setOnReady(() -> {
+                Logger.logInfo("Music player ready!");
+                ImpartUI.bindLabel(newVal.getTotalTimeDuration());
+                ImpartUI.bindProgressDisplay(newVal.getPlayerProcessProperty());
+                ImpartUI.bindProgressSetter(newVal);
+            });
+            newVal.setOnEnd(nextMusicStrategy);
         }
     }
 
@@ -461,9 +485,9 @@ public class Client implements ClientInterface{
             }
             this.playingMusicIndex = 0;
             this.music = getMusicPlayer(this.musicList.get(playingMusicIndex));
-        } else {
-            this.music.resumeMusic();
+            this.onChangeMusic(null, music);
         }
+        this.music.resumeMusic();
         return;
     }
 
@@ -474,13 +498,7 @@ public class Client implements ClientInterface{
         this.music.pauseMusic();
     }
 
-    private class PlayerProgressUIBoundTask implements ChangeListener<Duration> {
-        @Override
-        public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-            ImpartUI.delegatedInvoke(() -> {
-                MusicTvController.instance().getMusic_slider().setValue(newValue.toSeconds());
-                MusicTvController.instance().getMusic_playing_time_label().setText(MusicTvController.formatDuration(newValue));
-            });
-        }
-    } 
+    public boolean isPlaying() {
+        return this.music == null ? false : this.music.isPlaying();
+    }
 }

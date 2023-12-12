@@ -9,6 +9,8 @@ import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.musicplayer.MusicPlayer;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -58,6 +60,24 @@ public class MusicTvController {
             host.setCellValueFactory((data) -> {
                 return new SimpleStringProperty(data.getValue().getUserIP());
             });
+
+            MusicTvController.this.music_slider.setOnMouseClicked((event) -> {
+                if(MusicTvController.this.sliderSetTarget != null) {
+                    MusicTvController.this.sliderSetTarget.setPositionMusic(
+                        MusicTvController.this.music_slider.getValue()
+                    );
+                }
+            });
+
+            MusicTvController.this.music_slider.valueProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> value, Number oldVal, Number newVal) {
+                    if(music_slider.isValueChanging() && MusicTvController.this.sliderSetTarget != null) {
+                        MusicTvController.this.sliderSetTarget.setPositionMusic(newVal.doubleValue());
+                    }
+                }
+            });
+
             tableViewButton.setCellFactory((tableColumn) -> new TableCell<MusicDetails, Button>() {
                 private String getTargetID() {
                     return ((MusicDetails) getTableRow().getItem()).getId();
@@ -250,19 +270,11 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
-        music_slider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (music_slider.isValueChanging()) {
-                    // 用户正在拖动Slider，设置播放位置
-                    MusicPlayer currentPlaying = Client.INSTANCE().getCurrentMusic();
-                    if(currentPlaying != null) {
-                        currentPlaying.setPositionMusic(newValue.doubleValue());
-                    }
-                }
-            }
-        });
-        
+        if(Client.INSTANCE().isPlaying()) {
+            Client.INSTANCE().pauseMusic(true);
+            return;
+        }
+        Client.INSTANCE().playMusic(true);
     }
 
     public static String formatDuration(Duration duration) {
@@ -322,5 +334,45 @@ public class MusicTvController {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+
+    public void bindLabel(Duration total) {
+        this.music_slider.setMax(total.toSeconds());
+        this.music_whole_time_label.setText(String.format(
+            "%02d:%02d",
+            (int)total.toMinutes(),
+            (int)total.toSeconds() % 60
+        ));
+    }
+    
+    public final ChangeListener<Duration> progressBarSubscriber = new ChangeListener<Duration>() {
+        @Override
+        public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
+            MusicTvController.this.music_slider.setValue(newValue.toSeconds());
+            MusicTvController.this.music_playing_time_label.setText(String.format(
+                "%02d:%02d",
+                (int)newValue.toMinutes(),
+                (int)newValue.toSeconds() % 60
+            ));
+        }
+    };
+    private ReadOnlyObjectProperty<Duration> subscribedProperty = null;
+
+    public void bindProgressDisplay(ReadOnlyObjectProperty<Duration> value) {
+        if(subscribedProperty != null) {
+            subscribedProperty.removeListener(progressBarSubscriber);
+        }
+        subscribedProperty = value;
+        value.addListener(progressBarSubscriber);
+    }
+
+    private MusicPlayer sliderSetTarget = null;
+    public void bindProgressSetter(MusicPlayer target) {
+        this.sliderSetTarget = target;
+    }
+
+    public void removeProgressSetter() {
+        this.sliderSetTarget = null;
     }
 }

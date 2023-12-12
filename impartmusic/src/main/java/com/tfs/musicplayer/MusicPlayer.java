@@ -9,6 +9,7 @@ import javafx.util.Duration;
 
 public class MusicPlayer {
     private boolean isPlaying = false;
+    private boolean isPlayerReady = false;
     private MediaPlayer player;
     private String absoluteFilePath;
     private ChangeListener<Duration> processChangeListener = null;
@@ -20,6 +21,10 @@ public class MusicPlayer {
         this.player = new MediaPlayer(media);
         isPlaying = false;
         this.playingID = playingID;
+        this.player.setOnReady(() -> {
+            Logger.logInfo("Music player is now ready");
+            isPlayerReady = true;
+        });
     }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
@@ -71,21 +76,11 @@ public class MusicPlayer {
         return player.getCurrentTime().toSeconds();
     }
 
-    public double getTotalTime() {
-        player.setVolume(0);
-        player.play();
-        try {
-            Thread.sleep(30);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        player.pause();
-        player.setStartTime(Duration.seconds(0));
-        player.setVolume(20);
-        return player.getCycleDuration().toSeconds();
+    public Duration getTotalTimeDuration() {
+        return player.getTotalDuration();
     }
+
     public String getStatus() {
-        System.out.println(isPlaying);
         if (isPlaying) {
             return "play";
         }
@@ -115,5 +110,13 @@ public class MusicPlayer {
 
     public String getPlayingID() {
         return playingID;
+    }
+
+    public void setOnEnd(Runnable delegate) {
+        this.player.setOnEndOfMedia(delegate);
+    }
+
+    public void setOnReady(Runnable delegate) {
+        this.player.setOnReady(delegate);
     }
 }

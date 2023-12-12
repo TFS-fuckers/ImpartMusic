@@ -7,15 +7,18 @@ import java.util.List;
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
+import com.tfs.musicplayer.MusicPlayer;
 import com.tfs.musicplayer.Netease;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class ImpartUI extends Application {
     static class ThreadDispatcher {
@@ -113,5 +116,25 @@ public class ImpartUI extends Application {
 
     public static void delegatedInvoke(Runnable task) {
         ThreadDispatcher.invoke(task);
+    }
+
+    public static void bindLabel(Duration duration) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().bindLabel(duration);
+        });
+    }
+
+    public static void bindProgressDisplay(ReadOnlyObjectProperty<Duration> property) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().bindProgressDisplay(property);
+        });
+    }
+
+    public static void bindProgressSetter(MusicPlayer target) {
+        MusicTvController.instance().bindProgressSetter(target);
+    }
+
+    public static void removeProgressSetter() {
+        MusicTvController.instance().removeProgressSetter();
     }
 }
