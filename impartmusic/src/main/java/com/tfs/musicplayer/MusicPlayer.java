@@ -1,5 +1,8 @@
 package com.tfs.musicplayer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.tfs.logger.Logger;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -13,6 +16,8 @@ public class MusicPlayer {
     private String absoluteFilePath;
     private ChangeListener<Duration> processChangeListener = null;
     private String playingID;
+    private List<Runnable> onReadyListeners = new LinkedList<>();
+    private boolean isReady = false;
 
     public MusicPlayer(String absoluteFilePath, String playingID) {
         this.absoluteFilePath = absoluteFilePath;
@@ -20,6 +25,12 @@ public class MusicPlayer {
         this.player = new MediaPlayer(media);
         isPlaying = false;
         this.playingID = playingID;
+        this.player.setOnReady(() -> {
+            for(Runnable action : onReadyListeners) {
+                action.run();
+            }
+        });
+        this.onReadyListeners.add(() -> this.isReady = true);
     }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
@@ -111,7 +122,15 @@ public class MusicPlayer {
         this.player.setOnEndOfMedia(delegate);
     }
 
-    public void setOnReady(Runnable delegate) {
-        this.player.setOnReady(delegate);
+    public void addOnReady(Runnable delegate) {
+        this.onReadyListeners.add(delegate);
+    }
+
+    public void clearOnReady() {
+        this.onReadyListeners.clear();
+    }
+
+    public boolean isMediaReady() {
+        return this.isReady;
     }
 }

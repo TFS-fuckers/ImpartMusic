@@ -92,24 +92,6 @@ public class MusicTvController {
                             controller.setDeleteAction(() -> {
                                 Client instance = Client.INSTANCE();
                                 instance.deleteMusic(this.getTargetID());
-                                if(instance.getMusicList().size() == 0) {
-                                    ImpartUI.bindLabel(null);
-                                    ImpartUI.bindProgressDisplay(null);
-                                    ImpartUI.bindProgressSetter(null);
-                                    return;
-                                }
-
-                                if(instance.getCurrentMusic().getPlayingID().equals(this.getTargetID())) {
-                                    instance.useTargetMusic(instance.getMusicList().get(
-                                        Math.min(
-                                            instance.getPlayingMusicIndex(),
-                                            instance.getMusicList().size() - 1
-                                        )
-                                    ), false);
-                                }
-                                if(instance.getCurrentMusic().isPlaying()) {
-                                    instance.playMusic(false);
-                                }
                             });
                             Stage stage = new Stage();
                             stage.setScene(new Scene(root));
@@ -311,12 +293,12 @@ public class MusicTvController {
 
     @FXML
     void To_last_music(ActionEvent event) {
-
+        Client.INSTANCE().goPreviousMusic(true);
     }
 
     @FXML
     void To_next_music(ActionEvent event) {
-
+        Client.INSTANCE().goNextMusic(true);
     }
 
     @FXML
@@ -382,6 +364,9 @@ public class MusicTvController {
             subscribedProperty.removeListener(progressBarSubscriber);
         }
         subscribedProperty = value;
+        if(value == null) {
+            this.music_slider.setValue(0);
+        }
         value.addListener(progressBarSubscriber);
     }
 

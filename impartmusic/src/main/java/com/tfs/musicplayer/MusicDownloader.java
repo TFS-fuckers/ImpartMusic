@@ -11,12 +11,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.tfs.client.Client;
-import com.tfs.logger.Logger;
 
 public class MusicDownloader {
     private String downloadPath;
     private String urlPath;
     private double downloadProgress;
+    
     private static final Queue<MusicDownloader> ASYNC_QUEUE = new LinkedList<>();
     private static MusicDownloader asyncDownloadTask = null;
     private static final Lock conditionLock = new ReentrantLock();
@@ -25,40 +25,18 @@ public class MusicDownloader {
     public static MusicDownloader getAsyncDownloading() {
         return asyncDownloadTask;
     }
-
-    static {
-        new Thread(() -> {
-            Thread.currentThread().setName("async-downloader");
-            while(true) {
-                try {
-                    Thread.sleep(1000);
-                    while(ASYNC_QUEUE.size() > 0) {
-                        asyncDownloadTask = ASYNC_QUEUE.peek();
-                        conditionLock.lock();
-                        MusicDownloader asyncTask = ASYNC_QUEUE.remove();
-                        File downloaded = asyncTask.downloadMusicFile();
-                        if(downloaded != null) {
-                            Client.INSTANCE().cacheFile(
-                                Netease.downloadURLtoID(asyncTask.getUrlPath()),
-                                downloaded
-                            );
-                        }
-                        asyncDownloadTask = null;
-                        downloadCondition.signal();
-                    }
-                } catch (Exception e) {
-                    Logger.logError("Error downloading music file asynchronously");
-                    e.printStackTrace();
-                }
-            }
-        }).start();     
+    
+    public static void downloadMusicFileAsync(String urlPath, String downloadPath) {
+        ASYNC_QUEUE.add(new MusicDownloader(urlPath, downloadPath));
     }
     
+    
+
     public MusicDownloader(String urlPath, String downloadPath) {
         this.urlPath = urlPath;
         this.downloadPath = downloadPath;
     }
-
+    
     public File downloadMusicFile() {
         File file = null;
         String path = null;
@@ -73,6 +51,7 @@ public class MusicDownloader {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            httpURLConnection.setConnectTimeout(10);
             httpURLConnection.connect();
             int fileLength = httpURLConnection.getContentLength();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
@@ -100,9 +79,6 @@ public class MusicDownloader {
         return file;
     }
 
-    public static void downloadMusicFileAsync(String urlPath, String downloadPath) {
-        ASYNC_QUEUE.add(new MusicDownloader(urlPath, downloadPath));
-    }
     
     public String getUrlPath() {
         return urlPath;

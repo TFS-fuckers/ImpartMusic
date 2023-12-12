@@ -13,7 +13,6 @@ public class PackageResolver {
 
     protected static void resolveDatapack(Datapack datapack){
         Client client = Client.INSTANCE();
-        Logger.logInfo("Resolving datapack");
         switch (datapack.identifier) {
             case "ControlConnect":
                 client.controlConnect(datapack.deserializeContent(ControlConnect.class));

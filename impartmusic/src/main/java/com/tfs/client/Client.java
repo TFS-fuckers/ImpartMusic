@@ -114,11 +114,11 @@ public class Client implements ClientInterface{
         if(this.musicList == null || !this.musicList.equals(musicProgress.getMusicList())) {
             this.musicList = musicProgress.getMusicList();
             ImpartUI.displaySongList(musicList);
-            for(String id : musicProgress.getMusicList()) {
-                if(!musicFileHashMap.containsKey(id)) {
-                    MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
-                }
-            }
+            // for(String id : musicProgress.getMusicList()) {
+            //     if(!musicFileHashMap.containsKey(id)) {
+            //         MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
+            //     }
+            // }
         }
 
         //sync music player
@@ -143,7 +143,14 @@ public class Client implements ClientInterface{
 
         //sync musicplayer process
         if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND)) {
-            this.music.setPositionMusic(musicProgress.getMusicTime());
+            double time = musicProgress.getMusicTime();
+            if(!this.music.isMediaReady()) {
+                this.music.addOnReady(() -> {
+                    this.music.setPositionMusic(time);
+                });
+            } else {
+                this.music.setPositionMusic(time);
+            }
         }
     }
 
@@ -275,8 +282,8 @@ public class Client implements ClientInterface{
                 musicFileHashMap.remove(musicId);
             }
         }
-        String downloadPath = "./data";
         if(musicFile == null) {
+            String downloadPath = "./data";
             MusicDownloader asyncDownloading = MusicDownloader.getAsyncDownloading();
             boolean asyncDownloaded = false;
             if(asyncDownloading != null && Netease.downloadURLtoID(asyncDownloading.getUrlPath()).equals(musicId)) {
@@ -364,10 +371,33 @@ public class Client implements ClientInterface{
     }
     
     public void deleteMusic(String id) {
-        if (findMusic(id)) {
-            this.requestStandardUser();
-            musicList.remove(id);
-            ImpartUI.displaySongList(musicList);
+        if (!findMusic(id)) {
+            Logger.logWarning("Ignoring missing music delete request of %s", id);
+            Logger.logWarning("Cause: music unfound in list");
+            return;
+        }
+        this.requestStandardUser();
+        int elemIndex = this.musicList.indexOf(id);
+        musicList.remove(id);
+        ImpartUI.displaySongList(musicList);
+        if(this.musicList.size() == 0 && this.music != null) {
+            this.music.pauseMusic();
+            this.music = null;
+            return;
+        }
+
+        if(elemIndex > this.playingMusicIndex) {
+            return;
+        }
+        this.playingMusicIndex = Math.min(
+            this.playingMusicIndex,
+            this.musicList.size() - 1
+        );
+        boolean isPlaying = this.music == null ? false : this.music.isPlaying();
+        this.pauseMusic(false);
+        this.useTargetMusic(this.musicList.get(this.playingMusicIndex), killed);
+        if(isPlaying) {
+            this.playMusic(false);
         }
     }
     
@@ -440,25 +470,44 @@ public class Client implements ClientInterface{
     private final Runnable nextMusicStrategy = new Runnable() {
         @Override
         public void run() {
+            if(Client.this.getMusicList().size() == 0) {
+                return;
+            }
             MusicPlayer old = Client.this.getCurrentMusic();
             Client.this.playingMusicIndex++;
             Client.this.playingMusicIndex %= Client.this.getMusicList().size();
             Client.this.pauseMusic(false);
             Client.this.useTargetMusic(Client.this.getMusicList().get(Client.this.playingMusicIndex), false);
             Client.this.playMusic(false);
-            Client.this.onChangeMusic(old, Client.this.music);
+        }
+    };
+
+    private final Runnable previousMusicStrategy = new Runnable() {
+        @Override
+        public void run() {
+            if(Client.this.getMusicList().size() == 0) {
+                return;
+            }
+            MusicPlayer old = Client.this.getCurrentMusic();
+            Client.this.playingMusicIndex--;
+            if(Client.this.playingMusicIndex == -1) {
+                Client.this.playingMusicIndex = Client.this.getMusicList().size() - 1;
+            }
+            Client.this.pauseMusic(false);
+            Client.this.useTargetMusic(Client.this.getMusicList().get(Client.this.playingMusicIndex), false);
+            Client.this.playMusic(false);
         }
     };
 
     public void onChangeMusic(MusicPlayer oldVal, MusicPlayer newVal) {
         if(oldVal != null) {
             oldVal.setOnEnd(null);
-            oldVal.setOnReady(null);
+            oldVal.clearOnReady();
         }
 
         if(newVal != null) {
-            newVal.setOnReady(() -> {
-                Logger.logInfo("Music player ready!");
+            newVal.addOnReady(() -> {
+                Logger.logInfo("Music player of %s is ready!", newVal.getMusicId());
                 ImpartUI.bindLabel(newVal.getTotalTimeDuration());
                 ImpartUI.bindProgressDisplay(newVal.getPlayerProcessProperty());
                 ImpartUI.bindProgressSetter(newVal);
@@ -485,11 +534,16 @@ public class Client implements ClientInterface{
             this.music = getMusicPlayer(this.musicList.get(playingMusicIndex));
             this.onChangeMusic(null, music);
         }
-        this.music.resumeMusic();
+        if(this.music != null) {
+            this.music.resumeMusic();
+        }
         return;
     }
 
     public void pauseMusic(boolean doRequest) {
+        if(this.music == null) {
+            return;
+        }
         if(doRequest) {
             this.requestStandardUser();
         }
@@ -498,5 +552,19 @@ public class Client implements ClientInterface{
 
     public boolean isPlaying() {
         return this.music == null ? false : this.music.isPlaying();
+    }
+
+    public void goNextMusic(boolean doRequest) {
+        if(doRequest) {
+            this.requestStandardUser();
+        }
+        this.nextMusicStrategy.run();
+    }
+
+    public void goPreviousMusic(boolean doRequest) {
+        if(doRequest) {
+            this.requestStandardUser();
+        }
+        this.previousMusicStrategy.run();
     }
 }
