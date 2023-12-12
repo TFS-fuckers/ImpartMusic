@@ -13,6 +13,9 @@ import com.tfs.ui.ImpartUI;
 import com.tfs.ui.MusicTvController;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -26,9 +29,12 @@ public class Client implements ClientInterface{
     private MusicPlayer music = null;
     final public String MUSIC_LIST_PATH = "./data/MusicList.dat"; 
     final public double MAX_SYNC_INTERVAL = 0.5;
+    final public int REQUEST_STD_IGNORE_COUNT = 2;
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
     private List<String> musicList = new ArrayList<>();
     private boolean killed = false;
+    private int playingMusicIndex = -1;
+
     public Client() {
         INSTANCE = this;
         ImpartUI.showUI();
@@ -104,33 +110,40 @@ public class Client implements ClientInterface{
             return;
         }
 
-        for(String id : musicProgress.getMusicList()) {
-            if(!musicFileHashMap.containsKey(id)) {
-                MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
-            }
-        }
-
-        if(music == null && musicProgress.getMusicId() != null) {
-            music = getMusicPlayer(musicProgress.getMusicId());
-        }
-        if(musicProgress.getMusicStatus() != null) {
-            switch (musicProgress.getMusicStatus()) {
-                case "pause":
-                    music.pauseMusic();
-                    break;
-
-                case "play":
-                    music.resumeMusic();
-                    break;
-            
-                default:
-                    Logger.logError("Wrong status: "+musicProgress.getMusicStatus());
-                    break;
-            }
-        }
+        //sync music list
         if(this.musicList == null || !this.musicList.equals(musicProgress.getMusicList())) {
             this.musicList = musicProgress.getMusicList();
             ImpartUI.displaySongList(musicList);
+            for(String id : musicProgress.getMusicList()) {
+                if(!musicFileHashMap.containsKey(id)) {
+                    MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
+                }
+            }
+        }
+
+        //sync music player
+        if(music == null || music.getPlayingID() == null || (!music.getPlayingID().equals(musicProgress.getMusicId()))) {
+            this.useTargetMusic(musicProgress.getMusicId(), false);
+        }
+
+        //sync musicplayer status
+        if(musicProgress.getMusicStatus() != null) {
+            switch(musicProgress.getMusicStatus()) {
+                case "pause":
+                    music.pauseMusic();
+                    break;
+                case "play":
+                    music.playMusic();
+                    break;
+                default:
+                    Logger.logError("Unknown music player status tag %s", musicProgress.getMusicStatus());
+                    break;
+            }
+        }
+
+        //sync musicplayer process
+        if(this.music != null && this.music.getCurrentTime() != musicProgress.getMusicTime()) {
+            this.music.setPositionMusic(musicProgress.getMusicTime());
         }
     }
 
@@ -250,7 +263,10 @@ public class Client implements ClientInterface{
     }
 
     private MusicPlayer getMusicPlayer(String musicId) {
-        String downloadPath = "./data";
+        if(musicId == null) {
+            Logger.logWarning("Passing null musicID to getMusicPlayer(), returning null");
+            return null;
+        }
         File musicFile = null;
         if(musicFileHashMap.containsKey(musicId)) {
             musicFile = musicFileHashMap.get(musicId);
@@ -259,6 +275,7 @@ public class Client implements ClientInterface{
                 musicFileHashMap.remove(musicId);
             }
         }
+        String downloadPath = "./data";
         if(musicFile == null) {
             MusicDownloader asyncDownloading = MusicDownloader.getAsyncDownloading();
             boolean asyncDownloaded = false;
@@ -282,8 +299,7 @@ public class Client implements ClientInterface{
                 musicFileHashMap.put(musicId, musicFile);
             }
         }
-        return new MusicPlayer(musicFile.getAbsolutePath());
-
+        return new MusicPlayer(musicFile.getAbsolutePath(), musicId);
     }
 
     public void connect(String host, int port, String loginAs) {
@@ -329,6 +345,7 @@ public class Client implements ClientInterface{
     public void onSetVolume(float volume){
         music.setVolume(volume);
     }
+    
     public List<String> getMusicList() {
         return musicList;
     }
@@ -337,18 +354,23 @@ public class Client implements ClientInterface{
         if (findMusic(id)) {
             ImpartUI.infoToUI("歌曲已经存在于歌单中");
         }
+        this.requestStandardUser();
         musicList.add(id);
         ImpartUI.displaySongList(musicList);
     }
+    
     public boolean findMusic(String id) {
         return musicList.contains(id);
     }
+    
     public void deleteMusic(String id) {
         if (findMusic(id)) {
+            this.requestStandardUser();
             musicList.remove(id);
             ImpartUI.displaySongList(musicList);
         }
     }
+    
     public String getMusic(int i) {
         if (!musicList.isEmpty()) {
             i = i % musicList.size();
@@ -356,16 +378,33 @@ public class Client implements ClientInterface{
         }
         return null;
     }
+    
     public void swapMusic(int a, int b) {
+        this.requestStandardUser();
         String idA = this.musicList.get(a);
         String idB = this.musicList.get(b);
         this.musicList.set(a, idB);
         this.musicList.set(b, idA);
         ImpartUI.displaySongList(musicList);
     }
+    
     public void insertMusic(String id, int place) {
+        this.requestStandardUser();
         this.musicList.add(place, id);
         ImpartUI.displaySongList(musicList);
+    }
+    
+    public void useTargetMusic(String id, boolean doRequest) {
+        MusicPlayer old = this.music;
+        MusicPlayer newPlayer = getMusicPlayer(id);
+        if(newPlayer == null) {
+            Logger.logWarning("Play music %s failed", id);
+        }
+        if(doRequest) {
+            this.requestStandardUser();
+        }
+        onChangeMusic(old, this.music);
+        this.music = newPlayer;
     }
 
     public void displayUserList(List<UserSimpleInfo> list) {
@@ -392,4 +431,56 @@ public class Client implements ClientInterface{
     public void cacheFile(String id, File file) {
         this.musicFileHashMap.put(id, file);
     }
+
+    public MusicPlayer getCurrentMusic() {
+        return this.music;
+    }
+
+    public void onChangeMusic(MusicPlayer oldVal, MusicPlayer newVal) {
+        if(oldVal != null) {
+            oldVal.clearMusicProcessListener();
+        }
+        if(newVal != null) {
+            newVal.setMusicProcessListener(new PlayerProgressUIBoundTask());
+        }
+    }
+
+    public void requestStandardUser() {
+        this.connection.sendMessage(new Datapack("StandardRequest", null));
+        PackageResolver.ignoreSyncCounter = REQUEST_STD_IGNORE_COUNT;
+    }
+
+    public int getPlayingMusicIndex() {
+        return playingMusicIndex;
+    }
+
+    public void playMusic(boolean doRequest) {
+        if(this.music == null && this.musicList != null && !this.musicList.isEmpty()) {
+            if(doRequest) {
+                this.requestStandardUser();
+            }
+            this.playingMusicIndex = 0;
+            this.music = getMusicPlayer(this.musicList.get(playingMusicIndex));
+        } else {
+            this.music.resumeMusic();
+        }
+        return;
+    }
+
+    public void pauseMusic(boolean doRequest) {
+        if(doRequest) {
+            this.requestStandardUser();
+        }
+        this.music.pauseMusic();
+    }
+
+    private class PlayerProgressUIBoundTask implements ChangeListener<Duration> {
+        @Override
+        public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
+            ImpartUI.delegatedInvoke(() -> {
+                MusicTvController.instance().getMusic_slider().setValue(newValue.toSeconds());
+                MusicTvController.instance().getMusic_playing_time_label().setText(MusicTvController.formatDuration(newValue));
+            });
+        }
+    } 
 }

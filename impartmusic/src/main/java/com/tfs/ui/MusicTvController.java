@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
+import com.tfs.musicplayer.MusicPlayer;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -184,12 +185,18 @@ public class MusicTvController {
 
     @FXML
     private Label music_playing_time_label;
+    public Label getMusic_playing_time_label() {
+        return music_playing_time_label;
+    }
 
     @FXML
     private Button music_playmode_button;
 
     @FXML
     private Slider music_slider;
+    public Slider getMusic_slider() {
+        return music_slider;
+    }
 
     @FXML
     private Label music_title;
@@ -243,10 +250,25 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
-
+        music_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (music_slider.isValueChanging()) {
+                    // 用户正在拖动Slider，设置播放位置
+                    MusicPlayer currentPlaying = Client.INSTANCE().getCurrentMusic();
+                    if(currentPlaying != null) {
+                        currentPlaying.setPositionMusic(newValue.doubleValue());
+                    }
+                }
+            }
+        });
+        
     }
 
-    private String formatDuration(Duration duration) {
+    public static String formatDuration(Duration duration) {
+        if(duration == null) {
+            return "xx:xx";
+        }
         int minutes = (int) duration.toMinutes();
         int seconds = (int) (duration.toSeconds() % 60);
         return String.format("%d:%02d", minutes, seconds);

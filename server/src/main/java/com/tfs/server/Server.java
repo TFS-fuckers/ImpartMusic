@@ -136,6 +136,7 @@ public class Server {
             Logger.logError("Cannot set standard user index to -1");
             return;
         }
+        Logger.logInfo("set stadard user to %d", index);
         this.standardUserIndex = index;
     }
 

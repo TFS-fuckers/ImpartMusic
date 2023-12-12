@@ -110,4 +110,8 @@ public class ImpartUI extends Application {
             MusicTvController.instance().refreshTableView();
         });
     }
+
+    public static void delegatedInvoke(Runnable task) {
+        ThreadDispatcher.invoke(task);
+    }
 }

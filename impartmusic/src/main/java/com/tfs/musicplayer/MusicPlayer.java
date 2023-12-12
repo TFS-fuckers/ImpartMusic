@@ -1,5 +1,9 @@
 package com.tfs.musicplayer;
 
+import com.tfs.logger.Logger;
+
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.media.*;
 import javafx.util.Duration;
 
@@ -7,12 +11,15 @@ public class MusicPlayer {
     private boolean isPlaying = false;
     private MediaPlayer player;
     private String absoluteFilePath;
-    
-    public MusicPlayer(String absoluteFilePath) {
+    private ChangeListener<Duration> processChangeListener = null;
+    private String playingID;
+
+    public MusicPlayer(String absoluteFilePath, String playingID) {
         this.absoluteFilePath = absoluteFilePath;
         Media media = new Media("file:///" + absoluteFilePath.replace("\\", "/"));
         this.player = new MediaPlayer(media);
         isPlaying = false;
+        this.playingID = playingID;
     }
     public void changeMusicPath(String absoluteFilePath) {
         this.absoluteFilePath = absoluteFilePath;
@@ -38,19 +45,18 @@ public class MusicPlayer {
         isPlaying = true;
     }
     public void setPositionMusic(double seconds) {
+        if(player == null) {
+            Logger.logError("Music process set failed, because player is null");
+            return;
+        }
         player.pause();
-        player.setStartTime(Duration.seconds(seconds));
+        player.seek(Duration.seconds(seconds));
         if (isPlaying) {
             player.play();
         }
     }
     public void setPositionMusic(double minutes, double seconds) {
-        seconds += 60 * minutes;
-        player.pause();
-        player.setStartTime(Duration.seconds(seconds));
-        if (isPlaying) {
-            player.play();
-        }
+        this.setPositionMusic(minutes * 60 + seconds);
     }
     public void setVolume(float volume){
         player.setVolume(volume);
@@ -88,5 +94,26 @@ public class MusicPlayer {
 
     public float getVolume(){
         return Double.valueOf(player.getVolume()).floatValue();
+    }
+
+    public ReadOnlyObjectProperty<Duration> getPlayerProcessProperty() {
+        return this.player.currentTimeProperty();
+    }
+
+    public void setMusicProcessListener(ChangeListener<Duration> listener) {
+        this.clearMusicProcessListener();
+        this.player.currentTimeProperty().addListener(listener);
+        this.processChangeListener = listener;
+    }
+
+    public void clearMusicProcessListener() {
+        if(this.processChangeListener != null) {
+            this.player.currentTimeProperty().removeListener(this.processChangeListener);
+            this.processChangeListener = null;
+        }
+    }
+
+    public String getPlayingID() {
+        return playingID;
     }
 }

@@ -9,6 +9,8 @@ import com.tfs.logger.Logger;
 import com.tfs.ui.ImpartUI;
 
 public class PackageResolver {
+    public static int ignoreSyncCounter = 0;
+
     protected static void resolveDatapack(Datapack datapack){
         Client client = Client.INSTANCE();
         Logger.logInfo("Resolving datapack");
@@ -18,6 +20,10 @@ public class PackageResolver {
                 break;
 
             case "SynchronizeMusic":
+                if(ignoreSyncCounter != 0) {
+                    ignoreSyncCounter --;
+                    break;
+                }
                 client.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));
                 break;
 

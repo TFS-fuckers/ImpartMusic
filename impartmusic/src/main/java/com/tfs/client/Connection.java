@@ -70,7 +70,7 @@ public class Connection {
             try {
                 this.socket = new Socket();
                 this.socket.connect(address, timeout);
-                Logger.logInfo("Connected to %s:%d", address.getHostName(), address.getPort());
+                Logger.logInfo("Connected");
                 break;
             } catch (Exception e) {
                 Logger.logError("Connection failed: %s", e.getMessage());
