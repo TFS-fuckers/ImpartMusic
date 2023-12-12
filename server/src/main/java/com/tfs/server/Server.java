@@ -20,6 +20,9 @@ public class Server {
     public static final int MAX_SYNC_NO_RESPONSE = 5;
     private int standardUserIndex = 0;
 
+    private boolean musicListSyncTrigger = false;
+    private MusicProgress musicProgress;
+
     public Server(int port){
         INSTANCE = this;
         new Thread(() -> new ServerHandler(port, new CustomServerTick())).start();
@@ -90,6 +93,7 @@ public class Server {
 
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
         this.syncReceiveTrigger = true;
+        this.musicProgress = musicProgress;
         ServerHandler.instance().sendToAll(new Datapack("SynchronizeMusic", musicProgress));
     }
 
@@ -99,16 +103,18 @@ public class Server {
 
     public void onUserLogin(UserInfo info) {
         User user = ServerHandler.instance().getUser(info.getName());
-        // TODO: to this user
         ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
         for(User tmp:ServerHandler.instance().nameToUser.values()){
             userInfoList.add(new UserSimpleInfo(tmp.getName(), tmp.getAddress().getHostAddress()));
         }
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
         ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
-        // TODO: 发送内容等待修改后补充
+        if(musicListSyncTrigger){
+            ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", this.musicProgress));
+            musicListSyncTrigger = false;
+        }
     }
-
+    
     public void onUserDisconnect(UserInfo info) {
         ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
         for(User tmp:ServerHandler.instance().nameToUser.values()){
@@ -116,7 +122,9 @@ public class Server {
         }
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
         ServerHandler.instance().sendToAll(new Datapack("LogoutUser",info));
-        // ServerHandler.instance().sendToAll(new Datapack);
+        if(ServerHandler.instance().getUserNum() == 0){
+            musicListSyncTrigger = true;
+        }
     }
 
     public int getStandardUserIndex() {

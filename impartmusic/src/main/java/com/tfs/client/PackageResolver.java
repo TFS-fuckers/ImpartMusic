@@ -6,6 +6,7 @@ import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
+import com.tfs.ui.ImpartUI;
 
 public class PackageResolver {
     public static int ignoreSyncCounter = 0;
@@ -41,13 +42,13 @@ public class PackageResolver {
             case "LoginUser":
                 UserInfo userInfo = datapack.deserializeContent(UserInfo.class);
                 if(Client.INSTANCE().getConnection().getUserInfo().getName().equals(userInfo.getName()) == false)
-                    Logger.logInfo("User " + userInfo.getName() + " joins in.");
+                    ImpartUI.infoToUI("User " + userInfo.getName() + " joins in.");
                 break;
 
             case "LogoutUser":
                 userInfo = datapack.deserializeContent(UserInfo.class);
                 if(Client.INSTANCE().getConnection().getUserInfo().getName().equals(userInfo.getName()) == false)
-                    Logger.logInfo("User " + userInfo.getName() + " is out.");
+                    ImpartUI.infoToUI("User " + userInfo.getName() + " is out.");
                 break;
             
             case "UserList":
