@@ -45,6 +45,13 @@ public class Client implements ClientInterface{
             this.connection.killConnection();
             this.connection = null;
         }
+        try {
+            Thread.sleep(1500);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.logError("Error while exiting program");
+        }
+        System.exit(0);
     }
     
     public void kill() {
@@ -286,6 +293,11 @@ public class Client implements ClientInterface{
             String downloadPath = "./data";
             MusicDownloader asyncDownloading = MusicDownloader.getAsyncDownloading();
             boolean asyncDownloaded = false;
+
+            if(MusicDownloader.isWaitingAsyncDownload(musicId)) {
+                MusicDownloader.removeAsyncWaiter(musicId);
+            }
+
             if(asyncDownloading != null && Netease.downloadURLtoID(asyncDownloading.getUrlPath()).equals(musicId)) {
                 try {
                     MusicDownloader.downloadCondition.await();
@@ -473,7 +485,6 @@ public class Client implements ClientInterface{
             if(Client.this.getMusicList().size() == 0) {
                 return;
             }
-            MusicPlayer old = Client.this.getCurrentMusic();
             Client.this.playingMusicIndex++;
             Client.this.playingMusicIndex %= Client.this.getMusicList().size();
             Client.this.pauseMusic(false);
@@ -488,7 +499,6 @@ public class Client implements ClientInterface{
             if(Client.this.getMusicList().size() == 0) {
                 return;
             }
-            MusicPlayer old = Client.this.getCurrentMusic();
             Client.this.playingMusicIndex--;
             if(Client.this.playingMusicIndex == -1) {
                 Client.this.playingMusicIndex = Client.this.getMusicList().size() - 1;

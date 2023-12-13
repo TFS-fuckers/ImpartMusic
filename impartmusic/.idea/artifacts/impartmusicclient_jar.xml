@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="impartmusicclient:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/impartmusicclient_jar</output-path>
+    <root id="archive" name="impartmusicclient.jar">
+      <element id="module-output" name="impartmusicclient" />
+      <element id="module-test-output" name="impartmusicclient" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/corretto-1.8.0_392-1/jre/lib/ext/jfxrt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.9.1/gson-2.9.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -50,6 +50,7 @@ public class ImpartUI extends Application {
             Client.INSTANCE().disconnect();
         }
         Client.INSTANCE().kill();
+        Client.INSTANCE().saveMusicHashMap();
         System.out.println("stop()...");
     }
     
