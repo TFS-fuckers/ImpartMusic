@@ -38,7 +38,7 @@
                          <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
                      <Label fx:id="music_name_label" layoutX="33.0" layoutY="18.0" prefHeight="34.0" prefWidth="57.0" text="标题：" />
-                     <Label fx:id="music_title" layoutX="80.0" layoutY="14.0" prefHeight="33.0" prefWidth="287.0" text="fuck mc de da xia" textOverrun="CLIP" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="14.0">
+                     <Label fx:id="music_title" layoutX="80.0" layoutY="14.0" prefHeight="33.0" prefWidth="287.0" text="" textOverrun="CLIP" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="14.0">
                          <font>
                              <Font size="19.0" />
                          </font>
@@ -65,8 +65,8 @@
             <right>
                <AnchorPane prefHeight="397.0" prefWidth="320.0" BorderPane.alignment="CENTER">
                   <children>
-                     <TextArea fx:id="online_information_text" prefHeight="233.0" prefWidth="321.0" text="欢迎xxx加入线上music&#10;impart！&#10;" AnchorPane.bottomAnchor="166.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     <TextArea fx:id="text_to_online_textarea" layoutX="7.0" layoutY="233.0" prefHeight="164.0" prefWidth="313.0" text="虾头男唱歌贼好听" />
+                     <TextArea fx:id="online_information_text" prefHeight="233.0" prefWidth="321.0" text="欢迎使用ImpartMusic" AnchorPane.bottomAnchor="166.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     <TextArea fx:id="text_to_online_textarea" layoutX="7.0" layoutY="233.0" prefHeight="164.0" prefWidth="313.0" text="" />
                   </children>
                </AnchorPane>
             </right>
@@ -94,7 +94,7 @@
                   <Button fx:id="connect_button" contentDisplay="TOP" layoutX="23.0" layoutY="56.0" mnemonicParsing="false" onAction="#buildnewInputPane" text="连接服务器" />
                   <Label layoutX="36.0" layoutY="155.0" prefHeight="18.0" prefWidth="67.0" />
                   <Label fx:id="connection_state_label" alignment="CENTER" layoutX="37.0" layoutY="122.0" text="状态：" />
-                  <Label fx:id="connection_state_info_label" alignment="CENTER" layoutX="91.0" layoutY="122.0" text="fuckmcdedaxia" />
+                  <Label fx:id="connection_state_info_label" alignment="CENTER" layoutX="91.0" layoutY="122.0" text="未连接" />
                </children>
             </AnchorPane>
          </bottom>

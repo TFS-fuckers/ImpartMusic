@@ -1,7 +1,9 @@
 package com.tfs.musicplayer;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -56,6 +58,10 @@ public class Netease {
                 jsonAnalyser.getArrayValue("songs").get(0).getAsJsonObject().getAsJsonArray("artists").get(0).getAsJsonObject()
                 .get("name").getAsString()
             );
+            File relocate = new File("./data/out.txt");
+            PrintWriter writer = new PrintWriter(relocate);
+            writer.write(jsonAnalyser.getRawJson());
+            writer.close();
         } catch (Exception e) {
             Logger.logError("Get music details failed, maybe it's a network failure or wrong music id");
         }

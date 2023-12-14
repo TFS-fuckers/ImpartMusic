@@ -18,6 +18,7 @@ public class Server {
     private boolean syncReceiveTrigger = false;
     public static final int AUTO_SYNC_SLEEP_TICK = 5;
     public static final int MAX_SYNC_NO_RESPONSE = 5;
+    public static final String MES_TO_LOGIN_USER = "欢迎加入大虾的音乐小屋~";
     private int standardUserIndex = 0;
 
     private boolean musicListSyncTrigger = false;
@@ -109,6 +110,7 @@ public class Server {
         }
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
         ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
+        ServerHandler.instance().sendToUser(info.getName(), new Datapack("SimpleString", MES_TO_LOGIN_USER));
         if(musicListSyncTrigger){
             ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", this.musicProgress));
             musicListSyncTrigger = false;

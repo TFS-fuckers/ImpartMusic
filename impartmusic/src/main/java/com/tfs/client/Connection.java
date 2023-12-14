@@ -31,6 +31,10 @@ public class Connection {
     private Thread mainThread = null;
     /**请勿更改 服务器是否响应的触发器 */
     private boolean receiveTrigger = false;
+    /**对连接成功的监听器 */
+    private Runnable connectListener;
+    /**对连接断开的监听器 */
+    private Runnable disconnectListener;
 
     private PrintWriter writer;
     private BufferedReader reader;
@@ -70,6 +74,7 @@ public class Connection {
             try {
                 this.socket = new Socket();
                 this.socket.connect(address, timeout);
+                this.connectListener.run();
                 Logger.logInfo("Connected");
                 break;
             } catch (Exception e) {
@@ -118,6 +123,7 @@ public class Connection {
         try {
             Logger.logInfo("Disconnected from the server");
             this.socket.close();
+            this.disconnectListener.run();
         } catch (IOException e) {
             Logger.logError("Error while closing connection");
             Logger.logError(e.toString());
@@ -293,5 +299,21 @@ public class Connection {
         public void run(){
             Connection.this.onRefresh();
         }
+    }
+
+    /**
+     * 设置对连接成功事件的监听
+     * @param listener 监听器
+     */
+    public void setOnConnected(Runnable listener) {
+        this.connectListener = listener;
+    }
+
+    /**
+     * 设置对断开连接事件的监听
+     * @param listener 监听器
+     */
+    public void setOnDisconnected(Runnable listener) {
+        this.disconnectListener = listener;
     }
 }

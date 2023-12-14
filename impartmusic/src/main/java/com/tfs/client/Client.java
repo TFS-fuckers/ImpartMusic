@@ -36,7 +36,7 @@ public class Client implements ClientInterface{
     public Client() {
         INSTANCE = this;
         ImpartUI.showUI();
-        this.readMusicHashMap();
+        this.initializeNewMusicHashMap();
         Logger.logInfo("UI started, main loop running...");
         while(!killed) {
             clientMainLoop();
@@ -46,7 +46,7 @@ public class Client implements ClientInterface{
             this.connection = null;
         }
         try {
-            Thread.sleep(1500);
+            Thread.sleep(800);
         } catch (Exception e) {
             e.printStackTrace();
             Logger.logError("Error while exiting program");
@@ -83,6 +83,10 @@ public class Client implements ClientInterface{
     }
 
     public void disconnect() {
+        if(this.connection == null) {
+            return;
+        }
+
         synchronized(this.connection) {
             if(this.connection != null && this.connection.isConnected()) {
                 this.connection.sendMessageImmediately(new Datapack(
@@ -121,11 +125,11 @@ public class Client implements ClientInterface{
         if(this.musicList == null || !this.musicList.equals(musicProgress.getMusicList())) {
             this.musicList = musicProgress.getMusicList();
             ImpartUI.displaySongList(musicList);
-            // for(String id : musicProgress.getMusicList()) {
-            //     if(!musicFileHashMap.containsKey(id)) {
-            //         MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
-            //     }
-            // }
+            for(String id : musicProgress.getMusicList()) {
+                if(!musicFileHashMap.containsKey(id)) {
+                    MusicDownloader.downloadMusicFileAsync(Netease.buildNeteaseURL(id), "./data");
+                }
+            }
         }
 
         //sync music player
@@ -196,6 +200,7 @@ public class Client implements ClientInterface{
         Logger.logInfo(loginInfo.toString());
     }
 
+    @Deprecated
     public void saveMusicHashMap() {
         String path = MUSIC_LIST_PATH;
         File file = new File(path);
@@ -213,6 +218,7 @@ public class Client implements ClientInterface{
         }
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     protected void readMusicHashMap() {
         String path = MUSIC_LIST_PATH;
@@ -257,6 +263,13 @@ public class Client implements ClientInterface{
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if(this.musicFileHashMap != null) {
+            Logger.logInfo("Music file cache list read, showing as follows:");
+            for(File cached : musicFileHashMap.values()) {
+                Logger.logInfo("name: %s\t size(KB): %d", cached.getName(), cached.length() / 1024L);
+            }
+        }
     }
 
     private void initializeNewMusicHashMap() {
@@ -271,7 +284,7 @@ public class Client implements ClientInterface{
             if (type.equals("mp3")) {
                 String id = fileName.substring(0, dotIndex);
                 this.musicFileHashMap.put(id, child);
-                Logger.logInfo("Found music file %s.mp3", id);
+                Logger.logInfo("Found music file %s.mp3, size(KB): %d", id, child.length() / 1024L);
             }
         }
     }
@@ -315,7 +328,7 @@ public class Client implements ClientInterface{
                     Logger.logError("No music file was downloaded due to downloader error");
                     return null;
                 }
-                musicFileHashMap.put(musicId, musicFile);
+                this.cacheFile(musicId, musicFile);
             }
         }
         return new MusicPlayer(musicFile.getAbsolutePath(), musicId);
@@ -330,6 +343,11 @@ public class Client implements ClientInterface{
         } else {
             this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
         }
+        this.connection.setOnDisconnected(() -> {
+            this.pauseMusic(false);
+            ImpartUI.infoToUI("你已经从服务器断开连接");
+            ImpartUI.clearMusicList();
+        });
     }
 
     public void setStatus(ClientConnectionStatus status) {
@@ -356,7 +374,7 @@ public class Client implements ClientInterface{
 
     @Override
     public void onSetProgress(MusicProgress progress){
-        connection.sendMessage(new Datapack("StrandardRequest", null));
+        this.requestStandardUser();
         synchronizeMusicProgress(progress);
     }
 
@@ -513,6 +531,7 @@ public class Client implements ClientInterface{
         if(oldVal != null) {
             oldVal.setOnEnd(null);
             oldVal.clearOnReady();
+            oldVal.pauseMusic();
         }
 
         if(newVal != null) {
@@ -521,12 +540,14 @@ public class Client implements ClientInterface{
                 ImpartUI.bindLabel(newVal.getTotalTimeDuration());
                 ImpartUI.bindProgressDisplay(newVal.getPlayerProcessProperty());
                 ImpartUI.bindProgressSetter(newVal);
+                ImpartUI.bindShower(newVal.getMusicId());
             });
             newVal.setOnEnd(nextMusicStrategy);
         }
     }
 
     public void requestStandardUser() {
+        Logger.logInfo("Requesting standard user");
         this.connection.sendMessage(new Datapack("StandardRequest", null));
         PackageResolver.ignoreSyncCounter = REQUEST_STD_IGNORE_COUNT;
     }
@@ -536,6 +557,10 @@ public class Client implements ClientInterface{
     }
 
     public void playMusic(boolean doRequest) {
+        if(!this.isConnected()) {
+            return;
+        }
+
         if(this.music == null && this.musicList != null && !this.musicList.isEmpty()) {
             if(doRequest) {
                 this.requestStandardUser();

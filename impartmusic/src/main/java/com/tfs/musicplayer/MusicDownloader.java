@@ -45,20 +45,33 @@ public class MusicDownloader {
             
 
             while(true) {
-                synchronized(MusicDownloader.ASYNC_QUEUE) {
-                    if(MusicDownloader.ASYNC_QUEUE.size() == 0) {
-                        break;
+                try {
+                    synchronized(MusicDownloader.ASYNC_QUEUE) {
+                        if(MusicDownloader.ASYNC_QUEUE.size() == 0) {
+                            break;
+                        }
+                        MusicDownloader.asyncDownloadTask = MusicDownloader.ASYNC_QUEUE.remove();
                     }
-                    MusicDownloader.asyncDownloadTask = MusicDownloader.ASYNC_QUEUE.remove();
+                    conditionLock.lock();
+                    String id = Netease.downloadURLtoID(asyncDownloadTask.getUrlPath());
+                    ASYNC_DOWNLOADERS.put(
+                        id,
+                        asyncDownloadTask
+                    );
+                    File file = asyncDownloadTask.downloadMusicFile();
+                    Client.INSTANCE().cacheFile(
+                        Netease.downloadURLtoID(asyncDownloadTask.getUrlPath()),
+                        file
+                    );
+                    Logger.logInfo("Successfully downloaded %s.mp3", id);
+                    ASYNC_DOWNLOADERS.remove(id);
+
+                    downloadCondition.signalAll();
+                    conditionLock.unlock();
+                } catch (Exception e) {
+                    Logger.logError("Exception in async downloader: %s", e.getMessage());
+                    e.printStackTrace();
                 }
-                conditionLock.lock();
-                File file = asyncDownloadTask.downloadMusicFile();
-                Client.INSTANCE().cacheFile(
-                    Netease.downloadURLtoID(asyncDownloadTask.getUrlPath()),
-                    file
-                );
-                downloadCondition.signalAll();
-                conditionLock.unlock();
             }
         }
     }

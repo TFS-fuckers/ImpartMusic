@@ -1,6 +1,7 @@
 package com.tfs.ui;
 
 import com.tfs.client.Client;
+import com.tfs.client.ParamVertifier;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,6 +43,11 @@ public class ConnectController {
 
     @FXML
     void make_link(ActionEvent event) {
+        if(!ParamVertifier.isValidName(users_name_text.getText())) {
+            ImpartUI.infoToUI("您输入的名称不符合要求！\n【名称规则】：\n·只能由大小写英文字母，下划线\"_\"和数字构成");
+            return;
+        }
+
         if(Client.INSTANCE() != null) {
              Client.INSTANCE().connect(IP_text.getText(), Integer.parseInt(port_text.getText()), users_name_text.getText());
         }

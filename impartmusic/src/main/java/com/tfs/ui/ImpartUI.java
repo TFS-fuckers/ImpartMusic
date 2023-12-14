@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tfs.client.Client;
+import com.tfs.datapack.ControlConnect;
+import com.tfs.datapack.Datapack;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicPlayer;
@@ -47,10 +49,13 @@ public class ImpartUI extends Application {
     public void stop() throws Exception{
         super.stop();
         if(Client.INSTANCE().isConnected()) {
+            Client.INSTANCE().getConnection().sendMessageImmediately(
+                new Datapack("ControlConnect", new ControlConnect("Disconnected")
+            ));
+            Thread.sleep(100);
             Client.INSTANCE().disconnect();
         }
         Client.INSTANCE().kill();
-        Client.INSTANCE().saveMusicHashMap();
         System.out.println("stop()...");
     }
     
@@ -137,5 +142,21 @@ public class ImpartUI extends Application {
 
     public static void removeProgressSetter() {
         MusicTvController.instance().removeProgressSetter();
+    }
+
+    public static void bindShower(int index) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().bindShower(index);
+        });
+    }
+
+    public static void bindShower(String id) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().bindShower(id);
+        });
+    }
+
+    public static void clearMusicList() {
+        MusicTvController.instance().clearMusicList();
     }
 }

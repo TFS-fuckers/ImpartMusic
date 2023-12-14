@@ -44,11 +44,21 @@ public class MusicPlayer {
     }
 
     public void playMusic() {
-        player.play();
-        isPlaying = true;
+        if(player != null) {
+            player.play();
+            isPlaying = true;
+        }
     }
     public void pauseMusic() {
-        player.pause();
+        try {
+            synchronized(player) {
+                if(player != null) {
+                    player.pause();
+                }
+            }    
+        } catch (Exception e) {
+            Logger.logWarning("Exception in player pause %s", e.getMessage());
+        }
         isPlaying = false;
     }
     public void resumeMusic() {

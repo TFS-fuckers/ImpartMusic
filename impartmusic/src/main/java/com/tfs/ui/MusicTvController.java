@@ -7,6 +7,7 @@ import java.util.List;
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.musicplayer.MusicPlayer;
+import com.tfs.musicplayer.Netease;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -31,7 +32,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MusicTvController {
-    private List<MusicDetails> data; 
+    private List<MusicDetails> detailedMusic; 
     public static final int ITEMS_PER_PAGE = 10;
 
     private static MusicTvController instance = null;
@@ -61,11 +62,10 @@ public class MusicTvController {
             });
 
             MusicTvController.this.music_slider.setOnMouseClicked((event) -> {
-                if(MusicTvController.this.sliderSetTarget != null) {
-                    MusicTvController.this.sliderSetTarget.setPositionMusic(
-                        MusicTvController.this.music_slider.getValue()
-                    );
+                if(Client.INSTANCE().getCurrentMusic() == null) {
+                    return;
                 }
+                Client.INSTANCE().requestStandardUser();
             });
 
             MusicTvController.this.music_slider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -75,6 +75,13 @@ public class MusicTvController {
                         MusicTvController.this.sliderSetTarget.setPositionMusic(newVal.doubleValue());
                     }
                 }
+            });
+            
+            MusicTvController.this.music_slider.setOnMouseDragReleased((event) -> {
+                if(Client.INSTANCE().getCurrentMusic() == null) {
+                    return;
+                }
+                Client.INSTANCE().requestStandardUser();
             });
 
             tableViewButton.setCellFactory((tableColumn) -> new TableCell<MusicDetails, Button>() {
@@ -111,28 +118,30 @@ public class MusicTvController {
             });
             tableViewMusicID.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getId()));
             tableViewMusicTitle.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getName()));
+            online_information_text.setEditable(false);
+            text_to_online_textarea.setText("");
         }
     }
 
     public void setMusicListDisplayPage(int page) {
-        if(data == null) {
+        if(detailedMusic == null) {
             return;
         }
 
         int fromIndex = page * ITEMS_PER_PAGE;
 
-        if(data.size() == 0) {
+        if(detailedMusic.size() == 0) {
             tableView.setItems(null);    
             return;
         }
         
-        while(fromIndex >= data.size()) {
+        while(fromIndex >= detailedMusic.size()) {
             fromIndex -= ITEMS_PER_PAGE;
             page--;
         }
         this.music_lists.setCurrentPageIndex(page);
-        int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, data.size());
-        tableView.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, detailedMusic.size());
+        tableView.setItems(FXCollections.observableArrayList(detailedMusic.subList(fromIndex, toIndex)));
     }
 
     public void refreshTableView() {
@@ -146,7 +155,7 @@ public class MusicTvController {
     }
 
     public void setDataList(List<MusicDetails> data) {
-        this.data = data;
+        this.detailedMusic = data;
     }
 
     @FXML
@@ -270,6 +279,10 @@ public class MusicTvController {
 
     @FXML
     void Play_music(ActionEvent event) {
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("请先登录服务器！");
+            return;
+        }
         if(Client.INSTANCE().isPlaying()) {
             Client.INSTANCE().pauseMusic(true);
             return;
@@ -293,16 +306,28 @@ public class MusicTvController {
 
     @FXML
     void To_last_music(ActionEvent event) {
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("请先登录服务器！");
+            return;
+        }
         Client.INSTANCE().goPreviousMusic(true);
     }
 
     @FXML
     void To_next_music(ActionEvent event) {
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("请先登录服务器！");
+            return;
+        }
         Client.INSTANCE().goNextMusic(true);
     }
 
     @FXML
     void cut_link(ActionEvent event) {
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("你还没有连接服务器！");
+            return;
+        }
         Client.INSTANCE().disconnect();
     }
 
@@ -322,7 +347,7 @@ public class MusicTvController {
     @FXML
     void add_music_to_pack(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
-            ImpartUI.infoToUI("请先连接服务器！");
+            ImpartUI.infoToUI("请先登录服务器！");
             return;
         }
         try {
@@ -377,5 +402,31 @@ public class MusicTvController {
 
     public void removeProgressSetter() {
         this.sliderSetTarget = null;
+    }
+
+    public void bindShower(int index) {
+        this.music_title.setText(this.detailedMusic.get(index).getName());
+    }
+
+    public void bindShower(String id) {
+        synchronized(this.detailedMusic) {
+            boolean found = false;
+            for(int i = 0; i < this.detailedMusic.size(); i++) {
+                if(detailedMusic.get(i).getId().equals(id)) {
+                    this.bindShower(i);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                this.music_title.setText(
+                    Netease.getMusicDetails(id).getName()
+                );
+            }
+        }
+    }
+
+    public void clearMusicList() {
+        this.tableView.getItems().clear();
     }
 }
