@@ -155,4 +155,10 @@ public class ImpartUI extends Application {
     public static void clearMusicList() {
         MusicTvController.instance().clearMusicList();
     }
+
+    public static void resetPlayerUIDisplay() {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().resetPlayerUIDisplay();
+        });
+    }
 }

@@ -116,6 +116,7 @@ public class MusicTvController {
                     setGraphic(empty ? null : button);
                 }
             });
+
             tableViewMusicID.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getId()));
             tableViewMusicTitle.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getName()));
             online_information_text.setEditable(false);
@@ -433,5 +434,13 @@ public class MusicTvController {
 
     public void clearMusicList() {
         this.tableView.getItems().clear();
+    }
+
+    public void resetPlayerUIDisplay() {
+        this.music_slider.setValue(0);
+        this.music_slider.setMax(999);
+        this.music_playing_time_label.setText("当前时间");
+        this.music_whole_time_label.setText("全曲时间");
+        this.music_title.setText("");
     }
 }

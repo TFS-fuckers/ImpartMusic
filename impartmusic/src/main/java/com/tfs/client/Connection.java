@@ -45,7 +45,7 @@ public class Connection {
     /**服务器无响应的最大容忍次数 */
     public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
     /**与服务器进行身份验证的最大等待次数 */
-    public static final int VERTIFICATION_MAX_TRIES = 2000000;
+    public static final int VERTIFICATION_MAX_TRIES = 10;
 
     /**
      * 创建一个与服务器的连接实例

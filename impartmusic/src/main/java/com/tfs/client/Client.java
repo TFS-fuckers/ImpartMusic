@@ -341,6 +341,7 @@ public class Client implements ClientInterface{
             this.musicList.clear();
             ImpartUI.infoToUI("你已经从服务器断开连接");
             ImpartUI.clearMusicList();
+            ImpartUI.resetPlayerUIDisplay();
         });
     }
 
