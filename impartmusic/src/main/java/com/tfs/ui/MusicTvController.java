@@ -333,6 +333,11 @@ public class MusicTvController {
 
     @FXML
     void buildnewInputPane(ActionEvent event) {
+        if(Client.INSTANCE() != null && Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("你已经连接服务器了！");
+            return;
+        }
+
         try {
             AnchorPane root = FXMLLoader.load(getClass().getResource("/connect.fxml"));
             Stage stage = new Stage();

@@ -211,16 +211,27 @@ public class ClientHandler implements Runnable{
             //断开连接
             this.clientSocket.close();
             synchronized(ServerHandler.instance().connectedUsers) {
-                ServerHandler.instance().connectedUsers.remove(this.user);
-                ServerHandler.instance().connectedUsers.notify();
+                try {
+                    ServerHandler.instance().connectedUsers.remove(this.user);
+                    ServerHandler.instance().connectedUsers.notify();
+                } catch (Exception e) {
+                    Logger.logWarning("Removing null user, it might be a vertification failure");
+                }
             }
             synchronized(ServerHandler.instance().nameToUser) {
-                ServerHandler.instance().nameToUser.remove(this.user.getName());
-                ServerHandler.instance().nameToUser.notify();
+                try {
+                    ServerHandler.instance().nameToUser.remove(this.user.getName());
+                    ServerHandler.instance().nameToUser.notify();
+                } catch (Exception e) {
+                    Logger.logWarning("Removing null user, it might be a vertification failure");
+                }
             }
-            Server.INSTANCE().onUserDisconnect(new UserInfo(user.getName(), null));
-            this.user.setConnected(false);
-            Logger.logInfo("%s disconnected from the server", this.user.getName());
+            Server.INSTANCE().onUserDisconnect(new UserInfo(user == null ? "UNVERTIFIED" : user.getName(), null));
+            if(this.user != null) {
+                this.user.setConnected(false);
+            }
+
+            Logger.logInfo("%s disconnected from the server", user == null ? "UNVERTIFIED" : this.user.getName());
         } catch (IOException err) {
             Logger.logError("Error while closing socket");
             Logger.logError(err.getMessage());

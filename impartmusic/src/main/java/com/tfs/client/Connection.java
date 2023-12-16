@@ -45,7 +45,7 @@ public class Connection {
     /**服务器无响应的最大容忍次数 */
     public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
     /**与服务器进行身份验证的最大等待次数 */
-    public static final int VERTIFICATION_MAX_TRIES = 5;
+    public static final int VERTIFICATION_MAX_TRIES = 2000000;
 
     /**
      * 创建一个与服务器的连接实例
@@ -74,7 +74,9 @@ public class Connection {
             try {
                 this.socket = new Socket();
                 this.socket.connect(address, timeout);
-                this.connectListener.run();
+                if(this.connectListener != null) {
+                    this.connectListener.run();
+                }
                 Logger.logInfo("Connected");
                 break;
             } catch (Exception e) {
@@ -152,6 +154,7 @@ public class Connection {
             Logger.logError(e.getMessage());
             this.killConnection();
         }
+        Logger.logInfo("Sent vertification pack to server");
         this.writer.println(new Datapack("UserInfo", this.userInfo).toJson());
         boolean vertified = false;
         String failCause = "No vertification feedback";
@@ -171,6 +174,7 @@ public class Connection {
                     }
                 }
                 Thread.sleep(200);
+                // TODO: Replace this with 200
             } catch (Exception e) {
                 Logger.logError("Error while vertification");
                 this.killConnection();

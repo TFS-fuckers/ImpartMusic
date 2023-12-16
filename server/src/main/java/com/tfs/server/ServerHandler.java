@@ -92,6 +92,7 @@ public class ServerHandler {
                     Logger.logInfo("Server is being closed");
                 } catch(Exception e){
                     Logger.logError(e.toString());
+                    Logger.logError("fatal error, server accept down");
                     this.kill();
                 }
             }

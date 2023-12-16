@@ -145,15 +145,11 @@ public class ImpartUI extends Application {
     }
 
     public static void bindShower(int index) {
-        ThreadDispatcher.invoke(() -> {
-            MusicTvController.instance().bindShower(index);
-        });
+        MusicTvController.instance().bindShower(index);
     }
 
     public static void bindShower(String id) {
-        ThreadDispatcher.invoke(() -> {
-            MusicTvController.instance().bindShower(id);
-        });
+        MusicTvController.instance().bindShower(id);
     }
 
     public static void clearMusicList() {

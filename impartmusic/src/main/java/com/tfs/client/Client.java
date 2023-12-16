@@ -102,7 +102,7 @@ public class Client implements ClientInterface{
             }
             this.clearUserList();
             this.connection.killConnection();
-            this.connection.notify();
+            this.connection = null;
         }
     }
 
@@ -335,16 +335,10 @@ public class Client implements ClientInterface{
     }
 
     public void connect(String host, int port, String loginAs) {
-        if(this.connection != null) {
-            synchronized(this) {
-                this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
-                this.notify();
-            }
-        } else {
-            this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
-        }
+        this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
         this.connection.setOnDisconnected(() -> {
             this.pauseMusic(false);
+            this.musicList.clear();
             ImpartUI.infoToUI("你已经从服务器断开连接");
             ImpartUI.clearMusicList();
         });
@@ -390,6 +384,7 @@ public class Client implements ClientInterface{
     public void addMusic(String id) {
         if (findMusic(id)) {
             ImpartUI.infoToUI("歌曲已经存在于歌单中");
+            return;
         }
         this.requestStandardUser();
         musicList.add(id);
@@ -548,7 +543,7 @@ public class Client implements ClientInterface{
 
     public void requestStandardUser() {
         Logger.logInfo("Requesting standard user");
-        this.connection.sendMessage(new Datapack("StandardRequest", null));
+        this.connection.sendMessageImmediately(new Datapack("StandardRequest", null));
         PackageResolver.ignoreSyncCounter = REQUEST_STD_IGNORE_COUNT;
     }
 

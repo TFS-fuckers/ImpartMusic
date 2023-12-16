@@ -49,7 +49,7 @@ public class ConnectController {
         }
 
         if(Client.INSTANCE() != null) {
-             Client.INSTANCE().connect(IP_text.getText(), Integer.parseInt(port_text.getText()), users_name_text.getText());
+            Client.INSTANCE().connect(IP_text.getText(), Integer.parseInt(port_text.getText()), users_name_text.getText());
         }
         closeWindow(event);
     }
