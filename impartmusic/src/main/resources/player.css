@@ -12,7 +12,7 @@
 
 .list-pane {
     -fx-background-color: rgb(78, 177, 239);
-    -fx-background-image:url("./image/blue.jpg");
+    -fx-background-image:url("./image/pink2.jpg");
     /*-fx-background-image:url("./image/MC.jpg");*/
     -fx-background-size: cover;
     -fx-background-opacity: 0.5;

@@ -35,6 +35,8 @@ public class ImpartUI extends Application {
         //
         primaryStage.setTitle("hello world");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+        //primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

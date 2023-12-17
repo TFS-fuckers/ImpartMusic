@@ -5,12 +5,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tfs.ui.Add_music_Controller">
    <children>
-      <Button fx:id="add_confirm_button" layoutX="175.0" layoutY="240.0" mnemonicParsing="false" onAction="#add_confirm" prefHeight="33.0" prefWidth="74.0" text="确认加入" />
-      <Button fx:id="cancel_add_button" layoutX="321.0" layoutY="240.0" mnemonicParsing="false" onAction="#cancel_add" prefHeight="33.0" prefWidth="55.0" text="取消" />
-      <TextField fx:id="id_text" layoutX="213.0" layoutY="158.0" prefHeight="23.0" prefWidth="174.0" />
-      <Label fx:id="id_label" layoutX="138.0" layoutY="153.0" prefHeight="33.0" prefWidth="74.0" text="歌曲ID：" />
+      <Button fx:id="add_confirm_button" layoutX="138.0" layoutY="232.0" mnemonicParsing="false" onAction="#add_confirm" prefHeight="49.0" prefWidth="93.0" text="确认加入" />
+      <Button fx:id="cancel_add_button" layoutX="347.0" layoutY="232.0" mnemonicParsing="false" onAction="#cancel_add" prefHeight="49.0" prefWidth="86.0" text="取消" />
+      <TextField fx:id="id_text" layoutX="177.0" layoutY="155.0" prefHeight="23.0" prefWidth="264.0" />
+      <Label fx:id="id_label" layoutX="119.0" layoutY="147.0" prefHeight="39.0" prefWidth="77.0" text="歌曲ID：" />
    </children>
 </AnchorPane>
