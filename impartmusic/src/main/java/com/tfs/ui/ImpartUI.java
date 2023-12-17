@@ -34,7 +34,7 @@ public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
-        primaryStage.setTitle("hello world");
+        primaryStage.setTitle("Impart Music");
         primaryScene = new Scene(root);
         primaryStage.setScene(primaryScene);
         primaryStage.setResizable(false);
