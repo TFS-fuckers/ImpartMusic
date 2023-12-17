@@ -29,11 +29,9 @@ public class MusicProgress {
         return musicStatus;
     }
     public boolean isEmpty(){
-        return this.equals(EMPTY_PACK);
+        return this.musicId == null && this.musicTime == 0.0 && this.musicStatus == null && this.musicList == null;
     }
     public List<String> getMusicList() {
         return musicList;
     }
-
-    public static final MusicProgress EMPTY_PACK = new MusicProgress();
 }

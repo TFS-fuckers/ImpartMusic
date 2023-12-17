@@ -124,14 +124,14 @@ public class Connection {
      */
     public void killConnection(){
         try {
-            Logger.logInfo("Disconnected from the server");
             this.socket.close();
-            this.disconnectListener.run();
+            Logger.logInfo("Disconnected from the server");
         } catch (IOException e) {
             Logger.logError("Error while closing connection");
             Logger.logError(e.toString());
         } finally {
             Client.INSTANCE().setStatus(ClientConnectionStatus.UNCONNECTED);
+            this.disconnectListener.run();
         }
     }
 
@@ -166,6 +166,7 @@ public class Connection {
                     Datapack feedback = new Datapack(rawJson);
                     AccessInstruction accessInstruction = feedback.deserializeContent(AccessInstruction.class);
                     if(accessInstruction.getResult().equals("Granted")) {
+                        Logger.logInfo("Login success");
                         vertified = true;
                         break;
                     }
@@ -175,7 +176,6 @@ public class Connection {
                     }
                 }
                 Thread.sleep(200);
-                // TODO: Replace this with 200
             } catch (Exception e) {
                 Logger.logError("Error while vertification");
                 this.killConnection();
@@ -238,6 +238,7 @@ public class Connection {
                 this.received.add(receive);
                 this.received.notify();
             }
+            Logger.logInfo("Received type: %s", receive.identifier);
         }
     }
 

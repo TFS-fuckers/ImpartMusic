@@ -18,7 +18,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,8 +31,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MusicTvController {
@@ -50,15 +47,22 @@ public class MusicTvController {
     private class UIInitializationTask implements Runnable {
         @Override
         public void run() {
-            /*******************/
             volumeSlider.setOrientation(Orientation.VERTICAL);
-            volumeSlider.setVisible(false); // 初始时隐藏
-            /*******************/
+            volumeSlider.setVisible(false);
+            volumeSlider.setDisable(false);
+            volumeSlider.setMax(1.0);
+            volumeSlider.setValue(1.0);
             ImpartUI.getPrimaryScene().setOnMouseClicked((event1) -> {
                 if (event1.getTarget() != volume_button && event1.getTarget() != volumeSlider) {
                     volumeSlider.setVisible(false);
                 }
             });
+            volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if(Client.INSTANCE().getCurrentMusic() != null) {
+                    Client.INSTANCE().onSetVolume(newVal.floatValue());
+                }
+            });
+
             music_lists.currentPageIndexProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> value, Number oldVal, Number newVal) {
@@ -85,8 +89,8 @@ public class MusicTvController {
             MusicTvController.this.music_slider.valueProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> value, Number oldVal, Number newVal) {
-                    if(music_slider.isValueChanging() && MusicTvController.this.sliderSetTarget != null) {
-                        MusicTvController.this.sliderSetTarget.setPositionMusic(newVal.doubleValue());
+                    if(music_slider.isValueChanging() && MusicTvController.this.traceTarget != null) {
+                        MusicTvController.this.traceTarget.setPositionMusic(newVal.doubleValue());
                     }
                 }
             });
@@ -296,6 +300,7 @@ public class MusicTvController {
     void Play_music(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
             ImpartUI.infoToUI("请先登录服务器！");
+            this.playmusic_button.setSelected(false);
             return;
         }
         if(Client.INSTANCE().isPlaying()) {
@@ -410,13 +415,13 @@ public class MusicTvController {
         value.addListener(progressBarSubscriber);
     }
 
-    private MusicPlayer sliderSetTarget = null;
-    public void bindProgressSetter(MusicPlayer target) {
-        this.sliderSetTarget = target;
+    private MusicPlayer traceTarget = null;
+    public void bindTraceTarget(MusicPlayer target) {
+        this.traceTarget = target;
     }
 
     public void removeProgressSetter() {
-        this.sliderSetTarget = null;
+        this.traceTarget = null;
     }
 
     public void bindShower(int index) {
@@ -481,5 +486,14 @@ public class MusicTvController {
         } else {
             volumeSlider.setVisible(true);
         }
+    }
+
+    public void refreshPlayerSlider(double max, double cur) {
+        this.music_slider.setMax(max);
+        this.music_slider.setValue(cur);
+    }
+
+    public void refreshPlayButton(boolean playing) {
+        this.playmusic_button.setSelected(playing);
     }
 }

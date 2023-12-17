@@ -34,6 +34,7 @@ public class Client implements ClientInterface{
     private List<String> musicList = new ArrayList<>();
     private boolean killed = false;
     private int playingMusicIndex = -1;
+    private boolean initalized = false;
 
     public Client() {
         System.setProperty("file.encoding", "UTF-8");
@@ -103,9 +104,9 @@ public class Client implements ClientInterface{
                 e.printStackTrace();
                 Logger.logError("Error occurred while disconnecting");
             }
-            this.clearUserList();
             this.connection.killConnection();
             this.connection = null;
+            this.clearUserList();
         }
     }
 
@@ -114,14 +115,27 @@ public class Client implements ClientInterface{
         connection.killConnection();
     }
 
+
+    private final List<String> empty = new ArrayList<>();
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
         if(musicProgress.isEmpty()) {
             if(music != null) {
                 music.pauseMusic();
                 music = null;
             }
-            setMusicList(null);
+            setMusicList(empty);
+            this.initalized = true;
             return;
+        }
+
+        if(!musicProgress.isEmpty()) {
+            Logger.logInfo(
+                "GetMusicProgess: count: %d\ncurrent:%s\nstatus: %s\ntime:%f",
+                musicProgress.getMusicList().size(),
+                musicProgress.getMusicId(),
+                musicProgress.getMusicStatus(),
+                musicProgress.getMusicTime()
+            );
         }
 
         //sync music list
@@ -144,19 +158,21 @@ public class Client implements ClientInterface{
         if(musicProgress.getMusicStatus() != null) {
             switch(musicProgress.getMusicStatus()) {
                 case "pause":
+                    ImpartUI.refreshPlayButton(false);
                     music.pauseMusic();
                     break;
                 case "play":
+                    ImpartUI.refreshPlayButton(true);
                     music.playMusic();
                     break;
                 default:
                     Logger.logError("Unknown music player status tag %s", musicProgress.getMusicStatus());
                     break;
+                }
             }
-        }
-
-        //sync musicplayer process
-        if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND)) {
+            
+            //sync musicplayer process
+        if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND) || !this.initalized) {
             double time = musicProgress.getMusicTime();
             if(!this.music.isMediaReady()) {
                 this.music.addOnReady(() -> {
@@ -165,7 +181,12 @@ public class Client implements ClientInterface{
             } else {
                 this.music.setPositionMusic(time);
             }
+            if(!this.initalized) {
+                ImpartUI.refreshPlayerSlider(music.getTotalTimeDuration().toSeconds(), time);
+                ImpartUI.bindLabel(music.getTotalTimeDuration());
+            }
         }
+        this.initalized = true;
     }
 
     private void setMusicList(List<String> idList) {
@@ -174,6 +195,11 @@ public class Client implements ClientInterface{
     }
 
     protected void getMusicProcess() {
+        if(!this.initalized) {
+            Logger.logInfo("Rejecting server's get progress request because you havn't initialized yet");
+            return;
+        }
+
         if(music == null && this.musicList == null){
             connection.sendMessage(new Datapack("SynchronizeMusic", new MusicProgress()));
             return;
@@ -338,14 +364,18 @@ public class Client implements ClientInterface{
     }
 
     public void connect(String host, int port, String loginAs) {
+        this.initalized = false;
         this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
         this.connection.setOnDisconnected(() -> {
             this.pauseMusic(false);
-            this.musicList.clear();
             ImpartUI.infoToUI("你已经从服务器断开连接");
-            ImpartUI.clearMusicList();
             ImpartUI.resetPlayerUIDisplay();
             ImpartUI.clearUserList();
+            ImpartUI.clearMusicList();
+            ImpartUI.refreshPlayButton(false);
+            this.musicList.clear();
+            this.initalized = false;
+            PackageResolver.ignoreSyncCounter = 0;
         });
     }
 
