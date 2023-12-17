@@ -17,6 +17,8 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -30,6 +32,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MusicTvController {
@@ -46,6 +50,15 @@ public class MusicTvController {
     private class UIInitializationTask implements Runnable {
         @Override
         public void run() {
+            /*******************/
+            volumeSlider.setOrientation(Orientation.VERTICAL);
+            volumeSlider.setVisible(false); // 初始时隐藏
+            /*******************/
+            ImpartUI.getPrimaryScene().setOnMouseClicked((event1) -> {
+                if (event1.getTarget() != volume_button && event1.getTarget() != volumeSlider) {
+                    volumeSlider.setVisible(false);
+                }
+            });
             music_lists.currentPageIndexProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> value, Number oldVal, Number newVal) {
@@ -292,11 +305,6 @@ public class MusicTvController {
     }
 
     @FXML
-    void Playmode_change(ActionEvent event) {
-
-    }
-
-    @FXML
     void To_last_music(ActionEvent event) {
         Client.INSTANCE().goPreviousMusic(true);
     }
@@ -389,4 +397,18 @@ public class MusicTvController {
 
     }
 
+    @FXML
+    private Button volume_button;
+
+    @FXML
+    private Slider volumeSlider;
+
+    @FXML
+    void set_volume(ActionEvent event) {
+        if (volumeSlider.isVisible()) {
+            volumeSlider.setVisible(false); // 点击按钮时隐藏/显示音量调节滑动条
+        } else {
+            volumeSlider.setVisible(true);
+        }
+    }
 }
