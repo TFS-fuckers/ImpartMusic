@@ -516,4 +516,8 @@ public class MusicTvController {
     public void refreshPlayButton(boolean playing) {
         this.playmusic_button.setSelected(playing);
     }
+
+    public double getVolume() {
+        return this.volumeSlider.getValue();
+    }
 }

@@ -180,4 +180,8 @@ public class ImpartUI extends Application {
             MusicTvController.instance().refreshPlayButton(playing);
         });
     }
+
+    public static double getVolume() {
+        return MusicTvController.instance().getVolume();
+    }
 }
