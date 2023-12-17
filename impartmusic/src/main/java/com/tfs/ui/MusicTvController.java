@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -111,6 +112,7 @@ public class MusicTvController {
                 {
                     button.setOnAction(event -> {
                         try {
+                            button.setAlignment(Pos.CENTER);
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/delete_music.fxml"));
                             AnchorPane root = loader.load();
                             Delete_music_Controller controller = loader.getController();

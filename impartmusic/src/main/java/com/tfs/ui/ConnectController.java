@@ -2,7 +2,10 @@ package com.tfs.ui;
 
 import com.tfs.client.Client;
 import com.tfs.client.ParamVertifier;
+import com.tfs.dxconfig.IMConfig;
+import com.tfs.dxconfig.ImpartConfigReader;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -12,6 +15,15 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ConnectController {
+
+    public ConnectController() {
+        Platform.runLater(() -> {
+            this.IP_text.setText(ImpartConfigReader.instance().get("DEFAULT_HOST").getAsString());
+            this.port_text.setText(ImpartConfigReader.instance().get("DEFAULT_PORT").getAsString());
+            this.users_name_text.setText(ImpartConfigReader.instance().get("DEFAULT_USERNAME").getAsString());
+        });
+    }
+
     @FXML
     private Label IP_label;
 
@@ -57,5 +69,11 @@ public class ConnectController {
     private void closeWindow(ActionEvent event) {
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.close();
+
+        IMConfig defaultVal = ImpartConfigReader.instance().getDeafult();
+        defaultVal.DEFAULT_USERNAME = this.users_name_text.getText();
+        defaultVal.DEFAULT_HOST = this.IP_text.getText();
+        defaultVal.DEFAULT_PORT = this.port_text.getText();
+        ImpartConfigReader.instance().save(defaultVal);
     }
 }

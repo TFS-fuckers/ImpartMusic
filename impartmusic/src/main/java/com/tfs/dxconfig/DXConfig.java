@@ -9,12 +9,27 @@ import java.io.*;
 
 public class DXConfig<T extends Config>{
     private final Class<T> type;
+    private JsonObject defaultVal;
     private final File configFile;
     private final MessageRedirector redirector;
     private JsonObject jsonObject;
     private boolean valid = false;
     private BufferedReader reader = null;
     public DXConfig(Class<T> type, String jsonFilePath, MessageRedirector redirector) {
+        try {
+            T instance = type.newInstance();
+            Gson gson = new Gson();
+            this.defaultVal = JsonParser.parseString(gson.toJson(instance)).getAsJsonObject();
+        } catch (InstantiationException e) {
+            this.log("Failed to instantiate config class: %s", type.getName());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        if(this.defaultVal == null) {
+            this.log("default config initialization failed, this might make program unstable!");
+        }
+
         this.redirector = redirector == null ? System.out::println : redirector;
         this.configFile = new File(jsonFilePath);
         this.type = type;
@@ -90,8 +105,13 @@ public class DXConfig<T extends Config>{
 
     private void readAll() throws IOException {
         StringBuilder builder = new StringBuilder();
-        String line = this.reader.readLine();
-        builder.append(line);
+        while(true) {
+            String line = this.reader.readLine();
+            if(line == null) {
+                break;
+            }
+            builder.append(line);
+        }
         try {
             this.jsonObject = JsonParser.parseString(builder.toString()).getAsJsonObject();
         } catch (IllegalStateException e) {
@@ -111,7 +131,8 @@ public class DXConfig<T extends Config>{
             this.log("You are trying to fetch an invalid config reader, please fix this first or the program might run wrongly");
             return null;
         }
-        return this.jsonObject.get(key);
+        JsonElement element = this.jsonObject.get(key);
+        return element == null ? this.defaultVal.get(key) : element;
     }
 
     private String writeDefault() {
@@ -138,5 +159,15 @@ public class DXConfig<T extends Config>{
             this.valid = false;
             this.close();
         }
+    }
+    
+    public T getDefault() {
+        Gson gson = new Gson();
+        return gson.fromJson(this.jsonObject.toString(), this.type);
+    }
+
+    public void save(JsonObject object) {
+        this.write(object.toString(), false);
+        this.jsonObject = object;
     }
 }
