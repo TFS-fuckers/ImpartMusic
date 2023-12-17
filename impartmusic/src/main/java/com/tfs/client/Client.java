@@ -34,6 +34,7 @@ public class Client implements ClientInterface{
     private int playingMusicIndex = -1;
 
     public Client() {
+        System.setProperty("file.encoding", "UTF-8");
         INSTANCE = this;
         ImpartUI.showUI();
         this.initializeNewMusicHashMap();

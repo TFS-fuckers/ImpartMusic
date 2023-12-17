@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.GetMusicProcess;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.SimpleString;
 import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
@@ -110,7 +111,7 @@ public class Server {
         }
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
         ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
-        ServerHandler.instance().sendToUser(info.getName(), new Datapack("SimpleString", MES_TO_LOGIN_USER));
+        ServerHandler.instance().sendToUser(info.getName(), new Datapack("SimpleString", new SimpleString(MES_TO_LOGIN_USER, "UTF-8")));
         if(musicListSyncTrigger){
             ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", this.musicProgress));
             musicListSyncTrigger = false;

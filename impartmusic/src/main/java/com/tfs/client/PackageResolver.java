@@ -3,6 +3,7 @@ package com.tfs.client;
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.SimpleString;
 import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.logger.Logger;
@@ -36,7 +37,7 @@ public class PackageResolver {
             
             case "SimpleString":
                 Logger.logInfo(datapack.content);
-                ImpartUI.infoToUI(datapack.deserializeContent(String.class));
+                ImpartUI.infoToUI(datapack.deserializeContent(SimpleString.class).getString());
                 break;
 
             case "LoginUser":
