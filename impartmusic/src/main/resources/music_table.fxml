@@ -8,60 +8,69 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Region?>
 
-<BorderPane fx:id="music_pane" cacheShape="false" centerShape="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="734.0" prefWidth="971.0" scaleShape="false" stylesheets="@player.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tfs.ui.MusicTvController">
+<BorderPane fx:id="music_pane" cacheShape="false" centerShape="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="746.0" prefWidth="971.0" scaleShape="false" styleClass="root" stylesheets="@player.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tfs.ui.MusicTvController">
    <top>
-       <TitledPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="355.0" prefWidth="971.0" style="-fx-background-color: #b7b7b7;" text="播放列表信息" underline="true" BorderPane.alignment="CENTER">
-           <AnchorPane prefHeight="401.0" prefWidth="969.0" style="-fx-background-color: #cfcfcf;">
-               <padding>
-                   <Insets left="5.0" right="5.0" top="5.0" />
-               </padding>
-               <Label fx:id="music_name_label" layoutX="33.0" layoutY="18.0" prefHeight="34.0" prefWidth="57.0" text="标题：" />
-            <Button fx:id="add_music_to_pack" layoutX="751.0" layoutY="289.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="24.0" prefWidth="71.0" text="加入歌单" />
-            <Button fx:id="playmusic_button" layoutX="85.0" layoutY="283.0" minWidth="35.0" mnemonicParsing="false" onAction="#Play_music" prefHeight="36.0" prefWidth="43.0" text="播放" />
-               <Label fx:id="music_title" layoutX="80.0" layoutY="14.0" prefHeight="33.0" prefWidth="287.0" text="fuck mc de da xia" textOverrun="CLIP" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="14.0">
-                   <font>
-                       <Font size="19.0" />
-                   </font>
-               </Label>
-               <Label fx:id="music_introduction_label" layoutX="33.0" layoutY="58.0" text="介绍：" />
-            <TextArea fx:id="music_introduction_text" layoutX="71.0" layoutY="63.0" prefHeight="209.0" prefWidth="487.0" />
-            <Slider fx:id="music_slider" layoutX="241.0" layoutY="289.0" prefHeight="24.0" prefWidth="444.0" />
-            <Button fx:id="music_playmode_button" layoutX="841.0" layoutY="289.0" mnemonicParsing="false" onAction="#Playmode_change" text="Playmode" />
-            <Label fx:id="music_playing_time_label" layoutX="192.0" layoutY="293.0" text="当前时间" />
-            <Label fx:id="music_whole_time_label" layoutX="692.0" layoutY="293.0" text="全曲时间" />
-            <Button fx:id="disconnect_button" contentDisplay="TOP" layoutX="684.0" layoutY="23.0" mnemonicParsing="false" onAction="#cut_link" text="断开连接" />
-            <Button fx:id="last_button" layoutX="14.0" layoutY="283.0" minWidth="35.0" mnemonicParsing="false" onAction="#To_last_music" prefHeight="36.0" prefWidth="57.0" text="上一首" />
-            <Button fx:id="connect_button" contentDisplay="TOP" layoutX="586.0" layoutY="23.0" mnemonicParsing="false" onAction="#buildnewInputPane" text="连接服务器" />
-            <Button fx:id="next_button" layoutX="138.0" layoutY="282.0" mnemonicParsing="false" onAction="#To_next_music" prefHeight="37.0" prefWidth="53.0" text="下一首" />
-            <TextArea fx:id="online_information_text" layoutX="590.6666666666667" layoutY="212.66666666666669" prefHeight="66.0" prefWidth="345.0" text="欢迎xxx加入线上music&#10;impart！&#10;" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="585.0" AnchorPane.rightAnchor="39.0" AnchorPane.topAnchor="207.0" />
-            <Label fx:id="connection_state_label" alignment="CENTER" layoutX="769.0" layoutY="28.0" text="状态：" />
-            <Label fx:id="connection_state_info_label" alignment="CENTER" layoutX="817.0" layoutY="28.0" text="fuckmcdedaxia" />
-            <TableView fx:id="onlineusers_lists" layoutX="586.0" layoutY="58.0" prefHeight="135.0" prefWidth="345.0">
-              <columns>
-                <TableColumn fx:id="users_name" prefWidth="159.33331298828125" resizable="false" text="用户名" />
-                <TableColumn fx:id="host" prefWidth="184.666748046875" resizable="false" text="host" />
-              </columns>
-            </TableView>
-           </AnchorPane>
-       </TitledPane>
+        <AnchorPane prefHeight="277.0" prefWidth="951.0" style="-fx-background-color: #cfcfcf;" styleClass="content-pane">
+            <padding>
+                <Insets left="5.0" right="5.0" top="5.0" />
+            </padding>
+         <Label fx:id="music_whole_time_label" layoutX="415.0" layoutY="230.0" styleClass="time-label" text="全曲时间" AnchorPane.bottomAnchor="63.33333333333334" />
+         <Button fx:id="disconnect_button" contentDisplay="TOP" layoutX="613.0" layoutY="11.0" mnemonicParsing="false" onAction="#cut_link" text="断开连接" />
+         <Button fx:id="connect_button" contentDisplay="TOP" layoutX="496.0" layoutY="11.0" mnemonicParsing="false" onAction="#buildnewInputPane" text="连接服务器" AnchorPane.leftAnchor="496.0" />
+         <Button fx:id="next_button" layoutX="270.0" layoutY="224.0" mnemonicParsing="false" onAction="#To_next_music" prefHeight="27.0" prefWidth="36.0" styleClass="next-btn" AnchorPane.bottomAnchor="25.99999999999997">
+            <graphic>
+               <Region prefHeight="33.0" prefWidth="26.0" />
+            </graphic>
+         </Button>
+         <TextArea fx:id="online_information_text" layoutX="507.3333333333333" layoutY="44.66666666666667" prefHeight="193.0" prefWidth="423.0" text="欢迎xxx加入线上music&#10;impart！&#10;" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="496.0" AnchorPane.rightAnchor="27.0" AnchorPane.topAnchor="33.0" />
+         <Label fx:id="connection_state_label" alignment="CENTER" layoutX="731.0" layoutY="15.0" text="状态：" />
+         <Label fx:id="connection_state_info_label" alignment="CENTER" layoutX="788.0" layoutY="15.0" text="fuckmcdedaxia" />
+         <TableView fx:id="onlineusers_lists" layoutX="36.666666666666664" layoutY="10.0" prefHeight="177.0" prefWidth="435.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="485.0">
+           <columns>
+             <TableColumn fx:id="users_name" prefWidth="159.33331298828125" resizable="false" text="用户名" />
+             <TableColumn fx:id="host" prefWidth="184.666748046875" resizable="false" text="host" />
+           </columns>
+         </TableView>
+         <Slider fx:id="music_slider" layoutX="73.0" layoutY="231.0" prefHeight="14.0" prefWidth="342.0" AnchorPane.bottomAnchor="63.666666666666686" />
+         <Label fx:id="music_playing_time_label" layoutX="13.0" layoutY="198.0" styleClass="time-label" text="当前时间" AnchorPane.leftAnchor="13.0" />
+         <Button fx:id="last_button" layoutX="187.0" layoutY="224.0" mnemonicParsing="false" onAction="#To_last_music" prefHeight="29.0" prefWidth="37.0" styleClass="prev-btn" AnchorPane.bottomAnchor="23.99999999999997">
+            <graphic>
+               <Region prefHeight="0.0" prefWidth="0.0" />
+            </graphic>
+         </Button>
+         <ToggleButton fx:id="playmusic_button" layoutX="223.0" layoutY="221.0" mnemonicParsing="false" onAction="#Play_music" prefHeight="35.0" prefWidth="41.0" styleClass="play-btn" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="223.0">
+            <graphic>
+               <Region prefHeight="25.0" prefWidth="25.0" />
+            </graphic>
+         </ToggleButton>
+         <ToggleButton fx:id="add_music_to_pack" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="25.0" prefWidth="38.0" styleClass="like-btn" AnchorPane.bottomAnchor="24.99999999999997">
+            <graphic>
+               <Region prefHeight="0.0" prefWidth="0.0" />
+            </graphic>
+         </ToggleButton>
+         <Button layoutX="319.0" layoutY="227.0" mnemonicParsing="false" text="音量" AnchorPane.bottomAnchor="26.99999999999997" />
+         <TextField fx:id="text_to_onlineinfo" layoutX="502.0" layoutY="217.0" prefHeight="33.0" prefWidth="354.0" />
+         <Button fx:id="text_to_onlineinfo_button" layoutX="864.0" layoutY="217.0" mnemonicParsing="false" onAction="#text_to_onlineinfo" prefHeight="34.0" prefWidth="65.0" text="发送" />
+        </AnchorPane>
    </top>
    <effect>
       <DropShadow />
    </effect>
    <center>
-      <AnchorPane BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="354.0" prefWidth="951.0" styleClass="list-pane" BorderPane.alignment="CENTER">
          <children>
-              <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" onSort="#Music_Sort" prefHeight="326.0" prefWidth="971.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <TableView fx:id="tableView" cache="true" cacheHint="SPEED" editable="true" onSort="#Music_Sort" prefHeight="320.0" prefWidth="949.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <columns>
-                      <TableColumn fx:id="tableViewMusicID" maxWidth="408.66669714450836" minWidth="70" prefWidth="299.33333337306976" sortable="false" styleClass="firstColumn" text="序号" />
-                      <TableColumn fx:id="tableViewMusicTitle" minWidth="107.33330535888672" prefWidth="366.6667175292969" sortable="false" styleClass="firstColumn" text="歌曲标题" />
-                      <TableColumn fx:id="tableViewButton" maxWidth="428.0" minWidth="0.0" prefWidth="296.0001220703125" sortable="false" styleClass="firstColumn" text="多种选项" />
+                      <TableColumn fx:id="tableViewMusicID" maxWidth="408.66669714450836" minWidth="70" prefWidth="194.00003051757812" sortable="false" styleClass="firstColumn" text="序号" />
+                      <TableColumn fx:id="tableViewMusicTitle" minWidth="107.33330535888672" prefWidth="392.6666259765625" sortable="false" styleClass="firstColumn" text="歌曲标题" />
+                      <TableColumn fx:id="tableViewButton" maxWidth="430.00006103515625" minWidth="0.0" prefWidth="362.66668701171875" sortable="false" styleClass="firstColumn" text="多种选项" />
                   </columns>
                <columnResizePolicy>
                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -71,4 +80,10 @@
          </children>
       </AnchorPane>
    </center>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+   <opaqueInsets>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </opaqueInsets>
 </BorderPane>
