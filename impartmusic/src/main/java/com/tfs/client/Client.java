@@ -3,6 +3,7 @@ package com.tfs.client;
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.SimpleString;
 import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.dxconfig.ImpartConfigReader;
@@ -600,5 +601,12 @@ public class Client implements ClientInterface{
             this.requestStandardUser();
         }
         this.previousMusicStrategy.run();
+    }
+
+    public void sendChatMessage(String message) {
+        this.connection.sendMessage(new Datapack(
+            "SimpleString",
+            new SimpleString(message, "UTF-8")
+        ));
     }
 }

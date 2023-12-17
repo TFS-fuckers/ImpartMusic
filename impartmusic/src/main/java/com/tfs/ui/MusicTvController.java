@@ -7,7 +7,6 @@ import java.util.List;
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.musicplayer.MusicPlayer;
-import com.tfs.musicplayer.Netease;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -122,7 +121,7 @@ public class MusicTvController {
             tableViewMusicID.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getId()));
             tableViewMusicTitle.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getName()));
             online_information_text.setEditable(false);
-            text_to_online_textarea.setText("");
+            text_to_onlineinfo.setText("");
         }
     }
 
@@ -269,9 +268,6 @@ public class MusicTvController {
     public TableView<MusicDetails> getMusicTableView() {
         return tableView;
     }
-
-    @FXML
-    private TextArea text_to_online_textarea;
 
     @FXML
     void Collect_music(ActionEvent event) {
@@ -454,7 +450,14 @@ public class MusicTvController {
     }
     @FXML
     void text_to_onlineinfo(ActionEvent event) {
-        
+        if(!Client.INSTANCE().isConnected()) {
+            ImpartUI.infoToUI("请先连接服务器！");
+        }
+        String input = this.text_to_onlineinfo.getText();
+        this.text_to_onlineinfo.setText("");
+        if(!input.isEmpty()) {
+            Client.INSTANCE().sendChatMessage(input);
+        }
     }
 
 }
