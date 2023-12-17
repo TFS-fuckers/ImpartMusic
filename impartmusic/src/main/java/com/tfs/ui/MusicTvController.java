@@ -27,6 +27,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -160,7 +162,10 @@ public class MusicTvController {
     }
 
     @FXML
-    private Button add_music_to_pack;
+    private Pagination music_lists;
+
+    @FXML
+    private ToggleButton add_music_to_pack;
 
     @FXML
     private Button connect_button;
@@ -178,6 +183,12 @@ public class MusicTvController {
     public Label getConnection_state_label() {
         return connection_state_label;
     }
+
+    @FXML
+    private TextField text_to_onlineinfo;
+
+    @FXML
+    private Button text_to_onlineinfo_button;
 
     @FXML
     private Button disconnect_button;
@@ -204,8 +215,6 @@ public class MusicTvController {
     @FXML
     private TextArea music_introduction_text;
 
-    @FXML
-    private Pagination music_lists;
 
     @FXML
     private Label music_name_label;
@@ -219,8 +228,6 @@ public class MusicTvController {
         return music_playing_time_label;
     }
 
-    @FXML
-    private Button music_playmode_button;
 
     @FXML
     private Slider music_slider;
@@ -228,8 +235,6 @@ public class MusicTvController {
         return music_slider;
     }
 
-    @FXML
-    private Label music_title;
 
     @FXML
     private Label music_whole_time_label;
@@ -245,10 +250,10 @@ public class MusicTvController {
     }
 
     @FXML
-    private Button playmusic_button;
+    private ToggleButton playmusic_button;
 
-    @FXML
-    private Button store_button;
+    /*@FXML
+    private Button store_button;*/
 
     @FXML
     private TableColumn<MusicDetails, Button> tableViewButton;
@@ -411,25 +416,25 @@ public class MusicTvController {
     }
 
     public void bindShower(int index) {
-        this.music_title.setText(this.detailedMusic.get(index).getName());
+        // this.music_title.setText(this.detailedMusic.get(index).getName());
     }
 
     public void bindShower(String id) {
-        synchronized(this.detailedMusic) {
-            boolean found = false;
-            for(int i = 0; i < this.detailedMusic.size(); i++) {
-                if(detailedMusic.get(i).getId().equals(id)) {
-                    this.bindShower(i);
-                    found = true;
-                    break;
-                }
-            }
-            if(!found) {
-                this.music_title.setText(
-                    Netease.getMusicDetails(id).getName()
-                );
-            }
-        }
+        // synchronized(this.detailedMusic) {
+        //     boolean found = false;
+        //     for(int i = 0; i < this.detailedMusic.size(); i++) {
+        //         if(detailedMusic.get(i).getId().equals(id)) {
+        //             this.bindShower(i);
+        //             found = true;
+        //             break;
+        //         }
+        //     }
+        //     if(!found) {
+        //         this.music_title.setText(
+        //             Netease.getMusicDetails(id).getName()
+        //         );
+        //     }
+        // }
     }
 
     public void clearMusicList() {
@@ -441,10 +446,15 @@ public class MusicTvController {
         this.music_slider.setMax(999);
         this.music_playing_time_label.setText("当前时间");
         this.music_whole_time_label.setText("全曲时间");
-        this.music_title.setText("");
+        // this.music_title.setText("");
     }
 
     public void clearUserList() {
         this.getOnlineusers_lists().getItems().clear();
     }
+    @FXML
+    void text_to_onlineinfo(ActionEvent event) {
+        
+    }
+
 }
