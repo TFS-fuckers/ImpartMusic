@@ -84,6 +84,7 @@ public class ImpartUI extends Application {
             MusicTvController.instance().getOnline_information_text().setText(
                 messageStringBuilder.toString()
             );
+            MusicTvController.instance().getOnline_information_text().setScrollTop(Double.MAX_VALUE);
         });
     }
 
