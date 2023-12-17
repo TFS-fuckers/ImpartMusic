@@ -30,17 +30,20 @@ public class ImpartUI extends Application {
     }
 
     public static final HashMap<String, MusicDetails> MUSIC_DETAILS_CACHE = new HashMap<>();
-
+    private static Scene primaryScene = null;
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
         primaryStage.setTitle("hello world");
-        primaryStage.setScene(new Scene(root));
+        primaryScene = new Scene(root);
+        primaryStage.setScene(primaryScene);
         primaryStage.setResizable(false);
-        //primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
+    public static Scene getPrimaryScene() {
+        return primaryScene;
+    }
     @Override
     public void init() throws Exception{
         super.init();
@@ -117,6 +120,7 @@ public class ImpartUI extends Application {
             songsDetails.add(MUSIC_DETAILS_CACHE.get(id));
         }
         ThreadDispatcher.invoke(() -> {
+            Logger.logInfo("trying to set list to a %d element list", songsDetails.size());
             MusicTvController.instance().setDataList(songsDetails);
             MusicTvController.instance().refreshTableView();
         });
@@ -139,7 +143,7 @@ public class ImpartUI extends Application {
     }
 
     public static void bindProgressSetter(MusicPlayer target) {
-        MusicTvController.instance().bindProgressSetter(target);
+        MusicTvController.instance().bindTraceTarget(target);
     }
 
     public static void removeProgressSetter() {
@@ -161,6 +165,18 @@ public class ImpartUI extends Application {
     public static void resetPlayerUIDisplay() {
         ThreadDispatcher.invoke(() -> {
             MusicTvController.instance().resetPlayerUIDisplay();
+        });
+    }
+
+    public static void refreshPlayerSlider(double max, double cur) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().refreshPlayerSlider(max, cur);
+        });
+    }
+
+    public static void refreshPlayButton(boolean playing) {
+        ThreadDispatcher.invoke(() -> {
+            MusicTvController.instance().refreshPlayButton(playing);
         });
     }
 }

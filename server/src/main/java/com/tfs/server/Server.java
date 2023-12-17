@@ -23,7 +23,7 @@ public class Server {
     public static final String MES_TO_LOGIN_USER = ImpartConfigReader.instance().get("MES_TO_LOGIN_USER").getAsString();
     public static final int PORT = ImpartConfigReader.instance().get("PORT").getAsInt();
     private int standardUserIndex = 0;
-    private boolean musicListSyncTrigger = false;
+    private boolean musicListSyncTrigger = true;
     private MusicProgress musicProgress;
 
     public Server(){
@@ -97,6 +97,7 @@ public class Server {
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
         this.syncReceiveTrigger = true;
         this.musicProgress = musicProgress;
+        Logger.logInfo("musicProgress list count: %d", musicProgress.getMusicList().size());
         ServerHandler.instance().sendToAll(new Datapack("SynchronizeMusic", musicProgress));
     }
 
@@ -114,7 +115,12 @@ public class Server {
         ServerHandler.instance().sendToAll(new Datapack("LoginUser",info));
         ServerHandler.instance().sendToUser(info.getName(), new Datapack("SimpleString", new SimpleString(MES_TO_LOGIN_USER, "UTF-8")));
         if(musicListSyncTrigger){
-            ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", this.musicProgress));
+            Logger.logInfo("Sending cached music progress to user");
+            if(musicProgress == null) {
+                ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", new MusicProgress()));
+            } else {
+                ServerHandler.instance().sendToUser(user.getName(), new Datapack("SynchronizeMusic", this.musicProgress));
+            }
             musicListSyncTrigger = false;
         }
     }
@@ -125,7 +131,7 @@ public class Server {
             userInfoList.add(new UserSimpleInfo(tmp.getName(), tmp.getAddress().getHostAddress()));
         }
         ServerHandler.instance().sendToAll(new Datapack("UserList", userInfoList));
-        ServerHandler.instance().sendToAll(new Datapack("LogoutUser",info));
+        ServerHandler.instance().sendToAll(new Datapack("LogoutUser", info));
         if(ServerHandler.instance().getUserNum() == 0){
             musicListSyncTrigger = true;
         }
