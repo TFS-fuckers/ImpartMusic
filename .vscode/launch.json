@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "com.tfs.server.Main",
+      "projectName": "server"
+    },
+    {
+      "type": "java",
       "name": "NeteaseTest",
       "request": "launch",
       "mainClass": "NeteaseTest",

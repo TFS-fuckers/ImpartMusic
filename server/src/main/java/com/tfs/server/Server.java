@@ -10,6 +10,7 @@ import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.SimpleString;
 import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
+import com.tfs.dxconfig.ImpartConfigReader;
 import com.tfs.logger.Logger;
 
 public class Server {
@@ -17,17 +18,17 @@ public class Server {
     private int syncMusicPlayerNoResponseCount = 0;
 
     private boolean syncReceiveTrigger = false;
-    public static final int AUTO_SYNC_SLEEP_TICK = 5;
-    public static final int MAX_SYNC_NO_RESPONSE = 5;
-    public static final String MES_TO_LOGIN_USER = "欢迎加入大虾的音乐小屋~";
+    public static final int AUTO_SYNC_SLEEP_TICK = ImpartConfigReader.instance().get("AUTO_SYNC_SLEEP_TICK").getAsInt();
+    public static final int MAX_SYNC_NO_RESPONSE = ImpartConfigReader.instance().get("MAX_SYNC_NO_RESPONSE").getAsInt();
+    public static final String MES_TO_LOGIN_USER = ImpartConfigReader.instance().get("MES_TO_LOGIN_USER").getAsString();
+    public static final int PORT = ImpartConfigReader.instance().get("PORT").getAsInt();
     private int standardUserIndex = 0;
-
     private boolean musicListSyncTrigger = false;
     private MusicProgress musicProgress;
 
-    public Server(int port){
+    public Server(){
         INSTANCE = this;
-        new Thread(() -> new ServerHandler(port, new CustomServerTick())).start();
+        new Thread(() -> new ServerHandler(PORT, new CustomServerTick())).start();
         Timer synchronizeMusicTimer = new Timer();
 
         try {

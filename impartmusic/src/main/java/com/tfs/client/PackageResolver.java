@@ -36,7 +36,6 @@ public class PackageResolver {
                 break;
             
             case "SimpleString":
-                Logger.logInfo(datapack.content);
                 ImpartUI.infoToUI(datapack.deserializeContent(SimpleString.class).getString());
                 break;
 

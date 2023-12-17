@@ -14,6 +14,7 @@ import java.util.TimerTask;
 import com.tfs.datapack.AccessInstruction;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.UserInfo;
+import com.tfs.dxconfig.ImpartConfigReader;
 import com.tfs.logger.Logger;
 
 
@@ -41,11 +42,11 @@ public class Connection {
     private UserInfo userInfo;
 
     /**与服务器通信的验证间隔时间 */
-    public static final int HEART_BEAT_INTERVAL_MILLISECONDS = 1000;
+    public static final int HEART_BEAT_INTERVAL_MILLISECONDS = ImpartConfigReader.instance().get("HEART_BEAT_INTERVAL_MILLISECONDS").getAsInt();
     /**服务器无响应的最大容忍次数 */
-    public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
+    public static final int NO_RESPONSE_TIMEOUT_TRIES = ImpartConfigReader.instance().get("NO_RESPONSE_TIMEOUT_TRIES").getAsInt();
     /**与服务器进行身份验证的最大等待次数 */
-    public static final int VERTIFICATION_MAX_TRIES = 10;
+    public static final int VERTIFICATION_MAX_TRIES = ImpartConfigReader.instance().get("VERTIFICATION_MAX_TRIES").getAsInt();;
 
     /**
      * 创建一个与服务器的连接实例

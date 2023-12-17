@@ -12,6 +12,7 @@ import com.tfs.datapack.AccessInstruction;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.UserInfo;
+import com.tfs.dxconfig.ImpartConfigReader;
 import com.tfs.logger.Logger;
 
 import java.lang.Thread;
@@ -44,17 +45,17 @@ public class ClientHandler implements Runnable{
     /**
      * 与客户端之间发送HeartBeat验证信息的时间间隔
      */
-    public static final int HEART_BEAT_INTERVAL_MILLISECONDS = 1000;
+    public static final int HEART_BEAT_INTERVAL_MILLISECONDS = ImpartConfigReader.instance().get("HEART_BEAT_INTERVAL_MILLISECONDS").getAsInt();
 
     /**
      * 客户端没有回应的最大次数容忍限度
      */
-    public static final int NO_RESPONSE_TIMEOUT_TRIES = 5;
+    public static final int NO_RESPONSE_TIMEOUT_TRIES = ImpartConfigReader.instance().get("NO_RESPONSE_TIMEOUT_TRIES").getAsInt();
 
     /**
      * 客户端没有发送验证信息的最大次数容忍限度
      */
-    public static final int NO_VERTIFICATION_MAX_COUNT = 10;
+    public static final int NO_VERTIFICATION_MAX_COUNT = ImpartConfigReader.instance().get("NO_VERTIFICATION_MAX_COUNT").getAsInt();
 
     /**
      * 初始化方法
