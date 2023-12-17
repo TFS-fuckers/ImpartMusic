@@ -96,7 +96,7 @@ public class ImpartUI extends Application {
 
     public static void clearUserList() {
         ThreadDispatcher.invoke(() -> {
-            MusicTvController.instance().getOnlineusers_lists().setItems(null);
+            MusicTvController.instance().clearUserList();
         });
     }
 

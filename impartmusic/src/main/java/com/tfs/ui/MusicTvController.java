@@ -443,4 +443,8 @@ public class MusicTvController {
         this.music_whole_time_label.setText("全曲时间");
         this.music_title.setText("");
     }
+
+    public void clearUserList() {
+        this.getOnlineusers_lists().getItems().clear();
+    }
 }
