@@ -50,14 +50,18 @@
                <Region maxHeight="30.0" maxWidth="31.0" minHeight="30.0" minWidth="28.0" prefHeight="30.0" prefWidth="31.0" />
             </graphic>
          </ToggleButton>
-         <ToggleButton fx:id="add_music_to_pack" layoutX="147.33333333333334" layoutY="227.0" maxHeight="20.0" maxWidth="36.0" minHeight="20.0" minWidth="24.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="20.0" prefWidth="36.0" scaleShape="false" styleClass="like-btn" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="142.0" AnchorPane.rightAnchor="773.0">
+         <ToggleButton fx:id="add_music_to_pack" layoutX="147.33333333333334" layoutY="227.0" maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" onAction="#add_music_to_pack" prefHeight="24.0" prefWidth="24.0" scaleShape="false" styleClass="like-btn" AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="137.0" AnchorPane.rightAnchor="779.0">
             <graphic>
-               <Region maxHeight="20.0" maxWidth="24.0" minHeight="20.0" minWidth="24.0" prefHeight="20.0" prefWidth="24.0" />
+               <Region maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" prefHeight="22.0" prefWidth="22.0" />
             </graphic>
          </ToggleButton>
-         <Button alignment="CENTER" layoutX="319.0" layoutY="227.0" maxHeight="25.0" maxWidth="40.0" minHeight="25.0" minWidth="40.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="40.0" text="音量" textOverrun="CENTER_WORD_ELLIPSIS" AnchorPane.bottomAnchor="26.99999999999997" />
+         <Button fx:id="volume_button" alignment="CENTER" layoutX="304.0" layoutY="225.0" maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" onAction="#set_volume" prefHeight="24.0" prefWidth="24.0" styleClass="volume-btn" textOverrun="CENTER_WORD_ELLIPSIS" AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="305.0">
+            <graphic>
+               <Region maxHeight="20.0" maxWidth="24.0" minHeight="20.0" minWidth="24.0" prefHeight="20.0" prefWidth="24.0" />
+            </graphic></Button>
          <TextField fx:id="text_to_onlineinfo" layoutX="502.0" layoutY="217.0" prefHeight="33.0" prefWidth="354.0" />
          <Button fx:id="text_to_onlineinfo_button" alignment="CENTER" layoutX="864.0" layoutY="212.0" maxHeight="43.0" maxWidth="79.0" minHeight="30.0" minWidth="65.0" mnemonicParsing="false" onAction="#text_to_onlineinfo" prefHeight="43.0" prefWidth="79.0" text="发送" textAlignment="CENTER" />
+         <Slider fx:id="volumeSlider" disable="true" layoutX="315.0" layoutY="63.0" orientation="VERTICAL" prefHeight="161.0" prefWidth="14.0" visible="false" />
         </AnchorPane>
    </top>
    <effect>

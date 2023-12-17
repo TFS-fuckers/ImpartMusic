@@ -30,18 +30,23 @@ public class ImpartUI extends Application {
     }
 
     public static final HashMap<String, MusicDetails> MUSIC_DETAILS_CACHE = new HashMap<>();
-
+    private static Scene primaryScene = null;
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
         //
         primaryStage.setTitle("hello world");
-        primaryStage.setScene(new Scene(root));
+        primaryScene = new Scene(root);
+        primaryStage.setScene(primaryScene);
         primaryStage.setResizable(false);
         //primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        //ImpartUI.primaryScene = primaryStage;
     }
 
+    public static Scene getPrimaryScene() {
+        return primaryScene;
+    }
     @Override
     public void init() throws Exception{
         super.init();
