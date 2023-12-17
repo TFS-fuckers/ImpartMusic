@@ -36,6 +36,8 @@ public class ImpartUI extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
         primaryStage.setTitle("hello world");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+        //primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

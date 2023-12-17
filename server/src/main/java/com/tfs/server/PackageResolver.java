@@ -2,6 +2,7 @@ package com.tfs.server;
 
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
+import com.tfs.datapack.SimpleString;
 import com.tfs.logger.Logger;
 
 public class PackageResolver {
@@ -27,6 +28,18 @@ public class PackageResolver {
                     Logger.logWarning("Failed to kill connection with user's datapack instruction");
                     e.printStackTrace();
                 }
+                break;
+
+            case "SimpleString":
+                SimpleString message = datapack.deserializeContent(SimpleString.class);
+                String msg = String.format(
+                    "%s 说： %s", 
+                    datapack.senderTag,
+                    message.getString()
+                );
+                ServerHandler.instance().sendToAll(
+                    new Datapack("SimpleString", new SimpleString(msg, "UTF-8"))
+                );
                 break;
 
             default:
