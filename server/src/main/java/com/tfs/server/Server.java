@@ -12,6 +12,7 @@ import com.tfs.datapack.UserInfo;
 import com.tfs.datapack.UserSimpleInfo;
 import com.tfs.dxconfig.ImpartConfigReader;
 import com.tfs.logger.Logger;
+import com.tfs.modloader.ModLoader;
 
 public class Server {
     private static Server INSTANCE = null;
@@ -27,6 +28,7 @@ public class Server {
     private MusicProgress musicProgress;
 
     public Server(){
+        ModLoader.load();
         INSTANCE = this;
         new Thread(() -> new ServerHandler(PORT, new CustomServerTick())).start();
         Timer synchronizeMusicTimer = new Timer();

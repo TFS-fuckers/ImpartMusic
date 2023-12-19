@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gson-2.9.1 (2)">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/impartmusic/lib/gson-2.9.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

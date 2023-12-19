@@ -1,5 +1,4 @@
 package com.tfs.ui;
-
 import com.tfs.client.Client;
 import com.tfs.client.ParamVertifier;
 import com.tfs.dxconfig.IMConfig;

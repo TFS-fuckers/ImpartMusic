@@ -171,20 +171,24 @@ public class Client implements ClientInterface{
                 }
             }
             
-            //sync musicplayer process
-        if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND) || !this.initalized) {
-            double time = musicProgress.getMusicTime();
-            if(!this.music.isMediaReady()) {
-                this.music.addOnReady(() -> {
+        //sync musicplayer process
+        try {
+            if(this.music != null && (Math.abs(this.music.getCurrentTime() - musicProgress.getMusicTime()) > SYNC_RANGE_SECOND) || !this.initalized) {
+                double time = musicProgress.getMusicTime();
+                if(!this.music.isMediaReady()) {
+                    this.music.addOnReady(() -> {
+                        this.music.setPositionMusic(time);
+                    });
+                } else {
                     this.music.setPositionMusic(time);
-                });
-            } else {
-                this.music.setPositionMusic(time);
+                }
+                if(!this.initalized) {
+                    ImpartUI.refreshPlayerSlider(music.getTotalTimeDuration().toSeconds(), time);
+                    ImpartUI.bindLabel(music.getTotalTimeDuration());
+                }
             }
-            if(!this.initalized) {
-                ImpartUI.refreshPlayerSlider(music.getTotalTimeDuration().toSeconds(), time);
-                ImpartUI.bindLabel(music.getTotalTimeDuration());
-            }
+        } catch (Exception e) {
+            Logger.logWarning("Sync music progress failed, cause: %s", e.getMessage());
         }
         this.initalized = true;
     }

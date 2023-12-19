@@ -18,6 +18,15 @@ public class SimpleString {
         return null;
     }
 
+    public String getString(Charset charset) {
+        try {
+            return new String(this.data, charset);
+        } catch (Exception e) {
+            Logger.logError("encoding %s is not supported", charset);
+        }
+        return null;
+    }
+
     public SimpleString(String string, String encoding) {
         this.data = string.getBytes(Charset.forName(encoding));
         this.encoding = encoding;

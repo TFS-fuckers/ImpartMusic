@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.tfs.client.Client;
 import com.tfs.datapack.UserSimpleInfo;
+import com.tfs.logger.Logger;
 import com.tfs.musicplayer.MusicPlayer;
 
 import javafx.application.Platform;
@@ -467,7 +468,11 @@ public class MusicTvController {
     }
 
     public void clearMusicList() {
-        this.tableView.getItems().clear();
+        try {
+            this.tableView.getItems().clear();
+        } catch (NullPointerException e) {
+            Logger.logWarning("Nothing to clear in music list");
+        }
     }
 
     public void resetPlayerUIDisplay() {

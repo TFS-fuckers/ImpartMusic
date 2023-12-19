@@ -1,5 +1,6 @@
 package com.tfs.ui;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -34,6 +36,13 @@ public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
+        try {
+            URL url = getClass().getResource("/image/icon.jpg");
+            Image icon = new Image(url.toString());
+            primaryStage.getIcons().add(icon);
+        } catch (Exception e) {
+            Logger.logWarning("Load icon failed");
+        }
         primaryStage.setTitle("Impart Music");
         primaryScene = new Scene(root);
         primaryStage.setScene(primaryScene);

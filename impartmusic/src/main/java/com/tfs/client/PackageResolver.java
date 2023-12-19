@@ -1,5 +1,7 @@
 package com.tfs.client;
 
+import java.nio.charset.Charset;
+
 import com.tfs.datapack.ControlConnect;
 import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
@@ -36,7 +38,7 @@ public class PackageResolver {
                 break;
             
             case "SimpleString":
-                ImpartUI.infoToUI(datapack.deserializeContent(SimpleString.class).getString());
+                ImpartUI.infoToUI(datapack.deserializeContent(SimpleString.class).getString(Charset.forName("UTF-8")));
                 break;
 
             case "LoginUser":

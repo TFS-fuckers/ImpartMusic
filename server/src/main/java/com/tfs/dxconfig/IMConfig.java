@@ -1,7 +1,7 @@
 package com.tfs.dxconfig;
 
 public class IMConfig implements Config{
-    public String MES_TO_LOGIN_USER = "欢迎使用 ImpartMusic 播放器~";
+    public String MES_TO_LOGIN_USER = "Welcome to my music house~";
 
     public int MAX_SYNC_NO_RESPONSE = 5;
 

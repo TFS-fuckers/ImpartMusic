@@ -4,10 +4,12 @@ import com.tfs.datapack.Datapack;
 import com.tfs.datapack.MusicProgress;
 import com.tfs.datapack.SimpleString;
 import com.tfs.logger.Logger;
+import com.tfs.modloader.ModLoader;
 
 public class PackageResolver {
     protected static void packageResolver(Datapack datapack){
         Server server = Server.INSTANCE();
+        ModLoader.onResolveDatapack(datapack);
         switch (datapack.identifier) {
             case "SynchronizeMusic":
                 server.synchronizeMusicProgress(datapack.deserializeContent(MusicProgress.class));

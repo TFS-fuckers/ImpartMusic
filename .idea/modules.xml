@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ImpartMusic.iml" filepath="$PROJECT_DIR$/.idea/ImpartMusic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/impartmusic/impartmusicclient.iml" filepath="$PROJECT_DIR$/impartmusic/impartmusicclient.iml" />
     </modules>
   </component>
 </project>
