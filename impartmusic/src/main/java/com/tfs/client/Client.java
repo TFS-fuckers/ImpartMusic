@@ -571,6 +571,7 @@ public class Client implements ClientInterface{
                 ImpartUI.bindProgressDisplay(newVal.getPlayerProcessProperty());
                 ImpartUI.bindProgressSetter(newVal);
                 ImpartUI.bindShower(newVal.getMusicId());
+                newVal.setVolume((float) ImpartUI.getVolume());
             });
             newVal.setOnEnd(nextMusicStrategy);
         }

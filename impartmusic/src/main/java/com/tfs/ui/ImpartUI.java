@@ -34,7 +34,7 @@ public class ImpartUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/music_table.fxml"));
-        primaryStage.setTitle("hello world");
+        primaryStage.setTitle("Impart Music");
         primaryScene = new Scene(root);
         primaryStage.setScene(primaryScene);
         primaryStage.setResizable(false);
@@ -84,6 +84,7 @@ public class ImpartUI extends Application {
             MusicTvController.instance().getOnline_information_text().setText(
                 messageStringBuilder.toString()
             );
+            MusicTvController.instance().getOnline_information_text().setScrollTop(Double.MAX_VALUE);
         });
     }
 
@@ -178,5 +179,9 @@ public class ImpartUI extends Application {
         ThreadDispatcher.invoke(() -> {
             MusicTvController.instance().refreshPlayButton(playing);
         });
+    }
+
+    public static double getVolume() {
+        return MusicTvController.instance().getVolume();
     }
 }

@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -111,6 +112,7 @@ public class MusicTvController {
                 {
                     button.setOnAction(event -> {
                         try {
+                            button.setAlignment(Pos.CENTER);
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/delete_music.fxml"));
                             AnchorPane root = loader.load();
                             Delete_music_Controller controller = loader.getController();
@@ -137,6 +139,24 @@ public class MusicTvController {
 
             tableViewMusicID.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getId()));
             tableViewMusicTitle.setCellValueFactory((data) -> new SimpleStringProperty(data.getValue().getName()));
+            
+            tableView.setOnMouseClicked(event -> {
+                if(event.getClickCount() == 1) {
+                    MusicDetails selected = tableView.getSelectionModel().getSelectedItem();
+                    if(selected == null) {
+                        return;
+                    }
+                    boolean isPlaying = Client.INSTANCE().isPlaying();
+                    Client.INSTANCE().pauseMusic(true);
+                    Client.INSTANCE().useTargetMusic(selected.getId(), false);
+                    if(isPlaying) {
+                        Client.INSTANCE().playMusic(false);
+                    }
+                    MusicTvController.this.refreshPlayButton(isPlaying);
+                    MusicTvController.this.refreshPlayerSlider(Client.INSTANCE().getCurrentMusic().getTotalTimeDuration().toSeconds(), 0.0);
+                }
+            });
+            
             online_information_text.setEditable(false);
             text_to_onlineinfo.setText("");
         }
@@ -495,5 +515,9 @@ public class MusicTvController {
 
     public void refreshPlayButton(boolean playing) {
         this.playmusic_button.setSelected(playing);
+    }
+
+    public double getVolume() {
+        return this.volumeSlider.getValue();
     }
 }

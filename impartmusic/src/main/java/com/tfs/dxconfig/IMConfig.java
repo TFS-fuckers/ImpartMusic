@@ -14,4 +14,10 @@ public class IMConfig implements Config{
     public int NO_RESPONSE_TIMEOUT_TRIES = 5;
     
     public int VERTIFICATION_MAX_TRIES = 10;
+
+    public String DEFAULT_HOST = "";
+
+    public String DEFAULT_PORT = "";
+
+    public String DEFAULT_USERNAME = "";
 }

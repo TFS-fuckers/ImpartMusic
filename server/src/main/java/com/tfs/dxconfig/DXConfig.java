@@ -19,7 +19,7 @@ public class DXConfig<T extends Config>{
         this.configFile = new File(jsonFilePath);
         this.type = type;
         if(!this.configFile.exists()) {
-            this.log("Config file %s couldn't be found, generating empty config", this.configFile.getName());
+            this.log("Config file %s couldn't be found, generating empty config");
             try{
                 this.forceCreate();
                 this.valid = true;
@@ -90,8 +90,13 @@ public class DXConfig<T extends Config>{
 
     private void readAll() throws IOException {
         StringBuilder builder = new StringBuilder();
-        String line = this.reader.readLine();
-        builder.append(line);
+        while(true) {
+            String line = this.reader.readLine();
+            if(line == null) {
+                break;
+            }
+            builder.append(line);
+        }
         try {
             this.jsonObject = JsonParser.parseString(builder.toString()).getAsJsonObject();
         } catch (IllegalStateException e) {
