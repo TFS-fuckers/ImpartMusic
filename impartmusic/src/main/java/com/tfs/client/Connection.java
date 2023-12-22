@@ -213,10 +213,18 @@ public class Connection {
         }
     }
 
+    /**
+     * 获取连接使用的用户信息
+     * @return 用户信息
+     */
     public UserInfo getUserInfo(){
         return userInfo;
     }
 
+    /**
+     * 设置连接使用的用户信息
+     * @param name 名称
+     */
     public void setUserInfo(String name){
         userInfo.setName(name);
     }

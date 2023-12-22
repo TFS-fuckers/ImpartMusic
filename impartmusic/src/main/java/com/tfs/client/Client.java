@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Client implements ClientInterface{
+public class Client{
     private static Client INSTANCE = null;
     private Connection connection = null;
     private HashMap<String, File> musicFileHashMap = new HashMap<>();
     private MusicPlayer music = null;
     final public String MUSIC_LIST_PATH = ImpartConfigReader.instance().get("MUSIC_LIST_PATH").getAsString(); 
-    final public double MAX_SYNC_INTERVAL = ImpartConfigReader.instance().get("MAX_SYNC_INTERVAL").getAsDouble();;
     final public int REQUEST_STD_IGNORE_COUNT = ImpartConfigReader.instance().get("REQUEST_STD_IGNORE_COUNT").getAsInt();
     final public double SYNC_RANGE_SECOND = ImpartConfigReader.instance().get("SYNC_RANGE_SECOND").getAsDouble();
     private ClientConnectionStatus status = ClientConnectionStatus.UNCONNECTED;
@@ -36,6 +35,9 @@ public class Client implements ClientInterface{
     private int playingMusicIndex = -1;
     private boolean initalized = false;
 
+    /**
+     * 启动客户端
+     */
     public Client() {
         System.setProperty("file.encoding", "UTF-8");
         INSTANCE = this;
@@ -58,11 +60,17 @@ public class Client implements ClientInterface{
         System.exit(0);
     }
     
+    /**
+     * 终止客户端
+     */
     public void kill() {
         Logger.logInfo("Killed client main loop");
         this.killed = true;
     }
     
+    /**
+     * 客户端的主要逻辑循环
+     */
     private void clientMainLoop() {
         try {
             Thread.sleep(50);
@@ -82,10 +90,17 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 获取客户端的唯一实例
+     * @return 实例对象
+     */
     public static Client INSTANCE() {
         return INSTANCE;
     }
 
+    /**
+     * 要求客户端主动断开与服务端的连接
+     */
     public void disconnect() {
         if(this.connection == null) {
             return;
@@ -110,6 +125,10 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 通知客户端被动地被服务器踢出
+     * @param controlconnect 通知信息数据包
+     */
     protected void controlConnect(ControlConnect controlconnect) {
         Logger.logInfo("You are kicked out the sever! Cause: %s", controlconnect.getCause());
         connection.killConnection();
@@ -117,6 +136,11 @@ public class Client implements ClientInterface{
 
 
     private final List<String> empty = new ArrayList<>();
+    
+    /**
+     * 同步客户端的音乐播放
+     * @param musicProgress 音乐播放进度
+     */
     protected void synchronizeMusicProgress(MusicProgress musicProgress) {
         if(musicProgress.isEmpty()) {
             if(music != null) {
@@ -193,11 +217,18 @@ public class Client implements ClientInterface{
         this.initalized = true;
     }
 
+    /**
+     * 将客户端的音乐列表设置为给定列表
+     * @param idList 网易云ID列表
+     */
     private void setMusicList(List<String> idList) {
         this.musicList = idList;
         ImpartUI.displaySongList(musicList);
     }
 
+    /**
+     * 接受服务端的询问进度请求并回应
+     */
     protected void getMusicProcess() {
         if(!this.initalized) {
             Logger.logInfo("Rejecting server's get progress request because you havn't initialized yet");
@@ -225,14 +256,25 @@ public class Client implements ClientInterface{
         );
     }
 
+    /**
+     * 获取客户端的连接实例
+     * @return 与服务器的连接
+     */
     public Connection getConnection() {
         return connection;
     }
 
+    /**
+     * 在终端上显示用户的登录信息
+     * @param loginInfo 登录信息
+     */
     protected void checkLoginInfo(UserInfo loginInfo) {
         Logger.logInfo(loginInfo.toString());
     }
 
+    /**
+     * 保存客户端的本地音乐管理信息，在dev版本中已弃用
+     */
     @Deprecated
     public void saveMusicHashMap() {
         String path = MUSIC_LIST_PATH;
@@ -251,6 +293,9 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 读取本地的音乐管理信息，在dev版本中已弃用
+     */
     @Deprecated
     @SuppressWarnings("unchecked")
     protected void readMusicHashMap() {
@@ -305,6 +350,9 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 读取本地的音乐信息并整理成HashMap
+     */
     private void initializeNewMusicHashMap() {
         File path = new File("./data");
         for (File child : path.listFiles()) {
@@ -322,6 +370,11 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 获取一个播放指定音乐id的音乐播放器
+     * @param musicId 网易云音乐id
+     * @return 音乐播放器，如果id不合法或者获取失败，返回null
+     */
     private MusicPlayer getMusicPlayer(String musicId) {
         if(musicId == null) {
             Logger.logWarning("Passing null musicID to getMusicPlayer(), returning null");
@@ -367,6 +420,12 @@ public class Client implements ClientInterface{
         return new MusicPlayer(musicFile.getAbsolutePath(), musicId);
     }
 
+    /**
+     * 要求客户端连接服务器
+     * @param host IP
+     * @param port 端口
+     * @param loginAs 用户名
+     */
     public void connect(String host, int port, String loginAs) {
         this.initalized = false;
         this.connection = new Connection(host, port, new UserInfo(loginAs, "login"));
@@ -383,6 +442,10 @@ public class Client implements ClientInterface{
         });
     }
 
+    /**
+     * 设置客户端的连接状态
+     * @param status 连接状态
+     */
     public void setStatus(ClientConnectionStatus status) {
         this.status = status;
         switch(this.status) {
@@ -401,25 +464,43 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 获取客户端的连接状态
+     * @return 连接状态
+     */
     public ClientConnectionStatus getStatus() {
         return status;
     }
 
-    @Override
+    /**
+     * 本地主动设置客户端的音乐播放进度
+     * @param progress 音乐播放进度
+     */
     public void onSetProgress(MusicProgress progress){
         this.requestStandardUser();
         synchronizeMusicProgress(progress);
     }
 
-    @Override
+    /**
+     * 设置客户端的音乐音量大小
+     * @param volume 音量大小(0~1.0f)
+     */
     public void onSetVolume(float volume){
         music.setVolume(volume);
     }
     
+    /**
+     * 获取客户端的音乐列表
+     * @return 音乐id列表
+     */
     public List<String> getMusicList() {
         return musicList;
     }
 
+    /**
+     * 向客户端的音乐列表中主动加入某个音乐
+     * @param id 音乐id
+     */
     public void addMusic(String id) {
         if (findMusic(id)) {
             ImpartUI.infoToUI("歌曲已经存在于歌单中");
@@ -430,10 +511,19 @@ public class Client implements ClientInterface{
         ImpartUI.displaySongList(musicList);
     }
     
+    /**
+     * 判断在音乐列表中是否存在某音乐
+     * @param id 判断对象
+     * @return 是否存在
+     */
     public boolean findMusic(String id) {
         return musicList.contains(id);
     }
     
+    /**
+     * 从本地的音乐列表中删除某音乐
+     * @param id 删除的对象
+     */
     public void deleteMusic(String id) {
         if (!findMusic(id)) {
             Logger.logWarning("Ignoring missing music delete request of %s", id);
@@ -465,6 +555,11 @@ public class Client implements ClientInterface{
         }
     }
     
+    /**
+     * 获取给定序号的音乐id
+     * @param i 音乐序号
+     * @return 音乐id
+     */
     public String getMusic(int i) {
         if (!musicList.isEmpty()) {
             i = i % musicList.size();
@@ -473,6 +568,12 @@ public class Client implements ClientInterface{
         return null;
     }
     
+    /**
+     * 交换列表当中的某两个音乐id
+     * @param a 序号a
+     * @param b 序号b
+     */
+    @Deprecated
     public void swapMusic(int a, int b) {
         this.requestStandardUser();
         String idA = this.musicList.get(a);
@@ -482,12 +583,22 @@ public class Client implements ClientInterface{
         ImpartUI.displaySongList(musicList);
     }
     
+    /**
+     * 在列表某个位置插入音乐
+     * @param id 音乐id
+     * @param place 位置
+     */
     public void insertMusic(String id, int place) {
         this.requestStandardUser();
         this.musicList.add(place, id);
         ImpartUI.displaySongList(musicList);
     }
     
+    /**
+     * 要求客户端使用某个音乐id
+     * @param id 音乐id
+     * @param doRequest 是否请求标准用户
+     */
     public void useTargetMusic(String id, boolean doRequest) {
         MusicPlayer old = this.music;
         MusicPlayer newPlayer = getMusicPlayer(id);
@@ -502,31 +613,61 @@ public class Client implements ClientInterface{
         onChangeMusic(old, this.music);
     }
 
+    /**
+     * 将用户列表显示到UI
+     * @param list 用户列表
+     */
     public void displayUserList(List<UserSimpleInfo> list) {
         ImpartUI.displayUserList(list);
     }
 
+    /**
+     * 清空用户列表
+     */
     public void clearUserList() {
         Logger.logInfo("Cleared user list");
         ImpartUI.clearUserList();
     }
 
+    /**
+     * 获取客户端是否已经连接
+     * @return 是否连接
+     */
     public boolean isConnected() {
         return this.connection != null && this.connection.isConnected();
     }
-
+    
+    /**
+     * 获取某个音乐在本地是否存在
+     * @param id 音乐id
+     * @return 是否存在
+     */
     public boolean fileExists(String id) {
         return this.musicFileHashMap.containsKey(id);
     }
 
+    /**
+     * 获取在本地缓存的音乐文件
+     * @param id 音乐id
+     * @return 音乐文件
+     */
     public File getCachedFile(String id) {
         return this.musicFileHashMap.get(id);
     }
 
+    /**
+     * 缓存某文件
+     * @param id 音乐id
+     * @param file 音乐文件 
+     */
     public void cacheFile(String id, File file) {
         this.musicFileHashMap.put(id, file);
     }
 
+    /**
+     * 获取当前正在使用的音乐播放器
+     * @return 正在使用的音乐播放器
+     */
     public MusicPlayer getCurrentMusic() {
         return this.music;
     }
@@ -561,6 +702,11 @@ public class Client implements ClientInterface{
         }
     };
 
+    /**
+     * 客户端切换音乐逻辑
+     * @param oldVal 旧音乐
+     * @param newVal 新音乐
+     */
     public void onChangeMusic(MusicPlayer oldVal, MusicPlayer newVal) {
         if(oldVal != null) {
             oldVal.setOnEnd(null);
@@ -581,16 +727,27 @@ public class Client implements ClientInterface{
         }
     }
 
+    /**
+     * 客户端请求标准用户
+     */
     public void requestStandardUser() {
         Logger.logInfo("Requesting standard user");
         this.connection.sendMessageImmediately(new Datapack("StandardRequest", null));
         PackageResolver.ignoreSyncCounter = REQUEST_STD_IGNORE_COUNT;
     }
 
+    /**
+     * 获取正在播放的音乐的序号
+     * @return 序号
+     */
     public int getPlayingMusicIndex() {
         return playingMusicIndex;
     }
 
+    /**
+     * 要求客户端播放音乐
+     * @param doRequest 是否请求标准用户
+     */
     public void playMusic(boolean doRequest) {
         if(!this.isConnected()) {
             return;
@@ -610,6 +767,10 @@ public class Client implements ClientInterface{
         return;
     }
 
+    /**
+     * 客户端暂停音乐
+     * @param doRequest 是否请求标准用户
+     */
     public void pauseMusic(boolean doRequest) {
         if(this.music == null) {
             return;
@@ -620,10 +781,18 @@ public class Client implements ClientInterface{
         this.music.pauseMusic();
     }
 
+    /**
+     * 获取客户端是否正在播放音乐
+     * @return 是否正在播放音乐
+     */
     public boolean isPlaying() {
         return this.music == null ? false : this.music.isPlaying();
     }
 
+    /**
+     * 客户端切换到下一个音乐
+     * @param doRequest 是否请求标准用户
+     */
     public void goNextMusic(boolean doRequest) {
         if(doRequest) {
             this.requestStandardUser();
@@ -631,6 +800,10 @@ public class Client implements ClientInterface{
         this.nextMusicStrategy.run();
     }
 
+    /**
+     * 客户端切换到上一个音乐
+     * @param doRequest 是否请求标准用户
+     */
     public void goPreviousMusic(boolean doRequest) {
         if(doRequest) {
             this.requestStandardUser();
@@ -638,6 +811,10 @@ public class Client implements ClientInterface{
         this.previousMusicStrategy.run();
     }
 
+    /**
+     * 客户端发送聊天信息
+     * @param message 聊天信息内容
+     */
     public void sendChatMessage(String message) {
         this.connection.sendMessage(new Datapack(
             "SimpleString",

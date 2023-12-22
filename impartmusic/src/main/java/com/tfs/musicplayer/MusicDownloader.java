@@ -25,10 +25,19 @@ public class MusicDownloader {
     private static final Hashtable<String, MusicDownloader> ASYNC_DOWNLOADERS = new Hashtable<>();
     public static final Condition downloadCondition = conditionLock.newCondition();
     
+    /**
+     * 获取正在异步下载的音乐
+     * @return 下载任务
+     */
     public static MusicDownloader getAsyncDownloading() {
         return asyncDownloadTask;
     }
     
+    /**
+     * 将某音乐加入异步下载列表
+     * @param urlPath url
+     * @param downloadPath 下载保存路径
+     */
     public static void downloadMusicFileAsync(String urlPath, String downloadPath) {
         ASYNC_QUEUE.add(new MusicDownloader(urlPath, downloadPath));
     }
@@ -88,6 +97,10 @@ public class MusicDownloader {
         this.downloadPath = downloadPath;
     }
     
+    /**
+     * 下载音乐
+     * @return 下载的音乐文件
+     */
     public File downloadMusicFile() {
         File file = null;
         String path = null;
@@ -130,19 +143,35 @@ public class MusicDownloader {
         return file;
     }
 
-    
+    /**
+     * 获取下载url
+     * @return url
+     */
     public String getUrlPath() {
         return urlPath;
     }
 
+    /**
+     * 获取下载进度
+     * @return 下载进度
+     */
     public double getDownloadProgress() {
         return downloadProgress;
     }
 
+    /**
+     * 查询某音乐是否在等待异步下载
+     * @param id 音乐id
+     * @return 是否在等待异步下载
+     */
     public static boolean isWaitingAsyncDownload(String id) {
         return ASYNC_DOWNLOADERS.containsKey(id);
     }
 
+    /**
+     * 将某音乐移出异步下载队列
+     * @param url 对应url
+     */
     public static void removeAsyncWaiter(String url) {
         if(!ASYNC_DOWNLOADERS.containsKey(url)) {
             Logger.logWarning("The requested downloader of url %s is not in async download list.", url);

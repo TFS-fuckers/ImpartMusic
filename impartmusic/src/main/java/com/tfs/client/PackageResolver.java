@@ -12,8 +12,13 @@ import com.tfs.logger.Logger;
 import com.tfs.ui.ImpartUI;
 
 public class PackageResolver {
+    /**忽略的数据包个数计数器 */
     public static int ignoreSyncCounter = 0;
 
+    /**
+     * 解析数据包并行动
+     * @param datapack 数据包对象
+     */
     protected static void resolveDatapack(Datapack datapack){
         Client client = Client.INSTANCE();
         switch (datapack.identifier) {

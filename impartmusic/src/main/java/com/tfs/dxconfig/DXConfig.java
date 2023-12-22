@@ -7,6 +7,9 @@ import com.google.gson.JsonParser;
 
 import java.io.*;
 
+/**
+ * 标准配置文件阅读器
+ */
 public class DXConfig<T extends Config>{
     private final Class<T> type;
     private JsonObject defaultVal;
@@ -15,6 +18,12 @@ public class DXConfig<T extends Config>{
     private JsonObject jsonObject;
     private boolean valid = false;
     private BufferedReader reader = null;
+    /**
+     * 生成标准配置文件阅读器
+     * @param type 目标结构
+     * @param jsonFilePath 生成路径
+     * @param redirector 信息重定向
+     */
     public DXConfig(Class<T> type, String jsonFilePath, MessageRedirector redirector) {
         try {
             T instance = type.newInstance();
@@ -55,15 +64,37 @@ public class DXConfig<T extends Config>{
             }
         }
     }
+
+    /**
+     * 不使用重定向（默认sout）生成配置文件阅读器
+     * @param type 目标结构
+     * @param jsonFilePath 生成路径
+     */
     public DXConfig(Class<T> type, String jsonFilePath) {
         this(type, jsonFilePath, null);
     }
+
+    /**
+     * 发送日志信息
+     * @param message 内容
+     */
     private void log(String message) {
         this.redirector.log(message);
     }
+
+    /**
+     * 格式化发送日志信息
+     * @param format 格式化字符串
+     * @param args 参数
+     */
     private void log(String format, Object... args) {
         this.redirector.log(String.format(format, args));
     }
+
+    /**
+     * 强行创建新的配置文件
+     * @throws IOException
+     */
     private void forceCreate() throws IOException {
         File parent = this.configFile.getParentFile();
         boolean parentSuccess;
@@ -89,10 +120,18 @@ public class DXConfig<T extends Config>{
         }
         this.writeDefault();
     }
+
+    /**
+     * 获取该阅读器是否可用
+     * @return 是否可用
+     */
     public boolean isValid() {
         return valid;
     }
 
+    /**
+     * 关闭此阅读器
+     */
     public void close() {
         try {
             this.reader.close();
@@ -103,6 +142,10 @@ public class DXConfig<T extends Config>{
         }
     }
 
+    /**
+     * 阅读整个配置文件
+     * @throws IOException
+     */
     private void readAll() throws IOException {
         StringBuilder builder = new StringBuilder();
         while(true) {
@@ -126,6 +169,11 @@ public class DXConfig<T extends Config>{
         }
     }
     
+    /**
+     * 获取某个键的对应值
+     * @param key 键
+     * @return 对应值
+     */
     public JsonElement getValue(String key) {
         if(!this.isValid()) {
             this.log("You are trying to fetch an invalid config reader, please fix this first or the program might run wrongly");
@@ -135,6 +183,10 @@ public class DXConfig<T extends Config>{
         return element == null ? this.defaultVal.get(key) : element;
     }
 
+    /**
+     * 使用默认配置覆盖配置文件
+     * @return 默认Json
+     */
     private String writeDefault() {
         try {
             Gson gson = new Gson();
@@ -149,6 +201,11 @@ public class DXConfig<T extends Config>{
         return null;
     }
 
+    /**
+     * 写入配置文件
+     * @param content 内容
+     * @param append 是否在末尾继续
+     */
     private void write(String content, boolean append) {
         try {
             FileWriter writer = new FileWriter(this.configFile, append);
@@ -161,11 +218,19 @@ public class DXConfig<T extends Config>{
         }
     }
     
+    /**
+     * 获取默认的配置类
+     * @return 默认配置类
+     */
     public T getDefault() {
         Gson gson = new Gson();
         return gson.fromJson(this.jsonObject.toString(), this.type);
     }
 
+    /**
+     * 将配置文件类保存
+     * @param object 配置文件类生成的JsonObject
+     */
     public void save(JsonObject object) {
         this.write(object.toString(), false);
         this.jsonObject = object;

@@ -24,17 +24,29 @@ public class Add_music_Controller {
     @FXML
     private TextField id_text;
 
+    /**
+     * 确认加入音乐
+     * @param event 事件
+     */
     @FXML
     void add_confirm(ActionEvent event) {
         Client.INSTANCE().addMusic(id_text.getText());
         this.closeWindow(event);
     }
 
+    /**
+     * 取消加入音乐
+     * @param event 事件
+     */
     @FXML
     void cancel_add(ActionEvent event) {
         this.closeWindow(event);
     }
 
+    /**
+     * 关闭此窗口
+     * @param event 事件
+     */
     private void closeWindow(ActionEvent event) {
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.close();

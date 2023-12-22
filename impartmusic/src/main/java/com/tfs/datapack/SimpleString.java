@@ -5,10 +5,17 @@ import java.nio.charset.Charset;
 
 import com.tfs.logger.Logger;
 
+/**
+ * 聊天显示信息
+ */
 public class SimpleString {
     private String encoding;
     private byte[] data;
 
+    /**
+     * 获取字符串格式的信息
+     * @return 字符串
+     */
     public String getString() {
         try {
             return new String(this.data, encoding);
@@ -18,6 +25,11 @@ public class SimpleString {
         return null;
     }
 
+    /**
+     * 以要求的编码格式解析聊天信息
+     * @param charset 编码格式
+     * @return 聊天信息
+     */
     public String getString(Charset charset) {
         try {
             return new String(this.data, charset);

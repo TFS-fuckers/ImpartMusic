@@ -14,10 +14,16 @@ import com.tfs.logger.Logger;
 import com.tfs.server.Server;
 import com.tfs.server.ServerHandler;
 
+/**
+ * 用于加载并管理Mod的类
+ */
 public class ModLoader {
     private ModLoader() {}
     private static final List<Mod> MODS = new LinkedList<Mod>();
 
+    /**
+     * 加载mods
+     */
     public static void load() {
         Logger.logInfo("Loading mods...");
         File modsFile = new File("./mods");
@@ -54,6 +60,10 @@ public class ModLoader {
         }
     }
 
+    /**
+     * 数据包监听
+     * @param datapack 数据包实例
+     */
     public static void onResolveDatapack(Datapack datapack) {
         for(Mod mod : MODS) {
             mod.invoke(datapack);
@@ -71,6 +81,10 @@ public class ModLoader {
             this.listener = listener;
         }
 
+        /**
+         * 调用Mod的对应方法
+         * @param pack 数据包
+         */
         public void invoke(Datapack pack) {
             try {
                 this.listener.invoke(

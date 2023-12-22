@@ -7,6 +7,10 @@ import com.tfs.logger.Logger;
 import com.tfs.modloader.ModLoader;
 
 public class PackageResolver {
+    /**
+     * 解析数据包并行动
+     * @param datapack 数据包对象
+     */
     protected static void packageResolver(Datapack datapack){
         Server server = Server.INSTANCE();
         ModLoader.onResolveDatapack(datapack);

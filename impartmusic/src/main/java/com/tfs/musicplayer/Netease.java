@@ -9,12 +9,25 @@ import com.tfs.Json.JsonAnalyser;
 import com.tfs.logger.Logger;
 import com.tfs.ui.MusicDetails;
 
+/**
+ * 有关网易云音乐的类
+ */
 public class Netease {
     private Netease() {}
+    /**
+     * 根据音乐id生成下载url
+     * @param id 音乐id
+     * @return 下载url
+     */
     public static String buildNeteaseURL(String id) {
         return "http://music.163.com/song/media/outer/url?id=" + id;
     }
 
+    /**
+     * 根据下载url获取音乐id
+     * @param url 下载url
+     * @return 音乐id
+     */
     public static String downloadURLtoID(String url) {
         int index = url.indexOf('=');
         if(index == -1) {
@@ -24,6 +37,11 @@ public class Netease {
         return url.substring(index + 1);
     }
 
+    /**
+     * 获取某音乐的信息
+     * @param id 音乐id
+     * @return 音乐信息
+     */
     public static MusicDetails getMusicDetails(String id) {
         String apiURL = String.format(
             "http://music.163.com/api/song/detail/?id=%s&ids=[%s]",

@@ -163,6 +163,10 @@ public class MusicTvController {
         }
     }
 
+    /**
+     * 设置显示页
+     * @param page 页数
+     */
     public void setMusicListDisplayPage(int page) {
         if(detailedMusic == null) {
             return;
@@ -184,16 +188,27 @@ public class MusicTvController {
         tableView.setItems(FXCollections.observableArrayList(detailedMusic.subList(fromIndex, toIndex)));
     }
 
+    /**
+     * 刷新列表的显示页
+     */
     public void refreshTableView() {
         this.setMusicListDisplayPage(
             this.music_lists.getCurrentPageIndex()
         );
     }
 
+    /**
+     * 获取主UI单例
+     * @return 主UI控制器
+     */
     public static MusicTvController instance() {
         return instance;
     }
 
+    /**
+     * 设置音乐详情列表
+     * @param data 音乐详情列表
+     */
     public void setDataList(List<MusicDetails> data) {
         this.detailedMusic = data;
     }
@@ -210,16 +225,16 @@ public class MusicTvController {
     @FXML
     private Label connection_state_info_label;
 
+    /**
+     * 获取连接状态显示标签
+     * @return 显示标签
+     */
     public Label getConnection_state_info_label() {
         return connection_state_info_label;
     }
 
     @FXML
     private Label connection_state_label;
-
-    public Label getConnection_state_label() {
-        return connection_state_label;
-    }
 
     @FXML
     private TextField text_to_onlineinfo;
@@ -233,6 +248,10 @@ public class MusicTvController {
     @FXML
     private TableView<UserSimpleInfo> onlineusers_lists;
 
+    /**
+     * 获取用户列表
+     * @return TableView下的用户列表
+     */
     public TableView<UserSimpleInfo> getOnlineusers_lists() {
         return onlineusers_lists;
     }
@@ -261,6 +280,11 @@ public class MusicTvController {
 
     @FXML
     private Label music_playing_time_label;
+    
+    /**
+     * 获取音乐播放进度标签
+     * @return 音乐播放进度标签
+     */
     public Label getMusic_playing_time_label() {
         return music_playing_time_label;
     }
@@ -268,6 +292,11 @@ public class MusicTvController {
 
     @FXML
     private Slider music_slider;
+
+    /**
+     * 获取音乐播放进度滑杆
+     * @return 滑杆
+     */
     public Slider getMusic_slider() {
         return music_slider;
     }
@@ -282,15 +311,16 @@ public class MusicTvController {
     @FXML
     private TextArea online_information_text;
 
+    /**
+     * 获取聊天信息框
+     * @return 聊天信息框
+     */
     public TextArea getOnline_information_text() {
         return online_information_text;
     }
 
     @FXML
     private ToggleButton playmusic_button;
-
-    /*@FXML
-    private Button store_button;*/
 
     @FXML
     private TableColumn<MusicDetails, Button> tableViewButton;
@@ -303,6 +333,10 @@ public class MusicTvController {
 
     @FXML
     private TableView<MusicDetails> tableView;
+    /**
+     * 获取音乐详情列表
+     * @return 音乐详情列表
+     */
     public TableView<MusicDetails> getMusicTableView() {
         return tableView;
     }
@@ -317,6 +351,10 @@ public class MusicTvController {
 
     }
 
+    /**
+     * 播放音乐按钮自动调用事件
+     * @param event 事件
+     */
     @FXML
     void Play_music(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -331,6 +369,11 @@ public class MusicTvController {
         Client.INSTANCE().playMusic(true);
     }
 
+    /**
+     * 格式化显示Duration
+     * @param duration 时间对象
+     * @return 格式化字符串
+     */
     public static String formatDuration(Duration duration) {
         if(duration == null) {
             return "xx:xx";
@@ -340,6 +383,10 @@ public class MusicTvController {
         return String.format("%d:%02d", minutes, seconds);
     }
 
+    /**
+     * 切换到上一首歌曲按钮自动调用
+     * @param event 点击事件
+     */
     @FXML
     void To_last_music(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -349,6 +396,10 @@ public class MusicTvController {
         Client.INSTANCE().goPreviousMusic(true);
     }
 
+    /**
+     * 切换到下一首歌曲按钮自动调用
+     * @param event 点击事件
+     */
     @FXML
     void To_next_music(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -358,6 +409,10 @@ public class MusicTvController {
         Client.INSTANCE().goNextMusic(true);
     }
 
+    /**
+     * 断开连接按钮自动调用
+     * @param event 点击事件
+     */
     @FXML
     void cut_link(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -367,6 +422,10 @@ public class MusicTvController {
         Client.INSTANCE().disconnect();
     }
 
+    /**
+     * 创建连接对话框
+     * @param event 点击事件
+     */
     @FXML
     void buildnewInputPane(ActionEvent event) {
         if(Client.INSTANCE() != null && Client.INSTANCE().isConnected()) {
@@ -385,6 +444,10 @@ public class MusicTvController {
         }
     }
 
+    /**
+     * 加入音乐按钮自动调用
+     * @param event 点击事件
+     */
     @FXML
     void add_music_to_pack(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -402,7 +465,10 @@ public class MusicTvController {
         }
     }
 
-
+    /**
+     * 将总时间标签绑定为某时间
+     * @param total 总时间
+     */
     public void bindLabel(Duration total) {
         this.music_slider.setMax(total.toSeconds());
         this.music_whole_time_label.setText(String.format(
@@ -412,6 +478,9 @@ public class MusicTvController {
         ));
     }
     
+    /**
+     * 滑杆监听器
+     */
     public final ChangeListener<Duration> progressBarSubscriber = new ChangeListener<Duration>() {
         @Override
         public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
@@ -425,6 +494,10 @@ public class MusicTvController {
     };
     private ReadOnlyObjectProperty<Duration> subscribedProperty = null;
 
+    /**
+     * 使滑杆监听某进度属性
+     * @param value 进度属性
+     */
     public void bindProgressDisplay(ReadOnlyObjectProperty<Duration> value) {
         if(subscribedProperty != null) {
             subscribedProperty.removeListener(progressBarSubscriber);
@@ -437,18 +510,27 @@ public class MusicTvController {
     }
 
     private MusicPlayer traceTarget = null;
+    /**
+     * 绑定音乐播放进度监听对象
+     * @param target 音乐播放器
+     */
     public void bindTraceTarget(MusicPlayer target) {
         this.traceTarget = target;
     }
 
+    /**
+     * 移除音乐播放进度监听
+     */
     public void removeProgressSetter() {
         this.traceTarget = null;
     }
 
+    @Deprecated
     public void bindShower(int index) {
         // this.music_title.setText(this.detailedMusic.get(index).getName());
     }
 
+    @Deprecated
     public void bindShower(String id) {
         // synchronized(this.detailedMusic) {
         //     boolean found = false;
@@ -467,6 +549,9 @@ public class MusicTvController {
         // }
     }
 
+    /**
+     * 清空显示的音乐列表
+     */
     public void clearMusicList() {
         try {
             this.tableView.getItems().clear();
@@ -475,6 +560,9 @@ public class MusicTvController {
         }
     }
 
+    /**
+     * 重置音乐播放器UI
+     */
     public void resetPlayerUIDisplay() {
         this.music_slider.setValue(0);
         this.music_slider.setMax(999);
@@ -483,9 +571,17 @@ public class MusicTvController {
         // this.music_title.setText("");
     }
 
+    /**
+     * 清空显示的用户列表
+     */
     public void clearUserList() {
         this.getOnlineusers_lists().getItems().clear();
     }
+
+    /**
+     * 发送聊天信息自动调用
+     * @param event 点击事件
+     */
     @FXML
     void text_to_onlineinfo(ActionEvent event) {
         if(!Client.INSTANCE().isConnected()) {
@@ -504,6 +600,10 @@ public class MusicTvController {
     @FXML
     private Slider volumeSlider;
 
+    /**
+     * 设置音乐音量自动调用
+     * @param event 点击事件
+     */
     @FXML
     void set_volume(ActionEvent event) {
         if (volumeSlider.isVisible()) {
@@ -512,16 +612,29 @@ public class MusicTvController {
             volumeSlider.setVisible(true);
         }
     }
-
+    
+    /**
+     * 刷新音乐播放器滑杆显示
+     * @param max 最大值
+     * @param cur 当前值
+     */
     public void refreshPlayerSlider(double max, double cur) {
         this.music_slider.setMax(max);
         this.music_slider.setValue(cur);
     }
 
+    /**
+     * 刷新播放按钮显示状态
+     * @param playing 是否正在播放
+     */
     public void refreshPlayButton(boolean playing) {
         this.playmusic_button.setSelected(playing);
     }
 
+    /**
+     * 获取当前音量
+     * @return 音量（0~1.0f）
+     */
     public double getVolume() {
         return this.volumeSlider.getValue();
     }

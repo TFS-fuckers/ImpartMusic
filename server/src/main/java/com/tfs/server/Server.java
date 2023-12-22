@@ -27,6 +27,9 @@ public class Server {
     private boolean musicListSyncTrigger = true;
     private MusicProgress musicProgress;
 
+    /**
+     * 启动服务器
+     */
     public Server(){
         ModLoader.load();
         INSTANCE = this;
@@ -76,6 +79,9 @@ public class Server {
         },0,2000);      
     }
 
+    /**
+     * 依附于服务器Tick的自定义逻辑
+     */
     private class CustomServerTick implements Runnable {
         @Override
         public void run() {
@@ -92,10 +98,18 @@ public class Server {
         }
     }
 
+    /**
+     * 获取服务器实例
+     * @return 服务器实例
+     */
     public static Server INSTANCE(){
         return INSTANCE;
     }
 
+    /**
+     * 分发同步音乐播放器信息
+     * @param musicProgress 同步目标
+     */
     protected void synchronizeMusicProgress(MusicProgress musicProgress){
         this.syncReceiveTrigger = true;
         this.musicProgress = musicProgress;
@@ -103,10 +117,10 @@ public class Server {
         ServerHandler.instance().sendToAll(new Datapack("SynchronizeMusic", musicProgress));
     }
 
-    protected void broadcastUserConnection(UserInfo info) {
-
-    }
-
+    /**
+     * 用户登录时的事件监听逻辑
+     * @param info 用户登录的信息
+     */
     public void onUserLogin(UserInfo info) {
         User user = ServerHandler.instance().getUser(info.getName());
         ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
@@ -127,6 +141,10 @@ public class Server {
         }
     }
     
+    /**
+     * 在用户退出时的事件监听逻辑
+     * @param info 用户退出信息
+     */
     public void onUserDisconnect(UserInfo info) {
         ArrayList<UserSimpleInfo> userInfoList = new ArrayList<>();
         for(User tmp:ServerHandler.instance().nameToUser.values()){
@@ -139,10 +157,18 @@ public class Server {
         }
     }
 
+    /**
+     * 获取当前使用的标准用户的序号
+     * @return 标准用户的序号
+     */
     public int getStandardUserIndex() {
         return this.standardUserIndex;
     }
 
+    /**
+     * 设置标准用户
+     * @param index 标准用户的序号
+     */
     public void setStandardUserIndex(int index) {
         if(index == -1) {
             Logger.logError("Cannot set standard user index to -1");

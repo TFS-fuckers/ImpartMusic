@@ -47,11 +47,19 @@ public class ConnectController {
     @FXML
     private TextField users_name_text;
 
+    /**
+     * 取消连接
+     * @param event 事件
+     */
     @FXML
     void cancel_link(ActionEvent event) {
         closeWindow(event);
     }
 
+    /**
+     * 创建连接
+     * @param event 事件
+     */
     @FXML
     void make_link(ActionEvent event) {
         if(!ParamVertifier.isValidName(users_name_text.getText())) {
@@ -65,6 +73,10 @@ public class ConnectController {
         closeWindow(event);
     }
 
+    /**
+     * 关闭此窗口
+     * @param event 事件
+     */
     private void closeWindow(ActionEvent event) {
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.close();
