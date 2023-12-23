@@ -52,6 +52,7 @@ public class Connection {
      * 创建一个与服务器的连接实例
      * @param host 服务器的IP
      * @param port 服务器的端口号
+     * @param vertificationUserInfo 用于验证的用户信息
      */
     public Connection(String host, int port, UserInfo vertificationUserInfo){
         Logger.logInfo("Trying to connect to " + host + ":" + port);

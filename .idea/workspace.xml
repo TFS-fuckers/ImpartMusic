@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="8" />
+    <option name="CUSTOM_SCOPE_NAME" value="Module 'impartmusicclient'" />
+  </component>
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
       <artifact name="server:jar" />
@@ -10,12 +14,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4f7eee50-4bd7-4309-84ac-6fa778de16f1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/impartmusic/out/artifacts/impartmusicclient_jar/README.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/impartmusic/out/artifacts/impartmusicclient_jar/launch.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/impartmusic/out/artifacts/impartmusicclient_jar/launch.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/target/classes/com/tfs/logger/Logger.class" beforeDir="false" afterPath="$PROJECT_DIR$/server/target/classes/com/tfs/logger/Logger.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/target/classes/com/tfs/server/ClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/server/target/classes/com/tfs/server/ClientHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/target/test-classes/ServerTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/server/target/test-classes/ServerTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/impartmusic/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/impartmusic/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/impartmusic/src/main/java/com/tfs/client/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/impartmusic/src/main/java/com/tfs/client/Connection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/impartmusic/src/main/java/com/tfs/datapack/UserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/impartmusic/src/main/java/com/tfs/datapack/UserInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/impartmusicclient.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/ImpartMusic/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/server/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/server/main/resources/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/server.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/tfs/datapack/UserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/tfs/datapack/UserInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/tfs/server/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/tfs/server/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/tfs/server/ServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/tfs/server/ServerHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,26 +55,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-1.8&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/GithubPros/ImpartMusic&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.19655173&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "jdk.selected.JAVA_MODULE": "corretto-1.8",
+    "last_opened_file_path": "D:/GithubPros/ImpartMusic/server",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.19655173",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\GithubPros\ImpartMusic\impartmusic\lib" />
@@ -84,6 +97,8 @@
       <workItem from="1702983297960" duration="2888000" />
       <workItem from="1702986253050" duration="87000" />
       <workItem from="1702988873793" duration="8000" />
+      <workItem from="1703240381684" duration="181000" />
+      <workItem from="1703240835907" duration="316000" />
     </task>
     <servers />
   </component>

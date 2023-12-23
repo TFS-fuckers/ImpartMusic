@@ -13,6 +13,11 @@ public class UserInfo {
         return "User " + name + action;
     }
 
+    /**
+     * 构建一个用户登入登出信息
+     * @param name 用户名称
+     * @param action 行为
+     */
     public UserInfo(String name, String action) {
         this.name = name;
         this.action = action;
@@ -28,7 +33,7 @@ public class UserInfo {
 
     /**
      * 设置名称
-     * @param name
+     * @param name 名称
      */
     public void setName(String name){
         this.name = name;

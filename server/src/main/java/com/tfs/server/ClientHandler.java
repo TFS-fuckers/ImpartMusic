@@ -241,7 +241,7 @@ public class ClientHandler implements Runnable{
 
     /**
      * 命令用户断开连接(相对于强行中断的killConnection，向客户端说明了原因)
-     * @param killConnectionDatapack 断开连接的最后原因
+     * @param killConnectionCommand 断开连接的最后原因
      */
     public void askForKillConnection(ControlConnect killConnectionCommand){
         this.sendImmediateMessage(new Datapack("ControlConnect", killConnectionCommand));

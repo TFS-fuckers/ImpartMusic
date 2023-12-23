@@ -39,6 +39,11 @@ public class SimpleString {
         return null;
     }
 
+    /**
+     * 构建一个简单字符串数据包
+     * @param string 字符串内容
+     * @param encoding 编码格式
+     */
     public SimpleString(String string, String encoding) {
         this.data = string.getBytes(Charset.forName(encoding));
         this.encoding = encoding;

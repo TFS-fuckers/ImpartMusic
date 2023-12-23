@@ -23,6 +23,11 @@ public class AccessInstruction {
         return cause;
     }
 
+    /**
+     * 构建一个允许连接数据包
+     * @param result 是否允许（Granted/Denied）
+     * @param cause 原因
+     */
     public AccessInstruction(String result, String cause) {
         this.result = result;
         this.cause = cause;

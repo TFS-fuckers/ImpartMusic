@@ -6,6 +6,9 @@ import com.tfs.datapack.SimpleString;
 import com.tfs.logger.Logger;
 import com.tfs.modloader.ModLoader;
 
+/**
+ * 数据包解析器
+ */
 public class PackageResolver {
     /**
      * 解析数据包并行动

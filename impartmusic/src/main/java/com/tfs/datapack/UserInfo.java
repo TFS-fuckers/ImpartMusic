@@ -28,7 +28,7 @@ public class UserInfo {
 
     /**
      * 设置名称
-     * @param name
+     * @param name 名称
      */
     public void setName(String name){
         this.name = name;

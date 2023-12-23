@@ -14,14 +14,26 @@ import com.tfs.dxconfig.ImpartConfigReader;
 import com.tfs.logger.Logger;
 import com.tfs.modloader.ModLoader;
 
+/**
+ * 服务器实例
+ */
 public class Server {
     private static Server INSTANCE = null;
     private int syncMusicPlayerNoResponseCount = 0;
 
     private boolean syncReceiveTrigger = false;
-    public static final int AUTO_SYNC_SLEEP_TICK = ImpartConfigReader.instance().get("AUTO_SYNC_SLEEP_TICK").getAsInt();
+
+    /**
+     * 同步信息对标准用户没有回应的容许次数
+     */
     public static final int MAX_SYNC_NO_RESPONSE = ImpartConfigReader.instance().get("MAX_SYNC_NO_RESPONSE").getAsInt();
+    /**
+     * 在用户登入时向其发送的欢迎信息
+     */
     public static final String MES_TO_LOGIN_USER = ImpartConfigReader.instance().get("MES_TO_LOGIN_USER").getAsString();
+    /**
+     * 服务器所用的端口号
+     */
     public static final int PORT = ImpartConfigReader.instance().get("PORT").getAsInt();
     private int standardUserIndex = 0;
     private boolean musicListSyncTrigger = true;

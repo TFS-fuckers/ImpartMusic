@@ -14,6 +14,10 @@ public class ControlConnect {
         return cause;
     }
 
+    /**
+     * 生成一个通知客户端被踢出的数据包
+     * @param cause 原因
+     */
     public ControlConnect (String cause) {
         this.cause = cause;
     }

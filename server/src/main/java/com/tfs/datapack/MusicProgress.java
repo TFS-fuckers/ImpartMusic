@@ -10,13 +10,24 @@ public class MusicProgress {
     private double musicTime;
     private String musicStatus;
     private List<String> musicList;
-    
+
+    /**
+     * 构建一个音乐进度
+     * @param musicId 音乐id
+     * @param musicTime 音乐播放时间
+     * @param musicStatus 音乐播放状态
+     * @param musicList 音乐列表
+     */
     public MusicProgress(String musicId, double musicTime, String musicStatus, List<String> musicList) {
         this.musicId = musicId;
         this.musicTime = musicTime;
         this.musicStatus = musicStatus;
         this.musicList = musicList;
     }
+
+    /**
+     * 构建一个空音乐进度
+     */
     public MusicProgress(){}
     
     /**

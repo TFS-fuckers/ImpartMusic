@@ -4,12 +4,21 @@ import java.net.InetAddress;
 
 import com.tfs.exceptions.AccessToOfflineUserException;
 
+/**
+ * 用户类
+ */
 public class User {
     private String name;
     private InetAddress address;
     private ClientHandler handler;
     private boolean isConnected;
 
+    /**
+     * 构建一个用户
+     * @param name 用户名称
+     * @param address 用户IP地址
+     * @param handler 用户对应处理器
+     */
     public User(String name, InetAddress address, ClientHandler handler) {
         this.name = name;
         this.address = address;

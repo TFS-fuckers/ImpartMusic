@@ -32,6 +32,7 @@ public class ServerHandler {
     private boolean running = true;
     /**服务器已经连接的所有客户端 */
     public final List<User> connectedUsers = new ArrayList<>();
+    /**根据名称获取用户实例的哈希表 */
     public final Map<String, User> nameToUser = new HashMap<String, User>();
 
     /**服务器从所有客户端收到的所有数据包 */
@@ -260,14 +261,18 @@ public class ServerHandler {
     }
 
     /**
-     * 
-     * @param index
-     * @return
+     * 获取指定序号的用户
+     * @param index 序号
+     * @return 指定序号的用户
      */
     public User getUser(int index) {
         return this.connectedUsers.get(index);
     }
 
+    /**
+     * 获取用户数量
+     * @return 用户数量
+     */
     public int getUserNum() {
         if(connectedUsers == null)
             return 0;
